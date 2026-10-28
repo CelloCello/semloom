@@ -20,6 +20,18 @@ Keep the content in JSON, choose a presentation, and share the HTML. Reports wor
 
 Requires **Node.js 22 (22.14+) or 24**, and **pnpm 10.28.2** for a source checkout.
 
+If you have a compiled `.tgz` archive, install the global CLI:
+
+```sh
+npm install --global ./semloom-VERSION.tgz
+semloom --version
+semloom --help
+```
+
+You can then run `semloom` from your report directory, provided npm's global executable directory is on your PATH. Use the same active Node/npm installation when locating the package or registering its skill. Remove it with `npm uninstall --global semloom`. See the [installation guide](docs/releases.md#global-cli) for details. A public npm registry package is not currently provided; a compiled archive can be obtained from a GitHub Release when one is published.
+
+For a project-local installation, run `npm install ./semloom-VERSION.tgz` and use `npx --no-install semloom` instead. To build from source:
+
 ```sh
 git clone https://github.com/CelloCello/semloom.git
 cd semloom
@@ -30,7 +42,7 @@ pnpm semloom build examples/pr-daily.json --theme ocean --layout sidebar -o repo
 
 Open `reports/report.html` directly in a browser. It is a standalone file you can copy or share. The PR report contains illustrative data.
 
-Already have a compiled `.tgz` archive? Install it with `npm install ./semloom-VERSION.tgz`, then use `npx --no-install semloom`. See the [installation guide](docs/releases.md) for examples and package details. A public npm installation is not currently provided.
+The commands below use the global CLI. With a project-local package, replace `semloom` with `npx --no-install semloom`; at the source checkout root, use `pnpm semloom`.
 
 ## Write your first report
 
@@ -55,8 +67,8 @@ Save this as `report.json`:
 Validate it and build the HTML:
 
 ```sh
-pnpm semloom validate report.json
-pnpm semloom build report.json -o reports/project-update.html --explain
+semloom validate report.json
+semloom build report.json -o reports/project-update.html --explain
 ```
 
 All content strings are plain text. Source references belong to blocks; the compiler checks their relationships but does not verify factual claims or calculate metrics. See the [data contract](docs/semantic-schema.md) for supported fields and limits.
@@ -64,8 +76,8 @@ All content strings are plain text. Source references belong to blocks; the comp
 ## Choose a look
 
 ```sh
-pnpm semloom build report.json --theme midnight --layout sidebar -o reports/project-update.html
-pnpm semloom themes list
+semloom build report.json --theme midnight --layout sidebar -o reports/project-update.html
+semloom themes list
 ```
 
 | Theme       | Character                                             |
@@ -87,16 +99,18 @@ From a checkout, run `pnpm demo:themes` and open `reports/themes/index.html` to 
 
 Use the [bundled Semloom skill](skills/semloom/SKILL.md) to guide an agent through Schema discovery, semantic authoring, validation and rebuilding after edits. Follow the [skill installation guide](docs/skills.md) to register it with your agent; installing the package does not register the skill automatically.
 
-To export a clean Schema JSON file from a checkout:
+To export a clean Schema JSON file with the global CLI:
 
 ```sh
 mkdir -p reports
-node dist/cli/main.js schema > reports/semantic.schema.json
+semloom schema > reports/semantic.schema.json
 ```
 
-Use the same `--config` for `schema`, `validate` and `build` when loading local Plugins. The [Agent guide](docs/agent-guide.md) covers content, sources and configuration.
+For a project-local package, use `npx --no-install semloom schema`; from a checkout, use `node dist/cli/main.js schema` because `pnpm semloom` can add banners to stdout. Use the same `--config` for `schema`, `validate` and `build` when loading local Plugins. The [Agent guide](docs/agent-guide.md) covers content, sources and configuration.
 
 ## Optional interactive reports
+
+From a source checkout, try the bundled comparison example:
 
 ```sh
 pnpm semloom build examples/comparison.json --interactive -o reports/interactive.html
@@ -106,7 +120,7 @@ Interactive mode is off by default. When enabled, supported browser-enabled comp
 
 ## JavaScript API
 
-Use the ESM API from a built checkout or installed package:
+Use the ESM API from a built checkout or a project-local package. A global CLI installation does not make `import 'semloom'` available to arbitrary project files:
 
 ```js
 import { readFile, writeFile } from 'node:fs/promises';

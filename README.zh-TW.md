@@ -18,7 +18,19 @@ Semloom 將語意 JSON 編譯成一份獨立的 HTML 報告，適合研究比較
 
 ## 快速開始
 
-從原始碼使用，需要 **Node.js 22（22.14 以上）或 24**，以及 **pnpm 10.28.2**。
+需要 **Node.js 22（22.14 以上）或 24**；從原始碼使用還需要 **pnpm 10.28.2**。
+
+如果已取得編譯完成的 `.tgz`，可安裝全域 CLI：
+
+```sh
+npm install --global ./semloom-VERSION.tgz
+semloom --version
+semloom --help
+```
+
+只要 npm 的全域執行檔目錄已在 PATH 中，就能在報告目錄直接執行 `semloom`。查找套件位置與註冊 skill 時，請使用同一套啟用中的 Node/npm；移除時執行 `npm uninstall --global semloom`。詳細方式請見[安裝指南](docs/releases.md#global-cli)。目前未提供公開的 npm registry 套件；GitHub Release 發布後，可從中取得編譯好的封裝。
+
+若只想安裝在單一專案，執行 `npm install ./semloom-VERSION.tgz`，並改用 `npx --no-install semloom`。從原始碼使用則執行：
 
 ```sh
 git clone https://github.com/CelloCello/semloom.git
@@ -30,7 +42,7 @@ pnpm semloom build examples/pr-daily.json --theme ocean --layout sidebar -o repo
 
 直接用瀏覽器開啟 `reports/report.html`。這是一份可以複製或分享的獨立檔案；PR 報告中的資料為示意資料。
 
-如果已取得編譯完成的 `.tgz`，可用 `npm install ./semloom-VERSION.tgz` 安裝，再執行 `npx --no-install semloom`。詳細方式請見[安裝指南](docs/releases.md)。目前未提供公開的 npm 套件安裝方式。
+以下指令使用全域 CLI。使用專案本機套件時，將 `semloom` 換成 `npx --no-install semloom`；在原始碼 checkout 根目錄則使用 `pnpm semloom`。
 
 ## 撰寫第一份報告
 
@@ -55,8 +67,8 @@ pnpm semloom build examples/pr-daily.json --theme ocean --layout sidebar -o repo
 驗證資料並生成 HTML：
 
 ```sh
-pnpm semloom validate report.json
-pnpm semloom build report.json -o reports/project-update.html --explain
+semloom validate report.json
+semloom build report.json -o reports/project-update.html --explain
 ```
 
 所有內容字串都視為純文字。來源引用屬於區塊，編譯器會檢查引用關係，但不會查證事實或替作者計算指標。支援欄位與限制請見[資料契約](docs/semantic-schema.md)。
@@ -64,8 +76,8 @@ pnpm semloom build report.json -o reports/project-update.html --explain
 ## 選擇外觀
 
 ```sh
-pnpm semloom build report.json --theme midnight --layout sidebar -o reports/project-update.html
-pnpm semloom themes list
+semloom build report.json --theme midnight --layout sidebar -o reports/project-update.html
+semloom themes list
 ```
 
 | Theme       | 風格                                         |
@@ -87,16 +99,18 @@ Layout 可獨立選擇：`document` 將目錄放在內容上方；`sidebar` 在�
 
 內附的 [Semloom skill](skills/semloom/SKILL.md) 可引導 Agent 讀取 Schema、撰寫語意資料、驗證及修改後重建。請依 [skill 安裝說明](docs/skills.md) 註冊到所用的 Agent；安裝套件不會自動完成 skill 註冊。
 
-從 checkout 匯出純 JSON 的 Schema：
+透過全域 CLI 匯出純 JSON 的 Schema：
 
 ```sh
 mkdir -p reports
-node dist/cli/main.js schema > reports/semantic.schema.json
+semloom schema > reports/semantic.schema.json
 ```
 
-使用本機 Plugin 時，`schema`、`validate` 與 `build` 應使用同一份 `--config`。[Agent 指南](docs/agent-guide.md) 說明內容、來源與設定的使用方式。
+專案本機套件請使用 `npx --no-install semloom schema`；在 checkout 中則使用 `node dist/cli/main.js schema`，避免 `pnpm semloom` 將提示文字混入 stdout。使用本機 Plugin 時，`schema`、`validate` 與 `build` 應使用同一份 `--config`。[Agent 指南](docs/agent-guide.md) 說明內容、來源與設定的使用方式。
 
 ## 可選的互動報告
+
+在原始碼 checkout 中，可用內附的比較範例試用：
 
 ```sh
 pnpm semloom build examples/comparison.json --interactive -o reports/interactive.html
@@ -106,7 +120,7 @@ pnpm semloom build examples/comparison.json --interactive -o reports/interactive
 
 ## JavaScript API
 
-已編譯的 checkout 與安裝完成的套件都能使用 ESM API：
+已編譯的 checkout 與專案本機套件都能使用 ESM API。只安裝全域 CLI，不會讓其他專案檔案直接解析 `import 'semloom'`：
 
 ```js
 import { readFile, writeFile } from 'node:fs/promises';

@@ -29,6 +29,28 @@ The package allowlist includes runtime JS, declarations, both READMEs, CHANGELOG
 
 ## Install an archive
 
+### Global CLI
+
+Install a compiled archive with npm:
+
+```sh
+npm install --global ./semloom-VERSION.tgz
+semloom --version
+semloom --help
+```
+
+Then run `semloom validate report.json` or `semloom build report.json -o report.html` from the report directory. No source checkout, pnpm or TypeScript is needed. npm's global executable directory must be on PATH; on macOS/Linux this is the `bin` directory beneath `npm prefix --global`. Use the same active Node/npm installation when locating, updating or uninstalling the CLI. Uninstall with `npm uninstall --global semloom`.
+
+`npm root --global` locates the installed package and its docs/examples/skill. For example, on macOS/Linux:
+
+```sh
+semloom build "$(npm root --global)/semloom/examples/pr-daily.json" -o report.html
+```
+
+A global CLI does not make the library available for imports in arbitrary projects. Use a project-local installation for library integration or custom Plugins that import `semloom`. Bundled Plugin modules can remain in the global package, with their config passed by absolute path; see the [Agent guide](agent-guide.md#choose-the-cli).
+
+### Project-local package
+
 In a separate report project:
 
 ```sh
@@ -48,7 +70,7 @@ npx --no-install semloom build examples/comparison-plugin/report.json --config e
 
 For coding Agent use, follow [skill installation](skills.md). CLI installation and skill registration are separate steps; keep the installed docs/examples with the skill so its references resolve.
 
-Public library entries are ESM (`semloom`, `semloom/browser`) with declaration files. Compiler/data types from `semloom` work in Node-only TypeScript projects without DOM libs. Import `BrowserAdapter`, `BrowserContext` and `BrowserView` from `semloom/browser` with DOM types enabled. Relative Plugin imports resolve from their declaring module.
+Public library entries are ESM (`semloom`, `semloom/browser`) with declaration files. Install them as a project dependency. Compiler/data types from `semloom` work in Node-only TypeScript projects without DOM libs. Import `BrowserAdapter`, `BrowserContext` and `BrowserView` from `semloom/browser` with DOM types enabled. Relative Plugin imports resolve from their declaring module.
 
 Dependencies may need downloading during installation. Compilation and report reading need no network or LLM API key afterward. esbuild uses a platform-specific binary distributed through optional dependencies; do not omit optional dependencies.
 
@@ -58,7 +80,9 @@ Dependencies may need downloading during installation. Compilation and report re
 pnpm test:package
 ```
 
-This creates a real archive, installs it into a temporary consumer with install scripts disabled, checks the CLI/public exports/types and relative documentation links, and compiles static, interactive and Plugin examples using runtime dependencies. It also verifies [skill references and workflows](skills.md#verification). TypeScript declaration checks use the checkout's compiler without installing development dependencies in the consumer.
+This creates a real archive and installs it into a temporary project with install scripts disabled. It checks the CLI/public exports/types and relative documentation links, compiles static/interactive/Plugin examples, and verifies [skill references and workflows](skills.md#verification). TypeScript declaration checks use the checkout's compiler without installing development dependencies in the consumer.
+
+A separate global-install test uses the same archive with npm's normal install lifecycle, a temporary prefix, separate user/global config files and cache, and a child-process PATH. It invokes bare `semloom` from a report project with no local package, exercises Schema/validation/build/edit/Plugin/skill workflows, then uninstalls from that prefix. It checks real npm config contents and the real global package list before and after. No user-global package, shell startup file or persistent PATH setting is changed. These checks use only runtime dependencies in the installed packages.
 
 Manifests, checksums, logs and per-runtime receipts are written to ignored `reports/package/`. To verify with another installed Node executable:
 

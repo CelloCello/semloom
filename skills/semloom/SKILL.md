@@ -13,12 +13,15 @@ Resolve this skill directory's filesystem real path before following relative li
 
 Read the [Agent guide](../../docs/agent-guide.md) for the content contract and workflow. Use the CLI from the same checkout or package as these references; check `--version` before starting. Keep the working directory at the user's report project so input, output and config paths resolve there.
 
-| Mode                  | CLI entry                                                                                                                                                                                                                                |
-| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Built source checkout | `node /absolute/path/to/semloom/dist/cli/main.js ...` works from the report project. At the checkout root, `pnpm semloom ...` is also available.                                                                                         |
-| Installed package     | First confirm `node_modules/semloom/package.json` exists in the report project, then use `npx --no-install semloom ...` there. For an unambiguous entry, use `node /absolute/path/to/project/node_modules/semloom/dist/cli/main.js ...`. |
+| Mode                  | CLI entry                                                                                                                                                                                                                                             |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Built source checkout | `node /absolute/path/to/semloom/dist/cli/main.js ...` works from the report project. At the checkout root, `pnpm semloom ...` is also available.                                                                                                      |
+| Project-local package | First confirm `node_modules/semloom/package.json` exists in the report project, then use `npx --no-install semloom ...` there. For an unambiguous entry, use `node /absolute/path/to/project/node_modules/semloom/dist/cli/main.js ...`.              |
+| Global CLI            | Confirm `semloom` resolves on PATH and use `semloom ...` from the report project. With the same active Node/npm prefix, `npm root --global` locates the package at `<root>/semloom`; its skill, docs and examples must match the selected executable. |
 
 If using a registered skill from a different checkout/package, reconcile the reference root and CLI before proceeding. If the CLI is missing, use the [installation guide](../../docs/releases.md) for the chosen route; a checkout needs dependencies and `pnpm build`, whereas a compiled tarball already contains `dist/`. Do not let `npx` fetch an unrelated package as a fallback.
+
+With multiple Node versions or npm prefixes, check the actual CLI and skill target rather than assuming `npm root --global` describes the executable on PATH. A global CLI does not provide `import 'semloom'` to unrelated project files. For library use or Plugins with that import, install a project dependency or keep the Plugin modules in their original package location; see the [Agent guide](../../docs/agent-guide.md). Report authoring does not require changing global npm settings or shell startup files.
 
 ## Generate or update a report
 

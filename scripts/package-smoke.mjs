@@ -16,6 +16,7 @@ import { resolve, join, dirname, delimiter, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { createHash } from 'node:crypto';
+import { smokeGlobalPackage } from './global-package-smoke.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const { values } = parseArgs({
@@ -40,10 +41,10 @@ for (const binary of runtimes) {
   assert.equal(version.status, 0, 'Node executable must run.');
   const label = version.stdout.trim();
   const log = [];
-  function run(command, args, cwd) {
+  function run(command, args, cwd, commandEnv = env) {
     const result = spawnSync(command, args, {
       cwd,
-      env,
+      env: commandEnv,
       encoding: 'utf8',
       maxBuffer: 8_000_000,
     });
@@ -432,6 +433,13 @@ for (const binary of runtimes) {
         consumer,
       );
     }
+    const globalInstall = await smokeGlobalPackage({
+      archive,
+      binary,
+      env,
+      run,
+      version: manifest.version,
+    });
     const outputs = {};
     for (const name of [
       'comparison',
@@ -462,9 +470,10 @@ for (const binary of runtimes) {
       commands,
       outputs,
       skillWorkflows,
+      globalInstall,
       license: installedManifest.license ?? null,
       private: installedManifest.private ?? false,
-      note: 'No registry publication. Installation ignores lifecycle scripts and uses only runtime dependencies.',
+      note: 'No registry publication. Local install ignores lifecycle scripts; isolated global install uses the normal lifecycle. Both use runtime dependencies only.',
     };
     await writeFile(
       join(destination, `smoke-${label}.json`),

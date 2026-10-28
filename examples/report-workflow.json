@@ -38,12 +38,12 @@
     },
     {
       "id": "entry-points",
-      "title": "兩種使用入口",
+      "title": "三種使用入口",
       "blocks": [
         {
           "id": "usage-modes",
           "kind": "comparison",
-          "subject": "checkout 與已安裝套件的工作方式",
+          "subject": "checkout、專案本機套件與全域 CLI 的工作方式",
           "fields": [
             { "key": "prerequisite", "label": "使用前提" },
             { "key": "invocation", "label": "CLI 入口" },
@@ -61,12 +61,21 @@
               }
             },
             {
-              "name": "已安裝 compiled tarball",
+              "name": "專案本機套件",
               "attributes": {
                 "prerequisite": "報告專案已安裝編譯完成的 Semloom 套件。",
                 "invocation": "先確認本機套件存在，再使用 npx --no-install semloom。",
                 "schema": "使用已安裝的本機 CLI 匯出 Schema。",
                 "references": "讀取同一份安裝套件的指南與範例。"
+              }
+            },
+            {
+              "name": "全域 CLI",
+              "attributes": {
+                "prerequisite": "編譯完成的套件已全域安裝，執行檔目錄已在 PATH 中。",
+                "invocation": "從報告目錄直接執行 semloom；程式庫整合仍需專案本機套件。",
+                "schema": "使用 semloom schema 匯出純 JSON。",
+                "references": "以同一套 Node/npm 的 npm root --global 找到套件，使用其中的指南、範例與 skill。"
               }
             }
           ],
