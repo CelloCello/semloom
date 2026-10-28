@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "1.0",
+  "title": "本機 Plugin 示範（示意資料）",
+  "sources": [
+    { "id": "sample", "title": "示意資料，用於驗證擴充介面與引用呈現" }
+  ],
+  "sections": [
+    {
+      "id": "demo",
+      "title": "擴充語意與呈現",
+      "blocks": [
+        {
+          "id": "note",
+          "kind": "example.note",
+          "title": "同一份 Registry",
+          "text": "此補充說明由本機 Plugin 定義，引用由 Core 顯示。",
+          "sourceIds": ["sample"]
+        },
+        {
+          "id": "tools",
+          "kind": "comparison",
+          "subject": "兩個示意方案",
+          "sourceIds": ["sample"],
+          "fields": [
+            { "key": "mode", "label": "工作模式" },
+            { "key": "cost", "label": "示意成本", "unit": "點" }
+          ],
+          "items": [
+            { "name": "方案 A", "attributes": { "mode": "同步", "cost": 0 } },
+            { "name": "方案 B", "attributes": { "mode": "非同步", "cost": 2 } }
+          ]
+        }
+      ]
+    }
+  ]
+}

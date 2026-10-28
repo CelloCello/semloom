@@ -1,0 +1,26 @@
+[
+  {
+    "id": "compact",
+    "input": "benchmarks/scenarios/compact.json",
+    "comparisonId": "choices",
+    "expectedAuto": "comparison.cards",
+    "editedTitle": "排程方案：交接補充（示意）",
+    "appendText": "更新：下一位接手者需先確認實際使用情境。"
+  },
+  {
+    "id": "pr-daily",
+    "input": "examples/pr-daily.json",
+    "comparisonId": "pull-requests",
+    "expectedAuto": "comparison.table",
+    "editedTitle": "PR 日報：補充交接提醒（示意）",
+    "appendText": "更新：本報告只更新交接文字，PR 狀態與數值維持原快照。"
+  },
+  {
+    "id": "wide",
+    "input": "benchmarks/scenarios/wide.json",
+    "comparisonId": "matrix",
+    "expectedAuto": "comparison.table",
+    "editedTitle": "多欄資料：補充閱讀提醒（示意）",
+    "appendText": "更新：窄螢幕請在表格區域內水平捲動，所有欄位仍須保留。"
+  }
+]

@@ -1,0 +1,46 @@
+name: Verify source and package
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        node: ['22.14.0', '24.x']
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+      - uses: pnpm/action-setup@v6
+        with:
+          run_install: false
+      - run: pnpm install --frozen-lockfile
+      - run: node scripts/playwright.mjs install --with-deps chromium
+      - run: pnpm check
+      - run: pnpm test:package
+      - run: pnpm benchmark
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: evidence-${{ matrix.os }}-node-${{ matrix.node }}
+          path: |
+            reports/package/
+            reports/benchmark/results.json
+            test-results/
+          retention-days: 14
+
+# This workflow verifies and retains artifacts; it never publishes a registry
+# package, creates a tag/Release, uploads Release assets or changes visibility.

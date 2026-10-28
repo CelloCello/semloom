@@ -1,0 +1,5 @@
+{
+  "theme": "minimal",
+  "layout": "document",
+  "overrides": { "languages": "comparison.cards" }
+}

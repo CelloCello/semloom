@@ -1,0 +1,33 @@
+---
+name: semloom
+description: Create or update standalone offline HTML reports with Semloom from supplied facts and semantic JSON. Use when Semloom is requested or an existing Semloom report needs editing; not for general website development or other output formats.
+---
+
+# Semloom reports
+
+Produce semantic JSON and a compiled HTML report while preserving the user's facts, evidence and requested presentation.
+
+## Locate the matching tool and references
+
+Resolve this skill directory's filesystem real path before following relative links, including when loaded through a symlink. The Semloom checkout or installed package root is two directories above that physical directory. Keep its `docs/` and `examples/` alongside `skills/`; copying only this file breaks the references.
+
+Read the [Agent guide](../../docs/agent-guide.md) for the content contract and workflow. Use the CLI from the same checkout or package as these references; check `--version` before starting. Keep the working directory at the user's report project so input, output and config paths resolve there.
+
+| Mode                  | CLI entry                                                                                                                                                                                                                                |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Built source checkout | `node /absolute/path/to/semloom/dist/cli/main.js ...` works from the report project. At the checkout root, `pnpm semloom ...` is also available.                                                                                         |
+| Installed package     | First confirm `node_modules/semloom/package.json` exists in the report project, then use `npx --no-install semloom ...` there. For an unambiguous entry, use `node /absolute/path/to/project/node_modules/semloom/dist/cli/main.js ...`. |
+
+If using a registered skill from a different checkout/package, reconcile the reference root and CLI before proceeding. If the CLI is missing, use the [installation guide](../../docs/releases.md) for the chosen route; a checkout needs dependencies and `pnpm build`, whereas a compiled tarball already contains `dist/`. Do not let `npx` fetch an unrelated package as a fallback.
+
+## Generate or update a report
+
+1. Read the existing document and presentation config, or gather the supplied facts for a new report. Use [comparison](../../examples/comparison.json) or [PR handoff](../../examples/pr-daily.json) only as structural examples; their facts are not the user's facts.
+2. Run `schema` through the chosen CLI and read its effective JSON Schema. When a trusted local Plugin config is selected, pass the same `--config path/to/config.json` to `schema`, `validate` and `build`; use `plugins list` with that config when extension details matter. Do not substitute a static kind/field catalog. Saving Schema stdout requires the direct Node entry or installed CLI: `pnpm semloom` can add package-manager banners.
+3. Write or edit semantic JSON according to that Schema and the Agent guide. Keep content plain text, use stable section/block IDs, preserve field order and block-level references, and never invent evidence. Fix validation diagnostics at their file and JSON-pointer locations without dropping supplied facts to satisfy the Schema.
+4. Run `validate report.json` and then `build report.json -o reports/report.html --explain`, with the same config. Explain goes to stderr and describes the actual initial selection. For edits, change only the relevant semantic values/config and rebuild.
+5. Inspect the generated report for the requested change, content fidelity, references and presentation. When browser tooling is available, open the actual HTML and check the relevant behavior; otherwise disclose that visual verification was not performed. Return the JSON/config and HTML paths and the checks actually run.
+
+Use [data contracts](../../docs/semantic-schema.md) for semantics beyond structural validation, [CLI recipes](../../docs/cli-cookbook.md) for command options, and [Plugin authoring](../../docs/plugin-authoring.md) only when extending kinds or Variants. Local Plugin modules execute trusted code: use the selected config rather than discovering or installing Plugins automatically.
+
+Theme controls appearance, Layout controls the page arrangement, and compatible Variant overrides control individual block presentation. Follow the requested presentation using [Themes and Layouts](../../docs/themes.md). Enable [interactive switching](../../docs/interactive.md) only when requested or needed by the reader; it defaults to off. Do not generate bespoke CSS/DOM to work around a data validation error. Compilation does not calculate metrics or verify factual claims, and needs no LLM API key.

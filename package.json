@@ -1,0 +1,72 @@
+{
+  "name": "semloom",
+  "version": "0.1.0-alpha.1",
+  "description": "Compile semantic documents into standalone, offline HTML reports",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CelloCello/semloom.git"
+  },
+  "bugs": {
+    "url": "https://github.com/CelloCello/semloom/issues"
+  },
+  "homepage": "https://github.com/CelloCello/semloom#readme",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "packageManager": "pnpm@10.28.2",
+  "engines": {
+    "node": "^22.14.0 || ^24.0.0"
+  },
+  "bin": {
+    "semloom": "dist/cli/main.js"
+  },
+  "exports": {
+    "./browser": {
+      "types": "./dist/browser/index.d.ts",
+      "import": "./dist/browser/index.js"
+    },
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist/**/*.js",
+    "dist/**/*.d.ts",
+    "README.md",
+    "README.zh-TW.md",
+    "CHANGELOG.md",
+    "docs",
+    "examples",
+    "skills/semloom"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "prepack": "node scripts/build.mjs --package",
+    "test:package": "node scripts/package-smoke.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src tests scripts playwright.config.ts",
+    "format": "prettier --write src tests scripts docs skills examples benchmarks/scenarios .github/workflows *.json *.ts *.mjs *.yaml *.md",
+    "format:check": "prettier --check src tests scripts docs skills examples benchmarks/scenarios .github/workflows *.json *.ts *.mjs *.yaml *.md",
+    "test": "pnpm build && node --test tests/*.test.mjs",
+    "test:e2e": "pnpm build && node scripts/playwright.mjs test",
+    "browsers:install": "node scripts/playwright.mjs install chromium",
+    "semloom": "node dist/cli/main.js",
+    "demo": "pnpm build && pnpm semloom build examples/comparison.json -o reports/comparison.html --explain",
+    "demo:themes": "pnpm build && node scripts/demo-themes.mjs",
+    "benchmark": "pnpm build && node scripts/benchmark.mjs",
+    "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test && pnpm test:e2e"
+  },
+  "dependencies": {
+    "ajv": "8.20.0",
+    "esbuild": "0.28.2"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.0",
+    "@types/node": "22.20.5",
+    "eslint": "10.13.0",
+    "prettier": "3.9.10",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.1"
+  }
+}

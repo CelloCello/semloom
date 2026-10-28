@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "1.0",
+  "title": "兩種排程方案（示意資料）",
+  "sources": [
+    {
+      "id": "fixture",
+      "title": "固定測試資料；數字和方案均為虛構，不代表實際效能或建議"
+    }
+  ],
+  "sections": [
+    {
+      "id": "options",
+      "title": "方案比較",
+      "blocks": [
+        {
+          "id": "context",
+          "kind": "prose",
+          "text": "此樣本只驗證兩個短欄位的呈現，不可用於判斷真實排程效能。",
+          "sourceIds": ["fixture"]
+        },
+        {
+          "id": "choices",
+          "kind": "comparison",
+          "subject": "短欄位與零值",
+          "fields": [
+            { "key": "delay", "label": "提供的延遲", "unit": "ms" },
+            { "key": "retry", "label": "是否重試" }
+          ],
+          "items": [
+            {
+              "name": "批次方案",
+              "attributes": { "delay": 0, "retry": false }
+            },
+            { "name": "即時方案", "attributes": { "delay": 1, "retry": true } }
+          ],
+          "sourceIds": ["fixture"]
+        }
+      ]
+    }
+  ]
+}

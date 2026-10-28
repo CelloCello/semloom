@@ -1,0 +1,4 @@
+{
+  "plugins": ["./index.mjs"],
+  "overrides": { "tools": "example.comparison.rows" }
+}

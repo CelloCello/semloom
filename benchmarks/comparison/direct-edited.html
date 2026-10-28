@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none';style-src 'unsafe-inline';base-uri 'none';form-action 'none'">
+<title>JSON Schema 與 JTD：契約選型筆記</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#faf9f6;color:#242923;font:16px/1.75 system-ui,-apple-system,"PingFang TC",sans-serif}main{max-width:76rem;margin:auto;padding:3rem}h1{font-size:2.5rem;line-height:1.25;margin:0 0 2rem}h2{margin-top:2.5rem}p{max-width:72ch;white-space:pre-wrap}a{color:#285744;text-underline-offset:.2em;overflow-wrap:anywhere}a:focus-visible,[tabindex]:focus-visible{outline:3px solid #285744;outline-offset:4px}nav{border-block:1px solid #d8ddd4;padding:1rem}.scroll{max-width:100%;overflow:auto}table{width:100%;border-collapse:collapse;background:white}caption{text-align:left;font-weight:700;margin-bottom:1rem}th,td{padding:1rem;border:1px solid #d8ddd4;text-align:left;vertical-align:top;min-width:10rem;white-space:pre-wrap;overflow-wrap:anywhere}thead{background:#eef1eb}.citations{font-size:.875rem;color:#586255}.sources li{margin:.7rem 0}h1,h2,h3{overflow-wrap:anywhere}@media(max-width:600px){main{padding:1.5rem 1rem}h1{font-size:2rem}}@media print{body{background:white;font-size:10pt}main{max-width:none;padding:0}nav{display:none}.scroll{overflow:visible}table{table-layout:fixed;font-size:8pt}th,td{min-width:0;padding:.3rem}thead{display:table-header-group}.sources a::after{content:" (" attr(href) ")"}}
+</style>
+</head>
+<body><main>
+<h1>JSON Schema 與 JTD：契約選型筆記</h1>
+<nav aria-label="目錄"><ul><li><a href="#summary">選擇依據</a></li><li><a href="#comparison">能力比較</a><ul><li><a href="#limits">閱讀限制</a></li></ul></li></ul></nav>
+<section aria-labelledby="summary"><h2 id="summary">選擇依據</h2>
+<p>本研究供 Semloom 的資料契約選型使用。
+需要一般 union 與長度、範圍等驗證限制時，JSON Schema 較直接；若主要目標是跨語言型別與 tagged union，JTD 值得評估。這是依文件作出的選型判斷，不是速度測試結論。
+下一步：以實際輸入測試驗證錯誤訊息。</p>
+<div class="citations">本區塊來源<ul><li><a href="#source-languages">Ajv：Choosing schema language</a></li><li><a href="#source-typescript">Ajv：Using with TypeScript</a></li></ul></div>
+</section>
+<section aria-labelledby="comparison"><h2 id="comparison">能力比較</h2>
+<div class="scroll" role="region" aria-label="資料形狀與驗證能力" tabindex="0"><table>
+<caption>資料形狀與驗證能力</caption><thead><tr><th scope="col">對象</th><th scope="col">建模方式</th><th scope="col">Union 支援</th><th scope="col">限制表達</th><th scope="col">主要取捨</th></tr></thead>
+<tbody><tr><th scope="row">JSON Schema</th><td>以驗證限制定義可接受的資料</td><td>支援 untagged union 與布林組合</td><td>可描述數值範圍、字串長度與集合大小</td><td>表達力較完整，規格與組合規則也較複雜</td></tr>
+<tr><th scope="row">JSON Type Definition</th><td>以固定 schema forms 定義資料形狀</td><td>支援 tagged union；未標準化 untagged union</td><td>限制能力較少，聚焦型別與資料形狀</td><td>模型較簡單，適合型別產生、parser 與 serializer</td></tr></tbody>
+</table></div>
+<div class="citations">本區塊來源<ul><li><a href="#source-languages">Ajv：Choosing schema language</a></li></ul></div>
+<section aria-labelledby="limits"><h3 id="limits">閱讀限制</h3><p>來源關聯到整個區塊，不代表每個儲存格都有獨立證據映射。外部連結只在讀者主動點擊時開啟；報告本身不需要網路。</p></section>
+</section>
+<section class="sources" aria-labelledby="sources"><h2 id="sources">來源</h2><ol><li id="source-languages"><a href="https://ajv.js.org/guide/schema-language.html">Ajv：Choosing schema language</a></li><li id="source-typescript"><a href="https://ajv.js.org/guide/typescript.html">Ajv：Using with TypeScript</a></li></ol></section>
+</main></body></html>

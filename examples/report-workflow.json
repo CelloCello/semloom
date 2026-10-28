@@ -1,0 +1,128 @@
+{
+  "schemaVersion": "1.0",
+  "title": "從語意資料到 HTML：報告撰寫流程",
+  "locale": "zh-TW",
+  "sources": [
+    {
+      "id": "authoring-guide",
+      "title": "Semloom 專案指南：docs/agent-guide.md"
+    },
+    {
+      "id": "semantic-contract",
+      "title": "Semloom 語意資料契約：docs/semantic-schema.md"
+    },
+    {
+      "id": "installation-guide",
+      "title": "Semloom 套件與 skill 安裝指南：docs/releases.md、docs/skills.md"
+    }
+  ],
+  "sections": [
+    {
+      "id": "overview",
+      "title": "範例用途",
+      "blocks": [
+        {
+          "id": "purpose",
+          "kind": "prose",
+          "text": "這是一份流程說明型報告範例，展示如何以純文字、比較、步驟與區塊來源，描述語意資料的撰寫、驗證與重建流程。內容整理自專案指南，供作者或 coding Agent 參考。",
+          "sourceIds": ["authoring-guide", "semantic-contract"]
+        },
+        {
+          "id": "writing-notes",
+          "kind": "insight",
+          "level": "info",
+          "text": "流程中的操作是使用說明，並非特定環境的驗證紀錄。結構與語意檢查不會代替事實查證或實際成品檢查。",
+          "sourceIds": ["authoring-guide", "semantic-contract"]
+        }
+      ]
+    },
+    {
+      "id": "entry-points",
+      "title": "兩種使用入口",
+      "blocks": [
+        {
+          "id": "usage-modes",
+          "kind": "comparison",
+          "subject": "checkout 與已安裝套件的工作方式",
+          "fields": [
+            { "key": "prerequisite", "label": "使用前提" },
+            { "key": "invocation", "label": "CLI 入口" },
+            { "key": "schema", "label": "有效 Schema" },
+            { "key": "references", "label": "指南與範例來源" }
+          ],
+          "items": [
+            {
+              "name": "Source checkout",
+              "attributes": {
+                "prerequisite": "原始碼與相依套件已準備好，CLI 已完成編譯。",
+                "invocation": "在 checkout 根目錄使用 pnpm semloom；跨專案時使用編譯後 CLI 的絕對路徑。",
+                "schema": "以直接 Node 入口匯出 Schema，避免套件管理器的訊息混入 JSON。",
+                "references": "讀取同一份 checkout 的指南與範例。"
+              }
+            },
+            {
+              "name": "已安裝 compiled tarball",
+              "attributes": {
+                "prerequisite": "報告專案已安裝編譯完成的 Semloom 套件。",
+                "invocation": "先確認本機套件存在，再使用 npx --no-install semloom。",
+                "schema": "使用已安裝的本機 CLI 匯出 Schema。",
+                "references": "讀取同一份安裝套件的指南與範例。"
+              }
+            }
+          ],
+          "sourceIds": ["authoring-guide", "installation-guide"]
+        }
+      ]
+    },
+    {
+      "id": "workflow",
+      "title": "撰寫、驗證與重建",
+      "blocks": [
+        {
+          "id": "report-workflow",
+          "kind": "steps",
+          "title": "從已提供的資訊產生可閱讀的報告",
+          "items": [
+            {
+              "title": "整理事實與來源",
+              "description": "先整理讀者需要知道的資訊，區分已提供的事實、作者判斷與尚未提供的資料。"
+            },
+            {
+              "title": "讀取有效契約",
+              "description": "確認 CLI 與指南來自同一份安裝並匯出 Schema。若有可信任的本機 Plugin，Schema、validate 與 build 都使用同一份 config。"
+            },
+            {
+              "title": "撰寫語意 JSON",
+              "description": "內容維持純文字，保留欄位與項目順序。為需要穩定連結或 Override 的節點設定明確 ID，並在區塊引用已提供的來源。"
+            },
+            {
+              "title": "驗證資料",
+              "description": "執行 validate，依檔名與 JSON-pointer 修正錯誤；修正時保留作者提供的事實，避免為了通過驗證而悄悄刪除資料。"
+            },
+            {
+              "title": "編譯並閱讀成品",
+              "description": "用相同 config 執行 build 與 Explain，檢查初始 Variant 選擇及實際 HTML，確認內容、來源與所需呈現。"
+            },
+            {
+              "title": "修改後重建",
+              "description": "只修改相關語意資料或呈現設定，再次驗證與編譯；確認其他事實、順序、來源與穩定 ID 仍保留。"
+            }
+          ],
+          "sourceIds": ["authoring-guide", "semantic-contract"]
+        }
+      ]
+    },
+    {
+      "id": "boundaries",
+      "title": "呈現設定與驗證邊界",
+      "blocks": [
+        {
+          "id": "scope",
+          "kind": "prose",
+          "text": "Theme 控制字體、色彩與閱讀節奏，Layout 控制整頁排列。兩者與語意資料分開設定，調整呈現後仍應保留內容與來源。\n來源關聯到整個區塊，不表示每個句子或儲存格都有獨立證據映射。編譯器不會查證作者的結論，也不會代替作者計算指標。",
+          "sourceIds": ["authoring-guide", "semantic-contract"]
+        }
+      ]
+    }
+  ]
+}

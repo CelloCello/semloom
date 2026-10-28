@@ -1,0 +1,105 @@
+{
+  "schemaVersion": "1.0",
+  "title": "Semloom 工作報告（示意資料）",
+  "locale": "zh-TW",
+  "sources": [
+    { "id": "example", "title": "範例資料，僅展示呈現方式與資料保真契約" }
+  ],
+  "sections": [
+    {
+      "id": "overview",
+      "title": "工作摘要",
+      "blocks": [
+        {
+          "id": "intro",
+          "kind": "prose",
+          "text": "此範例使用六種內建語意區塊，所有數值與結論均由輸入提供。"
+        },
+        {
+          "id": "notice",
+          "kind": "insight",
+          "level": "warning",
+          "text": "示意資料不可作為實際交付進度。\n**Markdown 標記** 與 <b>HTML</b> 一律顯示為純文字。",
+          "sourceIds": ["example"]
+        },
+        {
+          "id": "numbers",
+          "kind": "metrics",
+          "items": [
+            {
+              "label": "待處理問題",
+              "value": 0,
+              "unit": "件",
+              "comparisonValue": 2,
+              "comparisonLabel": "前次提供值"
+            },
+            {
+              "label": "調整數量",
+              "value": -1,
+              "unit": "件",
+              "comparisonValue": 0
+            }
+          ],
+          "sourceIds": ["example"]
+        }
+      ]
+    },
+    {
+      "id": "execution",
+      "title": "執行方式",
+      "blocks": [
+        {
+          "id": "sequence",
+          "kind": "steps",
+          "title": "處理順序",
+          "items": [
+            { "title": "整理資訊", "description": "提供可查證內容與來源。" },
+            { "title": "驗證資料", "description": "先修正輸入，再檢查版型。" },
+            { "title": "產出報告", "description": "離線閱讀並保留所有來源。" }
+          ],
+          "sourceIds": ["example"]
+        },
+        {
+          "id": "choices",
+          "kind": "comparison",
+          "subject": "兩種工作方式",
+          "fields": [{ "key": "focus", "label": "適用情境" }],
+          "items": [
+            {
+              "name": "同步討論",
+              "attributes": { "focus": "需要即時澄清的問題" }
+            },
+            {
+              "name": "非同步文件",
+              "attributes": { "focus": "需要查證與思考的問題" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "events",
+      "title": "事件紀錄",
+      "blocks": [
+        {
+          "id": "history",
+          "kind": "timeline",
+          "title": "輸入順序即呈現順序",
+          "items": [
+            {
+              "time": "2026-10-27 14:00（原始文字）",
+              "title": "收集需求",
+              "description": "保留輸入時間，不推定時區。"
+            },
+            {
+              "time": "2026-10-27 09:00（原始文字）",
+              "title": "補充早先紀錄",
+              "description": "即使時間較早，也不自動重排事件。"
+            }
+          ],
+          "sourceIds": ["example"]
+        }
+      ]
+    }
+  ]
+}

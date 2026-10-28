@@ -1,0 +1,100 @@
+---
+name: Semloom minimal
+description: A quiet, readable technical report with explicit data and sources.
+colors:
+  paper: '#faf9f6'
+  ink: '#242923'
+  muted: '#586255'
+  accent: '#285744'
+  line: '#d8ddd4'
+  surface: '#ffffff'
+  ocean-paper: '#f4f8fc'
+  ocean-ink: '#20354b'
+  ocean-accent: '#245f88'
+  graphite-paper: '#fafafa'
+  graphite-ink: '#252525'
+  graphite-accent: '#424242'
+  signal-paper: '#ffffff'
+  signal-ink: '#272321'
+  signal-accent: '#a23e2c'
+  midnight-paper: '#151d2b'
+  midnight-surface: '#202c3d'
+  midnight-ink: '#e4eaf2'
+  midnight-accent: '#7bc6db'
+  print-ink: '#000000'
+  print-muted: '#333333'
+  print-line: '#999999'
+typography:
+  display:
+    fontSize: 'clamp(2rem, 4.4vw, 3.4rem)'
+    lineHeight: 1.2
+  section:
+    fontSize: '1.65rem'
+  section-mobile:
+    fontSize: '1.4rem'
+  comparison:
+    fontSize: '1.2rem'
+  item:
+    fontSize: '1.06rem'
+  body:
+    fontFamily: 'system-ui, -apple-system, PingFang TC, Microsoft JhengHei, sans-serif'
+    fontSize: '1rem'
+    lineHeight: 1.75
+  navigation:
+    fontSize: '.95rem'
+  citation:
+    fontSize: '.875rem'
+  field-label:
+    fontSize: '.85rem'
+  footer:
+    fontSize: '.8rem'
+  print-body:
+    fontSize: '10pt'
+  print-table:
+    fontSize: '8pt'
+  print-title:
+    fontSize: '24pt'
+rounded:
+  card: '12px'
+  control: '4px'
+spacing:
+  group: '1.5rem'
+---
+
+## Overview
+
+The minimal theme follows the product's reading-first, offline brief. A document title, ordinary section headings, a visible TOC and an ordered source list carry hierarchy. No remote fonts, decorative imagery or app-style chrome.
+
+Editorial shares that structure with warm paper (#f7f1e6), ink (#302a23), brown links (#804224) and local Georgia/Songti/PMingLiU serif fonts. Leading rises to 1.9 and group spacing to 1.75rem. Theme tokens are separate from common component styles; omitted values inherit minimal defaults. See [Theme tokens](docs/themes.md).
+
+Ocean, Graphite, Signal and Midnight extend that same report structure. Ocean uses cool white/navy/blue, 1.8 leading and 6px corners. Graphite uses neutral white/charcoal, 1.6 leading, 750 title weight, 1.25rem grouping and 2px corners. Signal uses white/near-black/brick-red, 1.7 leading, 750 title weight and 2px corners. Midnight uses dark blue-gray paper/surfaces, soft-white text and cyan links, 1.8 leading and 6px corners. All four inherit local system sans fonts. Theme choice does not alter the document, navigation or Variant selection; both Layouts work with every Theme.
+
+Source ownership follows those boundaries: `src/html/themes/` owns token definitions and the print palette; `src/html/styles/components.ts` owns shared typography and content/control styles; `src/html/layouts/` owns document/sidebar flow and Layout resets for print. `styles/index.ts` controls composition order, and Plugin-specific CSS remains with its manifest.
+
+Optional switching uses an inline labeled native select, inheriting Theme fonts/colors with a visible focus ring. Its controls stay hidden until initialization succeeds; recoverable errors appear beside the selector while prior content remains readable. `styles/interactive.ts` is included only for reports with switchable blocks. Print hides the controls and runtime errors while retaining the current View and citations.
+
+## Colors
+
+Warm paper and near-black text; green links and focus indicators. One-pixel rules separate groups. Color never encodes factual conclusions.
+
+The default remains minimal. Midnight explicitly sets `--color-scheme: dark`; other Themes inherit light. Controls, hover states, table headers and selection use Theme variables. Print resets every Theme to light color scheme, white page/component surfaces, black text/links and neutral headers/rules. Plugin CSS should consume the same variables and avoid fixed light colors. See `src/html/themes/` for complete palettes and inherited values.
+
+## Typography
+
+Local system fonts support CJK without downloads. Body line height is 1.75; prose measure is 72ch. Display title ranges from 2rem to 3.4rem. Content strings preserve line breaks and wrap long values; no inline Markdown styling.
+
+## Layout
+
+Page max width 76rem, desktop padding 4rem/3rem and mobile padding 2rem/1.1rem. Cards collapse to one column below 600px. Tables scroll inside an accessible, focusable region; the page must not scroll horizontally. Print removes navigation and uses wrapping table cells and repeated headers.
+
+Sidebar expands the page to 96rem with a 15rem sticky TOC and a flexible reading column. At 800px and below it becomes an in-flow mobile disclosure; no-JS keeps all links visible. Focus rings, a skip link and an explicit current-section mark support keyboard reading. Deep TOC indentation flattens after three levels. Print restores a single column and hides navigation controls.
+
+## Elevation & Depth
+
+Flat surfaces, no shadows. Cards use a single border; no nested card decorations.
+
+## Components
+
+Comparison cards and tables show the same ordered fields. Block citations sit outside the variant. Sources with no URL remain plain text; source links use visible underlines. Focus rings and print URLs preserve access and traceability.
+
+Insights use a quiet bordered aside with an explicit author-supplied level label. Metrics use compact definition lists, 1.4rem values and secondary comparison values without derived trend colors. Steps remain complete ordered lists; the stepper spreads short sequences across columns and collapses on mobile/print. Timelines display raw time labels in input order. These components and local Plugin CSS consume the same paper/ink/accent/line/space tokens.

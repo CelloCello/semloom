@@ -1,0 +1,80 @@
+{
+  "schemaVersion": "1.0",
+  "title": "JSON Schema 與 JTD：驗證契約怎麼選",
+  "locale": "zh-TW",
+  "sources": [
+    {
+      "id": "ajv-languages",
+      "title": "Ajv：Choosing schema language",
+      "url": "https://ajv.js.org/guide/schema-language.html"
+    },
+    {
+      "id": "ajv-typescript",
+      "title": "Ajv：Using with TypeScript",
+      "url": "https://ajv.js.org/guide/typescript.html"
+    }
+  ],
+  "sections": [
+    {
+      "id": "summary",
+      "title": "選擇依據",
+      "blocks": [
+        {
+          "id": "recommendation",
+          "kind": "prose",
+          "sourceIds": ["ajv-languages", "ajv-typescript"],
+          "text": "本研究供 Semloom 的資料契約選型使用。\n需要一般 union 與長度、範圍等驗證限制時，JSON Schema 較直接；若主要目標是跨語言型別與 tagged union，JTD 值得評估。這是依文件作出的選型判斷，不是速度測試結論。"
+        }
+      ]
+    },
+    {
+      "id": "comparison",
+      "title": "能力比較",
+      "blocks": [
+        {
+          "id": "languages",
+          "kind": "comparison",
+          "subject": "資料形狀與驗證能力",
+          "sourceIds": ["ajv-languages"],
+          "fields": [
+            { "key": "model", "label": "建模方式" },
+            { "key": "unions", "label": "Union 支援" },
+            { "key": "constraints", "label": "限制表達" },
+            { "key": "tradeoff", "label": "主要取捨" }
+          ],
+          "items": [
+            {
+              "name": "JSON Schema",
+              "attributes": {
+                "model": "以驗證限制定義可接受的資料",
+                "unions": "支援 untagged union 與布林組合",
+                "constraints": "可描述數值範圍、字串長度與集合大小",
+                "tradeoff": "表達力較完整，規格與組合規則也較複雜"
+              }
+            },
+            {
+              "name": "JSON Type Definition",
+              "attributes": {
+                "model": "以固定 schema forms 定義資料形狀",
+                "unions": "支援 tagged union；未標準化 untagged union",
+                "constraints": "限制能力較少，聚焦型別與資料形狀",
+                "tradeoff": "模型較簡單，適合型別產生、parser 與 serializer"
+              }
+            }
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "title": "閱讀限制",
+          "blocks": [
+            {
+              "kind": "prose",
+              "text": "來源關聯到整個區塊，不代表每個儲存格都有獨立證據映射。外部連結只在讀者主動點擊時開啟；報告本身不需要網路。"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

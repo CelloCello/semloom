@@ -1,0 +1,16 @@
+node_modules/
+.pnpm-store/
+.cache/
+dist/
+reports/
+test-results/
+playwright-report/
+*.tsbuildinfo
+
+# Local plans and development records
+/_plans/
+/.agents/
+/semloom-skill-check.*
+
+.impeccable/
+.DS_Store

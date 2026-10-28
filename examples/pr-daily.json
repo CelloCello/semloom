@@ -1,0 +1,164 @@
+{
+  "schemaVersion": "1.0",
+  "title": "PR 日報：讓變更容易接手（示意資料）",
+  "locale": "zh-TW",
+  "sources": [
+    {
+      "id": "snapshot",
+      "title": "虛構專案 2026-10-27 工作快照；PR 編號、人物與數值均為展示資料"
+    },
+    {
+      "id": "review-notes",
+      "title": "示意審查紀錄：驗證範圍由作者提供，未連接真實 CI 或 Git 平台"
+    }
+  ],
+  "sections": [
+    {
+      "id": "summary",
+      "title": "今日摘要",
+      "blocks": [
+        {
+          "id": "daily-context",
+          "kind": "prose",
+          "text": "這是一份可離線閱讀的 PR 日報範例，展示如何交接變更、審查狀態與下一步。所有資料均為示意，不代表 Semloom 或其他真實專案的進度。\n本日範圍：三筆 PR，其中一筆已合併、一筆等待審查、一筆需補測試。",
+          "sourceIds": ["snapshot"]
+        },
+        {
+          "kind": "metrics",
+          "items": [
+            {
+              "label": "本日 PR",
+              "value": 3,
+              "unit": "筆",
+              "comparisonValue": 2,
+              "comparisonLabel": "前日示意值"
+            },
+            { "label": "已合併", "value": 1, "unit": "筆" },
+            { "label": "待審查或補件", "value": 2, "unit": "筆" }
+          ],
+          "sourceIds": ["snapshot"]
+        },
+        {
+          "kind": "insight",
+          "level": "warning",
+          "text": "#103 尚未完成窄螢幕驗證。交接時請保留此限制，待補件後再判斷是否可合併。",
+          "sourceIds": ["review-notes"]
+        }
+      ]
+    },
+    {
+      "id": "changes",
+      "title": "變更與審查",
+      "blocks": [
+        {
+          "id": "pull-requests",
+          "kind": "comparison",
+          "subject": "本日 PR 清單（示意）",
+          "fields": [
+            { "key": "change", "label": "使用者可見變更" },
+            { "key": "status", "label": "狀態" },
+            { "key": "validation", "label": "已知驗證" },
+            { "key": "next", "label": "接手動作" }
+          ],
+          "items": [
+            {
+              "name": "#101 保留查詢條件",
+              "attributes": {
+                "change": "返回列表時保留搜尋文字",
+                "status": "已合併",
+                "validation": "查詢狀態單元測試通過（示意）",
+                "next": "觀察後續回報"
+              }
+            },
+            {
+              "name": "#102 顯示空白原因",
+              "attributes": {
+                "change": "列表無資料時說明如何調整篩選",
+                "status": "等待審查",
+                "validation": "一般與空白狀態檢查完成（示意）",
+                "next": "確認操作文字"
+              }
+            },
+            {
+              "name": "#103 改善表格閱讀",
+              "attributes": {
+                "change": "表格可在內容區域內捲動",
+                "status": "需補測試",
+                "validation": "桌機檢查完成，手機尚未驗證（示意）",
+                "next": "補上 375px 內容與鍵盤檢查"
+              }
+            }
+          ],
+          "sourceIds": ["snapshot", "review-notes"]
+        }
+      ],
+      "sections": [
+        {
+          "id": "review-boundary",
+          "title": "驗證範圍",
+          "blocks": [
+            {
+              "kind": "prose",
+              "text": "狀態由報告作者提供。Compiler 只檢查資料結構與關聯，不會向 PR 平台查詢、計算合併率或替作者判斷風險。",
+              "sourceIds": ["review-notes"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "handoff",
+      "title": "下一位接手者",
+      "blocks": [
+        {
+          "id": "review-sequence",
+          "kind": "steps",
+          "title": "明日處理順序",
+          "items": [
+            {
+              "title": "補齊 #103 驗證",
+              "description": "檢查 375px、鍵盤與完整欄位；將實際結果補回資料。"
+            },
+            {
+              "title": "審查 #102 文案",
+              "description": "確認空白狀態有清楚的下一步，再更新審查狀態。"
+            },
+            {
+              "title": "重建並分享日報",
+              "description": "更新 JSON，先 validate 再 build；引用維持在相關 Block。"
+            }
+          ],
+          "sourceIds": ["review-notes"]
+        }
+      ]
+    },
+    {
+      "id": "activity",
+      "title": "事件紀錄",
+      "blocks": [
+        {
+          "kind": "timeline",
+          "title": "工作快照（示意；依輸入順序）",
+          "items": [
+            {
+              "time": "09:30",
+              "title": "#101 合併",
+              "description": "搜尋狀態變更已納入主線。"
+            },
+            {
+              "time": "13:00",
+              "title": "#102 送審",
+              "description": "等待確認空白狀態文字。"
+            },
+            {
+              "time": "16:00",
+              "title": "#103 補件",
+              "description": "記錄手機驗證尚未完成。"
+            }
+          ],
+          "sourceIds": ["snapshot"]
+        }
+      ]
+    }
+  ]
+}

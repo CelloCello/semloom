@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "1.0",
+  "title": "團隊工作方式比較（示意資料）",
+  "sections": [
+    {
+      "title": "小型比較",
+      "blocks": [
+        {
+          "id": "working-modes",
+          "kind": "comparison",
+          "subject": "同步與非同步協作",
+          "fields": [
+            { "key": "focus", "label": "適用情境" },
+            { "key": "record", "label": "工作紀錄" }
+          ],
+          "items": [
+            {
+              "name": "同步討論",
+              "attributes": {
+                "focus": "需要立即釐清的問題",
+                "record": "討論後整理"
+              }
+            },
+            {
+              "name": "非同步文件",
+              "attributes": {
+                "focus": "需要思考與查證的問題",
+                "record": "隨工作持續累積"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

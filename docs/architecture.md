@@ -1,0 +1,34 @@
+# Architecture
+
+Semloom is one TypeScript package in a pnpm workspace. Source boundaries separate responsibilities without requiring a package for each module.
+
+A clean prepack build ships ESM/runtime declarations, docs and examples in a compiled tarball, without source maps or development files. `scripts/package-smoke.mjs` installs one real archive into isolated consumers to verify public exports and local browser-adapter paths. See [package installation and verification](releases.md).
+
+- `src/core`: public data types, Registry, exported JSON Schema, semantic validation, deterministic IDs, Planner and CSS dependency/hash handling. No filesystem or browser API.
+- `src/plugins`: six built-in kinds use the same `Registry.register()` manifest interface as local Plugins. Content schemas cannot redefine Core's `id`, `kind` or `sourceIds` envelope. The filesystem/module adapter resolves explicitly configured local modules; it does not install or discover packages.
+- `src/html`: a central escaping template helper, document/sidebar composer and progressive navigation. `themes/` defines built-in tokens and fallback, `styles/` owns shared component rules and stylesheet composition, and `layouts/` owns page flow and responsive/print Layout rules. Core validates reference relationships; the composer adds block citations outside variant output.
+- `src/cli`: argument/config parsing, bounded JSON input, diagnostics and atomic output replacement. Library `compile()` never writes files.
+
+## Data and rendering
+
+`compile(input, options, registry?)` validates configuration and the document, clones input, resolves IDs, generates one Presentation Plan, and renders that plan. The returned HTML, resolved document and Explain plan describe the same selection. Registry freezes before compilation; schema/manifest copies prevent callers changing registrations through returned objects. Asynchronous `loadRegistry(paths, baseDirectory)` resolves all module exports first; Registry checks all definitions before resolving extensions, so extension order does not depend on config order.
+
+Schema uses Ajv 8 in strict mode with no coercion, removal or default insertion. JSON Schema draft-07 provides a portable exported structural contract. Relationships such as unique IDs, reference targets and comparison field keys require a second semantic validation pass; they are documented rather than falsely advertised as pure JSON Schema constraints. Section recursion is represented by eight bounded definitions.
+
+Planner first checks support, then sorts descending scores with a code-point Variant-ID tie-break. It uses data size, field count and text length, never viewport or theme. An override can choose a lower-score compatible variant. IDs reserve every explicit Section/Block ID before allocating any automatic ID; source anchors have a separate reserved namespace.
+
+## Output and trust boundary
+
+The HTML always contains complete static content, CSS and a fixed navigation script. Optional interactive reports add one bundled switching script and safely encoded JSON for switchable blocks. No remote assets are required. The report works without JavaScript and includes print CSS. User strings are escaped in text/attribute contexts; fragments use a private WeakSet, so JSON cannot forge markup. Template indentation never trims interpolated data. Source URL rules are shared through the Node/browser-safe `core/url.ts`; semantic validation also checks source fragment targets. CSP authorizes the exact SHA-256 of navigation and any switching bundle, inline styles, and no remote resources or form submission. Document data never enters executable source. Plugins/adapters are trusted code, not a security sandbox.
+
+Theme names and Layout names come from the shared core contract. The Planner receives locale/Layout, never Theme. `themes/index.ts` resolves token overrides against the minimal baseline, while `styles/index.ts` composes token CSS, shared components, document flow, sidebar overrides and print Layout resets in that order. Selected Plugin assets follow the combined Core stylesheet; Plugin-declared CSS remains with its manifest. These are explicitly imported source modules, with no Theme/Layout file discovery or external registration API. The navigation script reads existing TOC links and heading IDs from the DOM, adds Scroll Spy, and progressively enables the mobile sidebar disclosure. Static navigation remains visible when JavaScript is absent or initialization fails. See [Themes and Layouts](themes.md) for adding Themes, focus, responsive and print behavior.
+
+Output is deterministic for fixed inputs/code/dependencies. Atomic writes use a random temporary filename only, never a random value inside HTML. Compilation/validation happens before replacement; failures preserve old output and temporary files are cleaned.
+
+## Extension boundary
+
+Plugin manifests separate `kinds` (content Schema plus initial Variants) from `extensions` (new Variants for an existing, exact data version). Registry checks Plugin/API/data versions, exact Plugin dependencies, duplicate IDs and schemas before reading a document. It validates all CSS declarations and dependency graphs, then emits only selected-Variant assets and their dependencies, ordered deterministically and deduplicated by content hash. The same asset ID with different content/dependencies is an error; contradictory ordering after deduplication is also rejected.
+
+Manifest assets remain inline static CSS; browser modules use a separate optional `browser` descriptor. `src/browser/plan.ts` filters the same build Plan's supported candidates by adapter capability; blocks need at least two. `bundle.ts` uses the [esbuild synchronous API](https://esbuild.github.io/api/#sync) to keep `compile()` synchronous, bundling only required adapters and shared module dependencies into one browser IIFE with no external imports. CSS includes initial and eligible candidate assets under the existing dependency/hash rules. Static compilation never bundles browser entries.
+
+`src/browser/runtime.ts` preserves SSR during setup, builds incoming Views detached, rolls failed construction back to the old View and aborts registered partial resources. After a successful replacement it aborts/disposes the old View and runs all cleanups, isolating cleanup errors. It replaces only the View host, preserving Core citations, block/section IDs and navigation. Per-block frozen data and context never expose mutable input/config or Theme. Built-in comparison server renderers and browser adapters use the same pure templates; `semloom/browser` provides DOM-safe helpers without importing the compiler or Node APIs. The example Plugin follows the same contract. See [interactive reports](interactive.md) and [Plugin authoring](plugin-authoring.md).
