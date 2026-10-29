@@ -71,7 +71,7 @@ semloom validate report.json
 semloom build report.json -o reports/project-update.html --explain
 ```
 
-既有文字欄位仍照原文顯示；強調、行內程式碼與連結使用明確的 `richtext` kind，請見 [Rich Text 範例](examples/richtext.json)。[技術指南範例](examples/technical-guide.json) 結合這套行內格式、巢狀清單與保留原文的程式碼區塊。[階層範例](examples/hierarchy.json) 預設為縮排樹，搭配 [mindmap config](examples/hierarchy-mindmap.json) 可選離線 Markmap 心智圖、外部 Theme 與右側目錄，支援滑鼠／鍵盤開合節點。每款內建 Theme 都有專屬[六色分支調色盤](docs/themes.md#hierarchy-branch-colors)。窄視窗仍保留圖形與局部捲動；停用 JS、初始化失敗或列印時保留完整樹狀內容。來源引用屬於區塊，編譯器會檢查引用關係，但不會查證事實或替作者計算指標。支援欄位與限制請見[資料契約](docs/semantic-schema.md)。
+既有文字欄位仍照原文顯示。[Rich Text 範例](examples/richtext.json) 示範行內格式，[技術指南](examples/technical-guide.json) 結合巢狀清單與程式碼；[階層範例](examples/hierarchy.json) 搭配 [mindmap config](examples/hierarchy-mindmap.json) 可選離線 Markmap。限制、連結與備援行為請見[資料契約](docs/semantic-schema.md)。來源引用屬於區塊；Semloom 檢查引用關係，但不查證事實或計算指標。
 
 ## 選擇外觀
 

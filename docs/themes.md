@@ -95,6 +95,14 @@ Layout is chosen at build time, with priority CLI option → config → `documen
 
 `document` places the full TOC above content. `sidebar` uses a sticky, independently scrollable desktop TOC. At widths up to 800px it becomes an in-flow disclosure above content. It is never a modal and does not trap focus. Every Section, up to eight levels deep, has a TOC anchor; IDs are encoded in links and looked up directly rather than interpolated into selectors.
 
+With JavaScript disabled, the disclosure button stays hidden and all links remain available. The fixed inline navigation script enables the button and sets `aria-current="location"` on the current Section link. Enter/Space opens the mobile TOC, Tab reaches links, Escape closes it and returns focus to the button. Activating a TOC link moves focus to its heading. Resizing from desktop to mobile moves a focused TOC link to the visible button before hiding the list. A skip link leads to the main content.
+
+No navigation selection is saved between openings. Initialization failure restores the visible static TOC. The CSP authorizes the exact navigation script hash; content is never embedded in that script. The script makes no requests and reads no storage. Optional [interactive reports](interactive.md) add a separately hashed adapter bundle and a safely encoded data payload. Switching preserves the TOC, section anchors and mobile disclosure state. Its Theme-aware control styles live in `styles/interactive.ts` and are included only when switching is available.
+
+At 375px the page fits the viewport; wide tables scroll in their own focusable region. Print removes the TOC, button and footer, restores one column, wraps table cells and retains all content/citations with source URLs. Print CSS cannot guarantee identical pagination across browsers or installed fonts.
+
+## Hierarchy
+
 Hierarchy tree labels consume `--surface`, `--ink`, `--line`, `--radius` and `--body-leading`. The real Markmap renderer inherits Theme fonts, ink, paper and leading through its CSS variables, with colored underlines, curves and folding circles. `.semloom-mindmap-diagram` is a locally scrollable region at every screen width; narrowing the viewport does not switch it to a list. A full `.semloom-hierarchy-tree[data-mindmap-fallback]` remains available for no-JS, setup failure and print. Keep the fallback complete and check long labels with both Layout bases. Nodes do not add TOC entries: only Sections do. The [mindmap config](../examples/hierarchy-mindmap.json) combines this content with external paper/night Themes and the right-side TOC Layout.
 
 ### Hierarchy branch colors
@@ -121,9 +129,3 @@ External Themes inherit Minimal's palette, or Midnight's when their existing `co
 ```
 
 Color identifies branches; it conveys no ranking or factual judgment. Plain text remains readable independently of color. Print uses the complete fallback tree and Core print palette, regardless of which nodes the reader folded. The [paper CSS example](../examples/presentation/styles/paper.css) includes these overrides. Markmap's `.markmap-node` and `.markmap-link` belong to the renderer; Semloom does not manually join HTML borders to its curves.
-
-With JavaScript disabled, the disclosure button stays hidden and all links remain available. The fixed inline navigation script enables the button and sets `aria-current="location"` on the current Section link. Enter/Space opens the mobile TOC, Tab reaches links, Escape closes it and returns focus to the button. Activating a TOC link moves focus to its heading. Resizing from desktop to mobile moves a focused TOC link to the visible button before hiding the list. A skip link leads to the main content.
-
-No navigation selection is saved between openings. Initialization failure restores the visible static TOC. The CSP authorizes the exact navigation script hash; content is never embedded in that script. The script makes no requests and reads no storage. Optional [interactive reports](interactive.md) add a separately hashed adapter bundle and a safely encoded data payload. Switching preserves the TOC, section anchors and mobile disclosure state. Its Theme-aware control styles live in `styles/interactive.ts` and are included only when switching is available.
-
-At 375px the page fits the viewport; wide tables scroll in their own focusable region. Print removes the TOC, button and footer, restores one column, wraps table cells and retains all content/citations with source URLs. Print CSS cannot guarantee identical pagination across browsers or installed fonts.

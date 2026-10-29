@@ -1,5 +1,12 @@
 #!/usr/bin/env node
-import { readFile, mkdir, rename, rm, writeFile } from 'node:fs/promises';
+import {
+  readFile,
+  mkdir,
+  realpath,
+  rename,
+  rm,
+  writeFile,
+} from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { parseArgs } from 'node:util';
@@ -60,6 +67,27 @@ async function atomicWrite(path: string, content: string): Promise<void> {
   } finally {
     await rm(temporary, { force: true });
   }
+}
+async function protectInputs(
+  output: string,
+  inputs: readonly string[],
+): Promise<void> {
+  const destination = resolve(output);
+  const reject = () =>
+    usage('Output must not overwrite input or configuration.');
+  if (inputs.some((file) => resolve(file) === destination)) reject();
+  let physicalOutput: string;
+  try {
+    physicalOutput = await realpath(destination);
+  } catch (error) {
+    // A missing destination cannot be one of the existing, loaded inputs.
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return;
+    throw error;
+  }
+  const physicalInputs = await Promise.all(
+    inputs.map((file) => realpath(file)),
+  );
+  if (physicalInputs.includes(physicalOutput)) reject();
 }
 async function main() {
   let args: ReturnType<typeof parseArgs>;
@@ -174,14 +202,11 @@ async function main() {
     } else {
       if (typeof values.output !== 'string')
         usage('build requires -o output.html.');
-      if (
-        [
-          resolve(input!),
-          ...(configFile ? [resolve(configFile)] : []),
-          ...presentation.sourceFiles,
-        ].includes(resolve(values.output))
-      )
-        usage('Output must not overwrite input or configuration.');
+      await protectInputs(values.output, [
+        input!,
+        ...(configFile ? [configFile] : []),
+        ...presentation.sourceFiles,
+      ]);
       const result = compile(document, options, registry, presentation);
       if (values.explain)
         process.stderr.write(JSON.stringify(result.plan, null, 2) + '\n');

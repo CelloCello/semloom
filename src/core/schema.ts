@@ -5,6 +5,7 @@ import {
   themeNames,
   layoutNames,
   type Config,
+  type NormalizedConfig,
   type JsonSchema,
   type PresentationNames,
   fail,
@@ -231,7 +232,7 @@ const configSchema: JsonSchema = {
 export function parseConfig(
   input: unknown = {},
   names?: PresentationNames,
-): Config {
+): NormalizedConfig {
   checkSchema<Partial<Config>>(configSchema, input);
   const themes =
     names?.themes ?? (input.themes?.length ? undefined : themeNames);

@@ -18,7 +18,7 @@ export async function loadPresentation(
   };
   const files: string[] = [];
   for (const category of ['themes', 'layouts'] as const) {
-    const paths = config[category];
+    const paths = config[category] === undefined ? [] : config[category];
     if (!Array.isArray(paths) || paths.length > 50)
       fail(
         `/${category}`,

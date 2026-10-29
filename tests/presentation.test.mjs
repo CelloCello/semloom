@@ -19,6 +19,29 @@ const configFile = resolve('examples/presentation/presentation.json');
 const raw = JSON.parse(readFileSync(configFile, 'utf8'));
 const load = () =>
   loadPresentation(parseConfig(raw), resolve('examples/presentation'));
+test('legacy Config objects omit registrations while parseConfig returns complete arrays', async () => {
+  const legacy = {
+    theme: 'minimal',
+    layout: 'document',
+    overrides: {},
+    plugins: [],
+    interactive: false,
+  };
+  const normalized = parseConfig(legacy);
+  assert.deepEqual(normalized.themes, []);
+  assert.deepEqual(normalized.layouts, []);
+  assert.equal(Object.hasOwn(legacy, 'themes'), false);
+  const catalog = await loadPresentation(legacy);
+  assert.deepEqual(catalog.names(), createPresentation().names());
+  assert.equal(
+    compile(technicalGuide(), legacy).html,
+    compile(technicalGuide(), normalized, undefined, catalog).html,
+  );
+  await assert.rejects(
+    loadPresentation({ themes: null }),
+    /PRESENTATION_PATH/u,
+  );
+});
 const theme = () => ({
   id: 'custom.paper',
   themeApiVersion: '1.0',

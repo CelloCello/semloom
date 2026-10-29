@@ -599,6 +599,23 @@ for (const binary of runtimes) {
     );
     run(binary, ['report-workflows-smoke.mjs'], consumer);
     await writeFile(
+      join(consumer, 'paths-smoke.mjs'),
+      [
+        "import assert from 'node:assert/strict';",
+        "import {mkdirSync,writeFileSync,readFileSync,symlinkSync} from 'node:fs';",
+        "import {resolve} from 'node:path';",
+        "import {spawnSync} from 'node:child_process';",
+        "mkdirSync('path-inputs');symlinkSync(resolve('path-inputs'),'path-alias','dir');",
+        "const fixtures={'input.json':readFileSync('examples/technical-guide.json','utf8'),'config.json':JSON.stringify({themes:['./theme.json'],layouts:['./layout.json'],theme:'consumer.paths',layout:'consumer.paths'}),'theme.json':JSON.stringify({id:'consumer.paths',themeApiVersion:'1.0',cssFile:'./theme.css'}),'layout.json':JSON.stringify({id:'consumer.paths',layoutApiVersion:'1.0',base:'document',cssFile:'./layout.css'}),'theme.css':'.prose{font-weight:500}','layout.css':'.page{max-width:60rem}'};",
+        "for(const [name,text] of Object.entries(fixtures))writeFileSync('path-inputs/'+name,text);",
+        `const cli=${JSON.stringify(cli)};`,
+        "for(const name of Object.keys(fixtures)){const result=spawnSync(process.execPath,[cli,'build','path-alias/input.json','--config','path-alias/config.json','-o','path-inputs/'+name],{encoding:'utf8'});assert.equal(result.status,2,result.stderr);assert.match(result.stderr,/Output must not overwrite input or configuration/u);}",
+        "for(const [name,text] of Object.entries(fixtures))assert.equal(readFileSync('path-inputs/'+name,'utf8'),text);",
+        'console.log(JSON.stringify({protectedSources:Object.keys(fixtures).length}));',
+      ].join('\n'),
+    );
+    run(binary, ['paths-smoke.mjs'], consumer);
+    await writeFile(
       join(consumer, 'types-hierarchy.mts'),
       [
         `import {compile,hierarchyLimits,type HierarchyNode,type HierarchyBlock,type Document} from ${JSON.stringify(manifest.name)};`,
@@ -611,7 +628,21 @@ for (const binary of runtimes) {
     );
     await writeFile(
       join(consumer, 'types-node.mts'),
-      `import {compile,createPresentation,parseConfig,loadPresentation,type Document,type ThemeDefinition,type LayoutDefinition,type ThemeTokens} from ${JSON.stringify(manifest.name)};\nconst data:Document={schemaVersion:'1.0',title:'T',sections:[{title:'S'}]};\nconst tokens:Partial<ThemeTokens>={accent:'#123456'};\nconst theme:ThemeDefinition={id:'consumer.typed',themeApiVersion:'1.0',tokens};\nconst layout:LayoutDefinition={id:'consumer.typed',layoutApiVersion:'1.0',base:'sidebar'};\nconst catalog=createPresentation({themes:[theme],layouts:[layout]});\nconst output:string=compile(data,{theme:theme.id,layout:layout.id},undefined,catalog).html;\nvoid [output,loadPresentation(parseConfig())];\n`,
+      [
+        `import {compile,createPresentation,parseConfig,loadPresentation,resolveDocument,planDocument,createRegistry,type Config,type NormalizedConfig,type Document,type ThemeDefinition,type LayoutDefinition,type ThemeTokens} from ${JSON.stringify(manifest.name)};`,
+        "const data:Document={schemaVersion:'1.0',title:'T',sections:[{title:'S'}]};",
+        "const tokens:Partial<ThemeTokens>={accent:'#123456'};",
+        "const theme:ThemeDefinition={id:'consumer.typed',themeApiVersion:'1.0',tokens};",
+        "const layout:LayoutDefinition={id:'consumer.typed',layoutApiVersion:'1.0',base:'sidebar'};",
+        'const catalog=createPresentation({themes:[theme],layouts:[layout]});',
+        'const output:string=compile(data,{theme:theme.id,layout:layout.id},undefined,catalog).html;',
+        "const legacy:Config={theme:'minimal',layout:'document',overrides:{},plugins:[],interactive:false};",
+        'const normalized:NormalizedConfig=parseConfig(legacy);',
+        'const themePaths:string[]=normalized.themes;',
+        'const layoutPaths:string[]=parseConfig().layouts;',
+        'const registry=createRegistry();',
+        'void [output,compile(data,legacy),planDocument(resolveDocument(data,registry),legacy,registry),loadPresentation(legacy),themePaths,layoutPaths];',
+      ].join('\n'),
     );
     await writeFile(
       join(consumer, 'types-browser.mts'),

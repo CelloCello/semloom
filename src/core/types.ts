@@ -131,11 +131,15 @@ export interface Document {
 export interface Config {
   theme: string;
   layout: string;
-  themes: string[];
-  layouts: string[];
+  themes?: string[];
+  layouts?: string[];
   overrides: Record<string, string>;
   plugins: string[];
   interactive: boolean;
+}
+export interface NormalizedConfig extends Config {
+  themes: string[];
+  layouts: string[];
 }
 export interface PresentationContext {
   locale: string;

@@ -64,7 +64,7 @@ const catalog = await loadPresentation(config, '/absolute/report-directory');
 const result = compile(input, config, undefined, catalog);
 ```
 
-`parseConfig()` validates shape and built-in selections; file-backed names are checked against the loaded catalog. Use `parseConfig(raw, catalog.names())` for full selection validation after loading. `compile()` rechecks names, rejects unresolved file registrations without a catalog, stays synchronous and never implicitly loads presentation files. Direct `planDocument()` callers pass the resolved base as its optional fourth argument for external Layouts.
+`Config` keeps registration arrays optional for existing typed callers; `parseConfig()` returns `NormalizedConfig` with both arrays populated. `parseConfig()` validates shape and built-in selections; file-backed names are checked against the loaded catalog. Use `parseConfig(raw, catalog.names())` for full selection validation after loading. `compile()` rechecks names, rejects unresolved file registrations without a catalog, stays synchronous and never implicitly loads presentation files. Direct `planDocument()` callers pass the resolved base as its optional fourth argument for external Layouts.
 
 Application-owned definitions use `createPresentation({ themes, layouts })`. They accept inline `css` text instead of `cssFile`; unresolved file fields fail. Public types include `ThemeDefinition`, `LayoutDefinition`, `ThemeTokens`, `ResolvedPresentation` and `PresentationNames`. Catalogs clone inputs and returned definitions; caller mutation does not change registrations.
 

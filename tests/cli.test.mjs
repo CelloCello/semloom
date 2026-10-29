@@ -1,7 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import {
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -16,6 +23,90 @@ const cli = (...args) =>
     cwd: root,
     encoding: 'utf8',
   });
+test('CLI protects loaded inputs through symlink aliases while allowing separate output paths', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'semloom-output-alias-'));
+  const physical = join(directory, 'physical'),
+    alias = join(directory, 'alias');
+  mkdirSync(physical);
+  symlinkSync(physical, alias, 'dir');
+  const fixtures = {
+    'input.json': JSON.stringify({
+      schemaVersion: '1.0',
+      title: 'Paths',
+      sections: [
+        {
+          title: 'Content',
+          blocks: [{ kind: 'prose', text: 'Preserve inputs' }],
+        },
+      ],
+    }),
+    'config.json': JSON.stringify({
+      themes: ['./theme.json'],
+      layouts: ['./layout.json'],
+      theme: 'review.theme',
+      layout: 'review.layout',
+    }),
+    'theme.json': JSON.stringify({
+      id: 'review.theme',
+      themeApiVersion: '1.0',
+      cssFile: './theme.css',
+    }),
+    'layout.json': JSON.stringify({
+      id: 'review.layout',
+      layoutApiVersion: '1.0',
+      base: 'document',
+      cssFile: './layout.css',
+    }),
+    'theme.css': '.prose{font-weight:500}',
+    'layout.css': '.page{max-width:60rem}',
+  };
+  for (const [name, text] of Object.entries(fixtures))
+    writeFileSync(join(physical, name), text);
+  try {
+    for (const name of Object.keys(fixtures)) {
+      const link = join(directory, `${name}.link`);
+      symlinkSync(join(physical, name), link, 'file');
+      for (const [source, output] of [
+        [alias, join(physical, name)],
+        [physical, join(alias, name)],
+        [physical, link],
+      ]) {
+        const result = cli(
+          'build',
+          join(source, 'input.json'),
+          '--config',
+          join(source, 'config.json'),
+          '-o',
+          output,
+        );
+        assert.equal(result.status, 2, result.stderr);
+        assert.match(
+          result.stderr,
+          /Output must not overwrite input or configuration/u,
+        );
+        for (const [file, text] of Object.entries(fixtures))
+          assert.equal(readFileSync(join(physical, file), 'utf8'), text);
+      }
+    }
+    for (const output of [
+      join(alias, 'new.html'),
+      join(alias, 'nested', 'new.html'),
+    ]) {
+      const result = cli(
+        'build',
+        join(alias, 'input.json'),
+        '--config',
+        join(alias, 'config.json'),
+        '-o',
+        output,
+      );
+      assert.equal(result.status, 0, result.stderr);
+      assert.match(readFileSync(output, 'utf8'), /^<!doctype html>/u);
+    }
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
 test('CLI help, listing, Schema stdout and validate work from compiled output', () => {
   const version = JSON.parse(
     readFileSync(join(root, 'package.json'), 'utf8'),

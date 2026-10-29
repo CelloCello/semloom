@@ -71,7 +71,7 @@ semloom validate report.json
 semloom build report.json -o reports/project-update.html --explain
 ```
 
-Existing text fields display literally. Use the explicit `richtext` kind for emphasis, inline code and links; see the [Rich Text example](examples/richtext.json). The [technical guide](examples/technical-guide.json) combines this inline content with nested lists and literal code blocks. The [hierarchy example](examples/hierarchy.json) renders as an indented tree by default; its [mindmap config](examples/hierarchy-mindmap.json) selects an offline Markmap with mouse/keyboard node folding, an external Theme and right-side TOC. Each built-in Theme supplies its own [six-color branch palette](docs/themes.md#hierarchy-branch-colors). Narrow screens retain the diagram with local scrolling; no-JS, initialization failure and print retain the complete tree. Source references belong to blocks; the compiler checks their relationships but does not verify factual claims or calculate metrics. See the [data contract](docs/semantic-schema.md) for supported fields and limits.
+Existing text fields remain literal. Use [Rich Text](examples/richtext.json) for inline formatting, the [technical guide](examples/technical-guide.json) for nested lists and code, or the [hierarchy example](examples/hierarchy.json) with its [mindmap config](examples/hierarchy-mindmap.json) for offline Markmap. See the [data contract](docs/semantic-schema.md) for limits, links and fallback behavior. Sources belong to blocks; Semloom checks references without verifying facts or calculating metrics.
 
 ## Choose a look
 

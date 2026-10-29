@@ -2,18 +2,11 @@
 
 ## Unreleased
 
-- Ship complete initial/edit workflows for tool comparison, technical instructions and architecture grouping, with external Theme/Layout configs, bounded edit checks, CLI/Library parity and installed-artifact browser verification.
-
-- Distinct six-color mindmap palettes for every built-in Theme, with light/dark external Theme defaults and per-color CSS overrides. A seven-branch example demonstrates inheritance and cycling.
-
-- Add bounded `hierarchy` JSON with default tree and an offline Markmap Variant, escaped plain-text nodes, mouse/keyboard folding, Theme branch palettes and local scrolling at every screen width. Bundle the real renderer and dependency notices; no-JS, setup failure and print retain the full tree. Include concept/reference reports and external Theme/right-side TOC config.
-
-- Add explicitly loaded local JSON Themes and Layouts, validated tokens/CSS, independent IDs, `layouts list`, and file/pure-data Library catalogs. External Layouts retain base context and navigation; a right-side TOC example composes with light/dark Themes and Core print resets.
-
-- Add bounded mixed ordered/unordered List groups that reuse inline marks/links and a literal Code block with optional language label, keyboard-accessible scrolling, CRLF preservation and print wrapping.
-
-- Add `richtext` paragraphs with bounded flat runs, combined strong/emphasis/inline-code marks and validated links. Existing text fields remain literal; citations stay at block level.
-- Share inline Schema, semantic validation and rendering internally; export inline types and limits for library callers. Source URLs and inline links use the same resolved-document reference checks.
+- Add Rich Text, nested List and literal Code blocks, with validated inline links, preserved code whitespace and public types/limits. Existing plain-text fields remain literal.
+- Support external Theme/Layout manifests and Library catalogs, including a right-side TOC example and `layouts list`.
+- Add hierarchy tree and offline Markmap views with node folding, Theme-specific six-color palettes and complete no-JS/print fallback.
+- Ship initial/edit examples for tool comparison, technical instructions and architecture grouping.
+- Preserve legacy typed `Config` objects without presentation registrations, and protect loaded files from CLI output through symlink aliases.
 
 ## 0.1.0-alpha.1 — release candidate
 
