@@ -76,6 +76,8 @@ Dependencies may need downloading during installation. Compilation and report re
 
 ## Verify a package
 
+The archive includes [three complete report workflows](../examples/report-workflows/README.md), their initial/edited semantic JSON and all presentation configs. Consumer smoke exports their effective Schemas, validates both phases and compares installed CLI HTML with the installed Library result, including explicit comparison and hierarchy Variants.
+
 The installed consumer checks include the external light/dark Theme and right-side TOC manifests, manifest-relative CSS, CLI listings/schema/validation/build, ESM file loading and pure data catalogs. Node-only declaration checks cover their public types without DOM libraries.
 
 ```sh
@@ -93,6 +95,14 @@ pnpm test:package --node /absolute/path/to/node
 ```
 
 Repeat `--node` to install the same archive under multiple runtimes. `SHA256SUMS` identifies the tested artifact. Results apply to the tested runtime/platform; browser rendering is covered separately by `pnpm test:e2e`. The CI workflow configures Node 22.14/24 on Ubuntu/macOS and retains verification artifacts. It does not publish packages or create releases.
+
+From a checkout, the report-workflow browser test can also inspect the exact installed CLI artifacts recorded in a smoke receipt:
+
+```sh
+SEMLOOM_WORKFLOW_RECEIPT=reports/package/smoke-v22.14.0.json node scripts/playwright.mjs test tests/e2e/report-workflows.spec.ts
+```
+
+Use an existing receipt from the selected runtime while its temporary consumer still exists. The test verifies output hashes before inspecting content, sources, navigation, switching/folding, offline/no-JS and print at desktop/375px. It writes separate results under `reports/workflows/installed-<node>/`; it does not overwrite installed HTML. The test runner/development dependencies stay in the checkout.
 
 Use a maintained patch release within the supported Node lines. Node 22.14 is the feature minimum; other major versions are outside the declared support range. See the [Node release policy](https://nodejs.org/en/about/previous-releases).
 

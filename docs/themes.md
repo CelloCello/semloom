@@ -26,6 +26,8 @@ Theme selection is explicit at build time, including `midnight`; there is no OS-
 
 ## Tokens and components
 
+For full reports rather than isolated components, use the [initial/edit workflows](../examples/report-workflows/README.md). Their configs register paper/night Themes and the right-side TOC independently; build flags can choose a registered Theme or a built-in Layout without editing semantic JSON.
+
 Styles are organized by responsibility:
 
 ```text

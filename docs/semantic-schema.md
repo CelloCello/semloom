@@ -1,5 +1,7 @@
 # Semantic document contract
 
+The [complete report workflows](../examples/report-workflows/README.md) combine these contracts in initial/edit pairs: comparison with Rich Text/List, a guide with nested List/literal Code, and the same hierarchy in tree/mindmap. Presentation configs remain separate from the semantic inputs.
+
 `pnpm semloom schema` exports the effective draft-07 schema, including configured local Plugins. The document supports `schemaVersion: "1.0"`, a nonempty title and at least one section. Unknown fields are errors; validation never coerces or mutates data. Optional locale defaults to `zh-TW` in presentation only.
 
 Sections have a title, optional ID, optional blocks and child sections. Own blocks appear before children. Empty sections are allowed. Limits: eight section levels, 200 total sections, 1,000 total blocks, 200 sources and 5 MB CLI JSON input. Titles/labels are limited to 1,000 characters; IDs to 200, with no whitespace/control characters or reserved `semloom-` prefix.

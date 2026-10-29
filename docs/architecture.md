@@ -1,5 +1,7 @@
 # Architecture
 
+The [complete report workflows](../examples/report-workflows/README.md) use the same `compile()` pipeline and CLI for tool comparison, technical instructions and architecture grouping. Their fixed initial/edit JSON and presentation manifests are shipped examples; they add no alternate compiler, implicit strategy or runtime I/O inside `compile()`.
+
 Semloom is one TypeScript package in a pnpm workspace. Source boundaries separate responsibilities without requiring a package for each module.
 
 A clean prepack build ships ESM/runtime declarations, docs and examples in a compiled tarball, without source maps or development files. `scripts/package-smoke.mjs` installs one real archive into isolated consumers to verify public exports and local browser-adapter paths. See [package installation and verification](releases.md).

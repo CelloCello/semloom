@@ -1,0 +1,128 @@
+{
+  "schemaVersion": "1.0",
+  "title": "Semloom 交付入口：CLI、Library 與 browser 的選擇",
+  "sources": [
+    {
+      "id": "cli-guide",
+      "title": "Semloom docs/cli-cookbook.md"
+    },
+    {
+      "id": "architecture-guide",
+      "title": "Semloom docs/architecture.md"
+    },
+    {
+      "id": "plugin-guide",
+      "title": "Semloom docs/plugin-authoring.md"
+    }
+  ],
+  "sections": [
+    {
+      "id": "decision",
+      "title": "選擇依據",
+      "blocks": [
+        {
+          "id": "tools-conclusion",
+          "kind": "richtext",
+          "content": [
+            {
+              "text": "批次交付可選 CLI；需要程式整合可選 Library API；browser entry 則用於離線互動，不作為文件編譯入口。",
+              "marks": ["strong"]
+            },
+            {
+              "text": "先依 "
+            },
+            {
+              "text": "入口比較",
+              "href": "#entry-comparison"
+            },
+            {
+              "text": " 確認呼叫方式。這份比較整理專案契約，不代表效能或成本評測。"
+            }
+          ],
+          "sourceIds": ["cli-guide", "architecture-guide"]
+        },
+        {
+          "id": "tools-summary",
+          "kind": "list",
+          "ordered": false,
+          "items": [
+            {
+              "content": [
+                {
+                  "text": "保留語意 JSON 與 presentation config。"
+                }
+              ]
+            },
+            {
+              "content": [
+                {
+                  "text": "以 "
+                },
+                {
+                  "text": "--explain",
+                  "marks": ["code"]
+                },
+                {
+                  "text": " 核對實際初始 Variant。"
+                }
+              ]
+            }
+          ],
+          "sourceIds": ["cli-guide"]
+        }
+      ]
+    },
+    {
+      "id": "entry-comparison",
+      "title": "入口比較",
+      "blocks": [
+        {
+          "id": "tools-comparison",
+          "kind": "comparison",
+          "subject": "Semloom 的公開交付入口",
+          "fields": [
+            {
+              "key": "input",
+              "label": "輸入"
+            },
+            {
+              "key": "output",
+              "label": "輸出"
+            },
+            {
+              "key": "use",
+              "label": "適用情境"
+            }
+          ],
+          "items": [
+            {
+              "name": "CLI",
+              "attributes": {
+                "input": "JSON 檔案與獨立 config",
+                "output": "寫入單檔 HTML；Explain 送至 stderr",
+                "use": "命令列驗證、建置與批次交付"
+              }
+            },
+            {
+              "name": "Library API",
+              "attributes": {
+                "input": "語意物件、options 與明確載入的 Catalog",
+                "output": "同步回傳 document、plan 與 HTML 字串",
+                "use": "Node.js 程式整合與自行管理檔案 I/O"
+              }
+            },
+            {
+              "name": "Browser entry",
+              "attributes": {
+                "input": "已編譯資料與受信任的 browser adapters",
+                "output": "報告內的 View 與資源清理契約",
+                "use": "離線切換相容 Variant；不負責 Node 文件編譯"
+              }
+            }
+          ],
+          "sourceIds": ["cli-guide", "architecture-guide", "plugin-guide"]
+        }
+      ]
+    }
+  ]
+}

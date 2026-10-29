@@ -24,6 +24,8 @@ CLI or library build; direct `file://` reading, offline use, desktop/375px and p
 
 ## Capabilities and Constraints
 
+Bundled [report workflows](examples/report-workflows/README.md) cover tool comparison, technical instructions and architecture grouping, each with a fixed initial document, a bounded edit and independent presentation configs. They illustrate the authoring contract rather than recording an Agent run or establishing performance advantages.
+
 External presentation uses explicitly configured local JSON manifests: Theme tokens/optional CSS and Layout base/CSS are independent. Layouts retain the document/sidebar frame, Core navigation and citations; the right-side TOC example inherits sidebar mobile behavior. No Theme/Layout JavaScript or arbitrary HTML renderer is loaded.
 
 Lists support mixed ordered/unordered groups with bounded nesting and shared inline runs. Code blocks retain literal text and whitespace, including CRLF, with local scrolling and print wrapping; language labels do not execute or highlight code.

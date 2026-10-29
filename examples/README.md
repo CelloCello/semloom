@@ -35,6 +35,10 @@ The PR, cards and block catalog data is illustrative. The research report cites 
 
 The workflow report summarizes the project's authoring and installation guides using prose, an insight, a comparison and steps. It demonstrates a process explanation with stable IDs and block citations. It contains no machine-specific paths, version snapshot or claim that a particular Agent/environment passed validation. Presentation comes from the existing config, so the same document can be rebuilt with another Theme or Layout.
 
+## Complete initial/edit workflows
+
+[report-workflows/](report-workflows/README.md) combines the content capabilities into three complete reports: tool comparison, technical guide and architecture grouping. Each ships initial/edited JSON, explicit edit boundaries and independent external Theme/Layout configs. The guide includes a CRLF/indentation/special-character code sample; architecture uses a long Chinese label and a complete subtree move. The linked guide contains checkout and installed CLI commands.
+
 ## Hierarchy and mindmap
 
 [hierarchy.json](hierarchy.json) groups project concepts into one tree. The same JSON supports an indented tree by default and a real offline Markmap via [hierarchy-mindmap.json](hierarchy-mindmap.json), without Markdown conversion. That config also registers/selects the external paper Theme and right-side TOC Layout; keep the `presentation/` manifests and styles alongside it. Labels are plain text, siblings retain input order, and sources belong to the block. All screen widths retain the enhanced diagram with local scrolling; no-JS, setup failure and print show the complete tree. See the [node contract](../docs/semantic-schema.md#hierarchy-content).

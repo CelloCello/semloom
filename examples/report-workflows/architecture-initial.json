@@ -1,0 +1,114 @@
+{
+  "schemaVersion": "1.0",
+  "title": "Semloom：內容、呈現與交付的概念整理",
+  "sources": [
+    {
+      "id": "architecture-guide",
+      "title": "Semloom docs/architecture.md"
+    },
+    {
+      "id": "presentation-guide",
+      "title": "Semloom docs/presentation-authoring.md"
+    }
+  ],
+  "sections": [
+    {
+      "id": "overview",
+      "title": "概念分組",
+      "blocks": [
+        {
+          "kind": "prose",
+          "text": "這份階層圖以專案文件中的能力作概念分組，展示內容、呈現與交付之間的父子關係。分組可依閱讀目的重新整理，不代表程式模組的責任改變。",
+          "sourceIds": ["architecture-guide", "presentation-guide"]
+        },
+        {
+          "kind": "hierarchy",
+          "id": "architecture-map",
+          "root": {
+            "label": "Semloom",
+            "children": [
+              {
+                "label": "內容能力",
+                "children": [
+                  {
+                    "label": "文字內容",
+                    "children": [
+                      {
+                        "label": "prose：純文字"
+                      },
+                      {
+                        "label": "richtext：行內格式"
+                      },
+                      {
+                        "label": "code：原文程式碼"
+                      }
+                    ]
+                  },
+                  {
+                    "label": "結構化資訊",
+                    "children": [
+                      {
+                        "label": "list：清單"
+                      },
+                      {
+                        "label": "comparison：比較"
+                      },
+                      {
+                        "label": "timeline：時間軸"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "label": "呈現配置",
+                "children": [
+                  {
+                    "label": "Theme",
+                    "children": [
+                      {
+                        "label": "內建風格"
+                      },
+                      {
+                        "label": "外部 Theme 的 tokens 與 CSS 負責視覺風格，內容、來源引用與導覽仍由 Core 保留"
+                      }
+                    ]
+                  },
+                  {
+                    "label": "Layout",
+                    "children": [
+                      {
+                        "label": "document：正文上方目錄"
+                      },
+                      {
+                        "label": "sidebar：側邊目錄"
+                      },
+                      {
+                        "label": "外部右側目錄：沿用基底導覽"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "label": "擴充與交付",
+                "children": [
+                  {
+                    "label": "內容 Plugin"
+                  },
+                  {
+                    "label": "CLI"
+                  },
+                  {
+                    "label": "Library API"
+                  }
+                ]
+              }
+            ]
+          },
+          "sourceIds": ["architecture-guide", "presentation-guide"]
+        }
+      ]
+    }
+  ]
+}

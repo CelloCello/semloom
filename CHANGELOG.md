@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Ship complete initial/edit workflows for tool comparison, technical instructions and architecture grouping, with external Theme/Layout configs, bounded edit checks, CLI/Library parity and installed-artifact browser verification.
+
 - Distinct six-color mindmap palettes for every built-in Theme, with light/dark external Theme defaults and per-color CSS overrides. A seven-branch example demonstrates inheritance and cycling.
 
 - Add bounded `hierarchy` JSON with default tree and an offline Markmap Variant, escaped plain-text nodes, mouse/keyboard folding, Theme branch palettes and local scrolling at every screen width. Bundle the real renderer and dependency notices; no-JS, setup failure and print retain the full tree. Include concept/reference reports and external Theme/right-side TOC config.

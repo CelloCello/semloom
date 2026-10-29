@@ -93,6 +93,12 @@ for (const binary of runtimes) {
       `${archiveSha256}  ${packed.filename}\n`,
     );
     const names = packed.files.map((file) => file.path);
+    const workflowCases = JSON.parse(
+      await readFile(
+        resolve(root, 'examples/report-workflows/cases.json'),
+        'utf8',
+      ),
+    );
     for (const required of [
       'LICENSE',
       'README.zh-TW.md',
@@ -114,6 +120,15 @@ for (const binary of runtimes) {
       'examples/hierarchy.json',
       'examples/hierarchy-mindmap.json',
       'examples/hierarchy-palettes.json',
+      'examples/report-workflows/README.md',
+      'examples/report-workflows/cases.json',
+      ...workflowCases.flatMap((scenario) =>
+        [
+          scenario.initial,
+          scenario.edited,
+          ...scenario.variants.map((variant) => variant.config),
+        ].map((name) => `examples/report-workflows/${name}`),
+      ),
       'examples/hierarchy-reference.json',
       'examples/hierarchy-reference-mindmap.json',
       'dist/core/hierarchy.js',
@@ -521,6 +536,68 @@ for (const binary of runtimes) {
       ].join('\n'),
     );
     run(binary, ['hierarchy-smoke.mjs'], consumer);
+    const workflowOutputs = [];
+    for (const scenario of workflowCases)
+      for (const variant of scenario.variants) {
+        const config = `examples/report-workflows/${variant.config}`;
+        JSON.parse(run(binary, [cli, 'schema', '--config', config], consumer));
+        for (const phase of ['initial', 'edited']) {
+          const input = `examples/report-workflows/${scenario[phase]}`;
+          const name = `workflow-${scenario.id}-${phase}-${variant.id}`;
+          run(binary, [cli, 'validate', input, '--config', config], consumer);
+          run(
+            binary,
+            [
+              cli,
+              'build',
+              input,
+              '--config',
+              config,
+              '--theme',
+              phase === 'initial' ? 'example.paper' : 'example.night',
+              '--explain',
+              '-o',
+              `reports/${name}.html`,
+            ],
+            consumer,
+          );
+          workflowOutputs.push(name);
+        }
+      }
+    assert.equal(
+      workflowOutputs.length,
+      10,
+      'All three workflows and five Variant configs must produce initial/edit artifacts.',
+    );
+    await writeFile(
+      join(consumer, 'report-workflows-smoke.mjs'),
+      [
+        "import assert from 'node:assert/strict';",
+        "import {readFileSync,writeFileSync} from 'node:fs';",
+        "import {resolve} from 'node:path';",
+        `import {compile,parseConfig,loadPresentation} from ${JSON.stringify(manifest.name)};`,
+        "const read=name=>JSON.parse(readFileSync('examples/report-workflows/'+name,'utf8'));",
+        'const results=[];',
+        "for(const scenario of read('cases.json'))for(const variant of scenario.variants){",
+        'const config=parseConfig(read(variant.config));',
+        "const catalog=await loadPresentation(config,resolve('examples/report-workflows'));",
+        "for(const phase of ['initial','edited']){",
+        'const input=read(scenario[phase]),original=structuredClone(input);',
+        "const options={...config,theme:phase==='initial'?'example.paper':'example.night'};",
+        'const output=compile(input,options,undefined,catalog);',
+        'assert.deepEqual(input,original);assert.deepEqual(output.document.data,original);',
+        "assert.equal(output.plan.context.layout,'sidebar');",
+        'if(variant.blockId)assert.equal(output.plan.blocks.find(block=>block.id===variant.blockId).selected,variant.selected);',
+        'const name=`workflow-${scenario.id}-${phase}-${variant.id}`;',
+        "assert.equal(output.html,readFileSync(`reports/${name}.html`,'utf8'));",
+        "writeFileSync(`reports/${name}.plan.json`,JSON.stringify(output.plan,null,2)+'\\n');",
+        'results.push({scenario:scenario.id,phase,variant:variant.id,name,theme:options.theme,plan:output.plan});',
+        '}}',
+        "assert.equal(results.length,10,'Installed workflow coverage must include all ten initial/edit artifacts.');",
+        "writeFileSync('reports/report-workflows.json',JSON.stringify(results,null,2)+'\\n');",
+      ].join('\n'),
+    );
+    run(binary, ['report-workflows-smoke.mjs'], consumer);
     await writeFile(
       join(consumer, 'types-hierarchy.mts'),
       [
@@ -587,6 +664,7 @@ for (const binary of runtimes) {
       'hierarchy-tree',
       'hierarchy-mindmap',
       ...installedThemes.map((theme) => `mindmap-palette-${theme}`),
+      ...workflowOutputs,
     ]) {
       const file = join(consumer, `reports/${name}.html`);
       const content = await readFile(file);

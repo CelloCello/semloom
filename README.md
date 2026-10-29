@@ -75,6 +75,8 @@ Existing text fields display literally. Use the explicit `richtext` kind for emp
 
 ## Choose a look
 
+For complete initial/edit tasks, see [three report workflows](examples/report-workflows/README.md): a tool comparison, a technical guide and architecture grouping. Each includes semantic inputs, exact edit boundaries and external Theme/Layout configs. Rebuild from JSON/config after edits; generated HTML needs no manual patching.
+
 ```sh
 semloom build report.json --theme midnight --layout sidebar -o reports/project-update.html
 semloom themes list

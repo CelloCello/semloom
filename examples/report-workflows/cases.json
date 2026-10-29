@@ -1,0 +1,54 @@
+[
+  {
+    "id": "tools",
+    "title": "工具研究比較",
+    "initial": "tools-initial.json",
+    "edited": "tools-edited.json",
+    "variants": [
+      {
+        "id": "cards",
+        "config": "tools-cards.json",
+        "blockId": "tools-comparison",
+        "selected": "comparison.cards"
+      },
+      {
+        "id": "table",
+        "config": "tools-table.json",
+        "blockId": "tools-comparison",
+        "selected": "comparison.table"
+      }
+    ]
+  },
+  {
+    "id": "guide",
+    "title": "技術操作指南",
+    "initial": "guide-initial.json",
+    "edited": "guide-edited.json",
+    "variants": [
+      {
+        "id": "default",
+        "config": "guide-default.json"
+      }
+    ]
+  },
+  {
+    "id": "architecture",
+    "title": "架構／知識整理",
+    "initial": "architecture-initial.json",
+    "edited": "architecture-edited.json",
+    "variants": [
+      {
+        "id": "tree",
+        "config": "architecture-tree.json",
+        "blockId": "architecture-map",
+        "selected": "hierarchy.tree"
+      },
+      {
+        "id": "mindmap",
+        "config": "architecture-mindmap.json",
+        "blockId": "architecture-map",
+        "selected": "hierarchy.mindmap"
+      }
+    ]
+  }
+]

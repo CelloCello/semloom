@@ -75,6 +75,8 @@ semloom build report.json -o reports/project-update.html --explain
 
 ## 選擇外觀
 
+完整初稿／修改任務請見[三種報告工作流](examples/report-workflows/README.md)：工具比較、技術指南與架構整理。各自提供語意輸入、明確修改範圍及外部 Theme／Layout configs；修改 JSON／config 後重新建置，無須手修生成的 HTML。
+
 ```sh
 semloom build report.json --theme midnight --layout sidebar -o reports/project-update.html
 semloom themes list
