@@ -24,6 +24,8 @@ CLI or library build; direct `file://` reading, offline use, desktop/375px and p
 
 ## Capabilities and Constraints
 
+External presentation uses explicitly configured local JSON manifests: Theme tokens/optional CSS and Layout base/CSS are independent. Layouts retain the document/sidebar frame, Core navigation and citations; the right-side TOC example inherits sidebar mobile behavior. No Theme/Layout JavaScript or arbitrary HTML renderer is loaded.
+
 Lists support mixed ordered/unordered groups with bounded nesting and shared inline runs. Code blocks retain literal text and whitespace, including CRLF, with local scrolling and print wrapping; language labels do not execute or highlight code.
 
 Existing text fields remain literal. The explicit `richtext` kind adds bounded inline runs with emphasis, code and validated links, without parsing Markdown or raw HTML. Citations stay at block level and presentation selection happens at build time. Optional `interactive` reports allow offline switching among compatible Variants with browser adapters; default is static. HTML must preserve data and sources, escape input and remain readable without JavaScript. Failed Views retain the prior content; successful switches dispose prior resources. Performance/token advantages require controlled evaluation rather than inference from individual reports.

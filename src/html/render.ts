@@ -9,12 +9,15 @@ import {
   SemloomError,
   type HtmlFragment,
   type ThemeName,
+  type ResolvedPresentation,
 } from '../core/types.js';
 import { fragment, heading, html, isFragment } from './html.js';
 import { stylesheetCss } from './styles/index.js';
 import { interactiveCss } from './styles/interactive.js';
 import { navigationHash, navigationScript } from './navigation.js';
 import { runtimeLicenseText } from './license.js';
+import { printThemeCss } from './themes/index.js';
+import { layoutPrintCss } from './layouts/document.js';
 import { planInteractive } from '../browser/plan.js';
 import { bundleInteractive, jsonForHtml } from '../browser/bundle.js';
 
@@ -22,8 +25,9 @@ export function renderDocument(
   document: ResolvedDocument,
   plan: PresentationPlan,
   registry: Registry,
-  theme: ThemeName = 'minimal',
+  theme: string = 'minimal',
   interactive = false,
+  presentation: ResolvedPresentation = { base: plan.context.layout },
 ): string {
   const runtimePlan = interactive
     ? planInteractive(document, plan, registry)
@@ -131,6 +135,7 @@ export function renderDocument(
       lang="${plan.context.locale}"
       data-theme="${theme}"
       data-layout="${plan.context.layout}"
+      ${presentation.layout ? html`data-layout-id="${presentation.layout.id}"` : ''}
     >
       <head>
         <meta charset="utf-8" />
@@ -142,7 +147,7 @@ export function renderDocument(
         <title>${document.data.title}</title>
         ${fragment(`<!-- Semloom runtime license (report content is separate)\n${runtimeLicenseText}\n-->`)}
         <style>
-          ${fragment(stylesheetCss(theme) + (runtime ? interactiveCss : ''))}
+          ${fragment(stylesheetCss(presentation.theme ?? (theme as ThemeName)) + (runtime ? interactiveCss : ''))}
         </style>
         ${assets.map(
           (asset) =>
@@ -150,6 +155,18 @@ export function renderDocument(
               ${fragment(asset.content)}
             </style>`,
         )}
+        ${
+          presentation.theme || presentation.layout
+            ? html`
+                <style data-semloom-presentation>
+                  ${fragment((presentation.theme?.css ?? '') + '\n' + (presentation.layout?.css ?? ''))}
+                </style>
+                <style data-semloom-print>
+                  ${fragment(printThemeCss + layoutPrintCss)}
+                </style>
+              `
+            : ''
+        }
       </head>
       <body>
         <a class="skip-link" href="#semloom-main">跳至內容</a>

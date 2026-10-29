@@ -1,0 +1,6 @@
+{
+  "id": "example.right-sidebar",
+  "layoutApiVersion": "1.0",
+  "base": "sidebar",
+  "cssFile": "./styles/right-sidebar.css"
+}

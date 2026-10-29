@@ -186,7 +186,7 @@ export async function smokeGlobalPackage({
     );
     const instructions = await readFile(join(skill, 'SKILL.md'), 'utf8');
     for (const match of instructions.matchAll(/\[[^\]]*\]\(([^)]+)\)/gu))
-      await access(join(skill, match[1]));
+      await access(join(skill, match[1].split('#')[0]));
 
     // Modules kept inside their installation resolve the Semloom self-reference.
     const config = join(

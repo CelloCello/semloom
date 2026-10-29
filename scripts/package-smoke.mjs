@@ -267,7 +267,7 @@ for (const binary of runtimes) {
       // Resolve every skill reference from its physical location, not .agents/.
       const instructions = await readFile(join(skillLink, 'SKILL.md'), 'utf8');
       for (const match of instructions.matchAll(/\[[^\]]*\]\(([^)]+)\)/gu))
-        await access(resolve(physicalSkill, match[1]));
+        await access(resolve(physicalSkill, match[1].split('#')[0]));
       assert.equal(invoke('--version').trim(), manifest.version);
       const config =
         mode === 'checkout'
@@ -399,9 +399,70 @@ for (const binary of runtimes) {
       `import assert from 'node:assert/strict';\nimport {compile} from ${JSON.stringify(manifest.name)};\nimport {safeUrl} from ${JSON.stringify(`${manifest.name}/browser`)};\nimport {readFileSync} from 'node:fs';\nsafeUrl('https://example.com');\nconst output=compile(JSON.parse(readFileSync('examples/comparison.json','utf8')),{interactive:true});\nassert.ok(output.html.includes('data-semloom-interactive'));\n`,
     );
     run(binary, ['library-smoke.mjs'], consumer);
+    const presentationConfig = 'examples/presentation/presentation.json';
+    for (const category of ['themes', 'layouts']) {
+      const listed = JSON.parse(
+        run(
+          binary,
+          [cli, category, 'list', '--config', presentationConfig],
+          consumer,
+        ),
+      );
+      assert.ok(
+        listed.includes(
+          category === 'themes' ? 'example.paper' : 'example.right-sidebar',
+        ),
+      );
+    }
+    run(binary, [cli, 'schema', '--config', presentationConfig], consumer);
+    run(
+      binary,
+      [
+        cli,
+        'validate',
+        'examples/technical-guide.json',
+        '--config',
+        presentationConfig,
+      ],
+      consumer,
+    );
+    run(
+      binary,
+      [
+        cli,
+        'build',
+        'examples/technical-guide.json',
+        '--config',
+        presentationConfig,
+        '-o',
+        'reports/presentation.html',
+      ],
+      consumer,
+    );
+    await writeFile(
+      join(consumer, 'presentation-smoke.mjs'),
+      [
+        "import assert from 'node:assert/strict';",
+        "import {readFileSync} from 'node:fs';",
+        "import {resolve} from 'node:path';",
+        `import {compile,parseConfig,loadPresentation,createPresentation} from ${JSON.stringify(manifest.name)};`,
+        "const input=JSON.parse(readFileSync('examples/technical-guide.json','utf8'));",
+        "const config=parseConfig(JSON.parse(readFileSync('examples/presentation/presentation.json','utf8')));",
+        "const catalog=await loadPresentation(config,resolve('examples/presentation'));",
+        'const output=compile(input,config,undefined,catalog);',
+        "assert.equal(output.html,readFileSync('reports/presentation.html','utf8'));",
+        "assert.equal(output.plan.context.layout,'sidebar');",
+        'assert.ok(output.html.includes(\'data-layout-id="example.right-sidebar"\'));',
+        "assert.ok(output.html.includes('grid-column: 2'));",
+        "assert.ok(output.html.includes('font-weight: 600'));",
+        "const pure=createPresentation({themes:[{id:'consumer.pure',themeApiVersion:'1.0',tokens:{accent:'#123456'}}],layouts:[{id:'consumer.reading',layoutApiVersion:'1.0',base:'document',css:'.page{max-width:60rem}'}]});",
+        "assert.equal(compile(input,{theme:'consumer.pure',layout:'consumer.reading'},undefined,pure).plan.context.layout,'document');",
+      ].join('\n'),
+    );
+    run(binary, ['presentation-smoke.mjs'], consumer);
     await writeFile(
       join(consumer, 'types-node.mts'),
-      `import {compile, type Document} from ${JSON.stringify(manifest.name)};\nconst data:Document={schemaVersion:'1.0',title:'T',sections:[{title:'S'}]};\nconst output:string=compile(data).html;\nvoid output;\n`,
+      `import {compile,createPresentation,parseConfig,loadPresentation,type Document,type ThemeDefinition,type LayoutDefinition,type ThemeTokens} from ${JSON.stringify(manifest.name)};\nconst data:Document={schemaVersion:'1.0',title:'T',sections:[{title:'S'}]};\nconst tokens:Partial<ThemeTokens>={accent:'#123456'};\nconst theme:ThemeDefinition={id:'consumer.typed',themeApiVersion:'1.0',tokens};\nconst layout:LayoutDefinition={id:'consumer.typed',layoutApiVersion:'1.0',base:'sidebar'};\nconst catalog=createPresentation({themes:[theme],layouts:[layout]});\nconst output:string=compile(data,{theme:theme.id,layout:layout.id},undefined,catalog).html;\nvoid [output,loadPresentation(parseConfig())];\n`,
     );
     await writeFile(
       join(consumer, 'types-browser.mts'),
@@ -447,6 +508,7 @@ for (const binary of runtimes) {
       'report-workflow',
       'interactive',
       'plugin-interactive',
+      'presentation',
     ]) {
       const file = join(consumer, `reports/${name}.html`);
       const content = await readFile(file);

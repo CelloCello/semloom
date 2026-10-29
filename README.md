@@ -11,7 +11,7 @@ Keep the content in JSON, choose a presentation, and share the HTML. Reports wor
 ## What you get
 
 - **Structured content:** prose, rich text, nested lists, code, comparisons, insights, metrics, steps and timelines, with block-level source references.
-- **Reusable presentation:** six Themes, two Layouts and compatible block Variants; change appearance while preserving the data.
+- **Reusable presentation:** six built-in Themes, two Layout bases, local Theme/Layout extensions and compatible block Variants; change appearance while preserving the data.
 - **Clear validation:** export JSON Schema, catch invalid fields/references, and inspect presentation choices with `--explain`.
 - **Optional interaction:** switch compatible comparison views offline. Complete content stays readable without JavaScript.
 - **Agent and library workflows:** a bundled skill, an ESM API and trusted local Plugin extensions.
@@ -96,6 +96,8 @@ Layout is a separate choice: `document` places the table of contents above the r
 From a checkout, run `pnpm demo:themes` and open `reports/themes/index.html` to compare all twelve combinations. See [Themes and Layouts](docs/themes.md) for styling and extension details.
 
 ## Work with a coding agent
+
+To create your own style or page arrangement, register local JSON manifests. The [external presentation guide](docs/presentation-authoring.md) includes light/dark Themes and a right-side TOC Layout; no edits or rebuild of Semloom are needed.
 
 Use the [bundled Semloom skill](skills/semloom/SKILL.md) to guide an agent through Schema discovery, semantic authoring, validation and rebuilding after edits. Follow the [skill installation guide](docs/skills.md) to register it with your agent; installing the package does not register the skill automatically.
 

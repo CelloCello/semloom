@@ -70,7 +70,7 @@ The exported schema validates structure. Uniqueness across nodes, total node cou
 
 ## Presentation config
 
-Config accepts `theme: "minimal" | "editorial" | "ocean" | "graphite" | "signal" | "midnight"`, `layout: "document" | "sidebar"`, an `overrides` object and a `plugins` array of explicit local `.js`/`.mjs`/`.cjs` module paths. Defaults are `minimal`/`document`. Relative paths resolve from the config directory. The same loaded Registry is used by Schema export, validate, build and list. Theme affects CSS tokens only; Layout participates in presentation context. See [Themes and Layouts](themes.md).
+Config accepts registered `theme`/`layout` IDs, optional `themes`/`layouts` arrays of explicit local JSON manifests, an `overrides` object and a `plugins` array of explicit local `.js`/`.mjs`/`.cjs` paths. Defaults remain `minimal`/`document`; built-in names continue working. Registration paths resolve from the config directory. Schema export, validate, build and list use the same Registry and presentation catalog. Theme changes appearance; the Layout base participates in context. See [Themes and Layouts](themes.md) and [external manifests](presentation-authoring.md).
 
 Each override maps an explicit block ID to a compatible full Variant ID: `comparison.cards`, `comparison.table`, `prose.paragraph`, `richtext.paragraph`, `list.nested`, `code.block`, `insight.callout`, `metrics.summary`, `steps.list`, `steps.stepper`, `timeline.vertical`, or a loaded Plugin contribution. Unknown targets, sections, automatic IDs and unsupported selections are errors. No permissive fallback is provided. See [Plugin authoring](plugin-authoring.md) for registration, compatibility and assets.
 

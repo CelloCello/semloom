@@ -87,6 +87,8 @@ Rich Text uses the same prose measure and whitespace behavior, with semantic str
 
 ## Layout
 
+External Layouts select an existing base and use `data-layout-id` for scoped placement CSS. The right-side TOC example mirrors desktop sidebar placement while retaining its 800px disclosure, static fallback, keyboard/focus and single-column print behavior. External Themes independently provide validated tokens and optional scoped CSS; Core print resets follow them.
+
 Page max width 76rem, desktop padding 4rem/3rem and mobile padding 2rem/1.1rem. Cards collapse to one column below 600px. Tables scroll inside an accessible, focusable region; the page must not scroll horizontally. Print removes navigation and uses wrapping table cells and repeated headers.
 
 Sidebar expands the page to 96rem with a 15rem sticky TOC and a flexible reading column. At 800px and below it becomes an in-flow mobile disclosure; no-JS keeps all links visible. Focus rings, a skip link and an explicit current-section mark support keyboard reading. Deep TOC indentation flattens after three levels. Print restores a single column and hides navigation controls.

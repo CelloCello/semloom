@@ -1,4 +1,4 @@
-import type { ThemeName } from '../../core/types.js';
+import type { ThemeName, ThemeDefinition } from '../../core/types.js';
 import { editorialTokens } from './editorial.js';
 import { oceanTokens } from './ocean.js';
 import { graphiteTokens } from './graphite.js';
@@ -21,14 +21,18 @@ export function resolveTheme(name: ThemeName): ThemeTokens {
   return { ...minimalTokens, ...themes[name] };
 }
 
-export function themeCss(name: ThemeName): string {
-  const tokens = Object.entries(resolveTheme(name))
+export function themeCss(name: ThemeName | ThemeDefinition): string {
+  const tokens = Object.entries(
+    typeof name === 'string'
+      ? resolveTheme(name)
+      : { ...minimalTokens, ...name.tokens },
+  )
     .map(([key, value]) => `--${key}:${value}`)
     .join(';');
   return `:root{${tokens}}\n${printThemeCss}`;
 }
 
-const printThemeCss = `
+export const printThemeCss = `
 @media print {
   :root {
     --color-scheme: light;

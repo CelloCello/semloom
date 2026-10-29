@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add explicitly loaded local JSON Themes and Layouts, validated tokens/CSS, independent IDs, `layouts list`, and file/pure-data Library catalogs. External Layouts retain base context and navigation; a right-side TOC example composes with light/dark Themes and Core print resets.
+
 - Add bounded mixed ordered/unordered List groups that reuse inline marks/links and a literal Code block with optional language label, keyboard-accessible scrolling, CRLF preservation and print wrapping.
 
 - Add `richtext` paragraphs with bounded flat runs, combined strong/emphasis/inline-code marks and validated links. Existing text fields remain literal; citations stay at block level.

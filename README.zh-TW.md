@@ -11,7 +11,7 @@ Semloom 將語意 JSON 編譯成一份獨立的 HTML 報告，適合研究比較
 ## 可以做什麼
 
 - **結構化內容**：段落、Rich Text、巢狀清單、程式碼、比較、重點提示、數值摘要、步驟與時間軸，支援區塊層級的來源引用。
-- **可重用的呈現方式**：六款 Theme、兩種 Layout，以及相容的區塊 Variant；調整外觀時保留語意資料。
+- **可重用的呈現方式**：六款內建 Theme、兩種 Layout 基底、本機 Theme／Layout 擴充，以及相容的區塊 Variant；調整外觀時保留語意資料。
 - **明確的驗證**：匯出 JSON Schema、檢查欄位與引用，透過 `--explain` 查看實際呈現選擇。
 - **可選的互動功能**：離線切換相容的比較呈現；停用 JavaScript 時仍保留完整內容。
 - **Agent 與程式整合**：內附 skill、ESM API，並可載入可信任的本機 Plugin。
@@ -96,6 +96,8 @@ Layout 可獨立選擇：`document` 將目錄放在內容上方；`sidebar` 在�
 在 checkout 中執行 `pnpm demo:themes`，再開啟 `reports/themes/index.html`，即可比較全部十二種組合。樣式與擴充方式請見 [Themes and Layouts](docs/themes.md)。
 
 ## 搭配 coding agent
+
+若要自行擴充風格或頁面配置，可註冊本機 JSON manifests。[外部呈現指南](docs/presentation-authoring.md) 提供淺／深色 Theme 與右側目錄 Layout 範例，不必修改或重建 Semloom。
 
 內附的 [Semloom skill](skills/semloom/SKILL.md) 可引導 Agent 讀取 Schema、撰寫語意資料、驗證及修改後重建。請依 [skill 安裝說明](docs/skills.md) 註冊到所用的 Agent；安裝套件不會自動完成 skill 註冊。
 

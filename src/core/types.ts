@@ -1,3 +1,5 @@
+import type { ThemeTokens } from './theme.js';
+export type { ThemeTokens } from './theme.js';
 export type JsonSchema = Record<string, unknown>;
 export type Cell = string | number | boolean | null;
 export const themeNames = [
@@ -11,6 +13,27 @@ export const themeNames = [
 export const layoutNames = ['document', 'sidebar'] as const;
 export type ThemeName = (typeof themeNames)[number];
 export type LayoutName = (typeof layoutNames)[number];
+export interface ThemeDefinition {
+  id: string;
+  themeApiVersion: '1.0';
+  tokens?: Partial<ThemeTokens>;
+  css?: string;
+}
+export interface LayoutDefinition {
+  id: string;
+  layoutApiVersion: '1.0';
+  base: LayoutName;
+  css?: string;
+}
+export interface PresentationNames {
+  themes: readonly string[];
+  layouts: readonly string[];
+}
+export interface ResolvedPresentation {
+  base: LayoutName;
+  theme?: ThemeDefinition;
+  layout?: LayoutDefinition;
+}
 
 export interface Block {
   id?: string;
@@ -98,8 +121,10 @@ export interface Document {
   sections: Section[];
 }
 export interface Config {
-  theme: ThemeName;
-  layout: LayoutName;
+  theme: string;
+  layout: string;
+  themes: string[];
+  layouts: string[];
   overrides: Record<string, string>;
   plugins: string[];
   interactive: boolean;

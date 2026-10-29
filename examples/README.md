@@ -37,6 +37,8 @@ The workflow report summarizes the project's authoring and installation guides u
 
 ## Choose presentation
 
+[External presentation](presentation/presentation.json) registers paper/night Themes and a right-side TOC Layout. Keep its JSON manifests and `styles/` directory together when copying it into a report project; paths are relative to the config and each manifest. See [authoring](../docs/presentation-authoring.md) for creating your own definitions and the independent Theme/Layout selection.
+
 Configs are not semantic documents. Pass them with `--config` alongside a report rather than validating them as report input. Overrides target IDs in their intended report.
 
 | Config                                           | Use with          | Effect                                                         |

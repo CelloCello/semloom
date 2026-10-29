@@ -1,0 +1,4 @@
+[data-theme='example.paper'] .semloom-code figcaption {
+  font-weight: 600;
+  background: var(--table-head);
+}

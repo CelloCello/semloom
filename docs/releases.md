@@ -76,6 +76,8 @@ Dependencies may need downloading during installation. Compilation and report re
 
 ## Verify a package
 
+The installed consumer checks include the external light/dark Theme and right-side TOC manifests, manifest-relative CSS, CLI listings/schema/validation/build, ESM file loading and pure data catalogs. Node-only declaration checks cover their public types without DOM libraries.
+
 ```sh
 pnpm test:package
 ```

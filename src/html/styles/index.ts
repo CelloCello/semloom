@@ -1,10 +1,10 @@
-import type { ThemeName } from '../../core/types.js';
+import type { ThemeName, ThemeDefinition } from '../../core/types.js';
 import { documentCss, layoutPrintCss } from '../layouts/document.js';
 import { sidebarCss } from '../layouts/sidebar.js';
 import { themeCss } from '../themes/index.js';
 import { componentCss } from './components.js';
 
-export function stylesheetCss(theme: ThemeName): string {
+export function stylesheetCss(theme: ThemeName | ThemeDefinition): string {
   // Layout overrides follow shared components; print flow overrides both Layouts.
   return [
     themeCss(theme),

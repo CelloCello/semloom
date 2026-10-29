@@ -204,8 +204,10 @@ test('deep lists wrap safely and literal Code round-trips whitespace, CRLF and i
       (element) => element.scrollWidth > element.clientWidth,
     ),
   ).toBe(true);
+  await region.scrollIntoViewIfNeeded();
+  await expect(region).toBeInViewport();
   await region.focus();
-  await page.keyboard.press('ArrowRight');
+  await region.press('ArrowRight');
   await expect(region).toBeFocused();
   await expect(region).toHaveCSS('outline-style', 'solid');
   await expect

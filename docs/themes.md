@@ -1,6 +1,6 @@
 # Themes and Layouts
 
-Config accepts `theme: "minimal" | "editorial" | "ocean" | "graphite" | "signal" | "midnight"` and `layout: "document" | "sidebar"`. Defaults are `minimal`/`document`. All Themes work with both Layouts; CLI options override config values. There is no user CSS, external Theme package or token configuration field.
+Built-in Themes are `minimal`, `editorial`, `ocean`, `graphite`, `signal` and `midnight`; Layout bases are `document` and `sidebar`. Defaults are `minimal`/`document`. Config can also register local JSON Theme/Layout manifests and select their IDs. See [external presentation authoring](presentation-authoring.md) for tokens, CSS, paths, Library APIs and the right-side TOC example. CLI options override valid config selections.
 
 `minimal` uses warm white, green links and local system sans fonts. `editorial` uses warm paper, brown links and local Georgia/Songti/PMingLiU serif fonts, with wider spacing and leading. Font availability depends on the reading machine; nothing is downloaded.
 
@@ -65,7 +65,7 @@ To add a built-in Theme:
 3. Import and register the overrides in the `themes` map in `themes/index.ts`. No component or Layout edits are needed for an existing token change. A new token also needs a baseline value and the rules that consume it.
 4. Update CLI help, docs/design tokens and tests; rebuild and verify all supported Layouts, mobile/print, contrast and unchanged content/Variant selection.
 
-Themes are explicitly registered source modules. Adding a file alone does not register it; there is no filesystem discovery or external Theme Plugin API.
+Built-in Themes are explicitly registered source modules. External Themes use explicitly configured JSON manifests; neither route discovers files automatically. External presentation is separate from content Plugins.
 
 | Variables                                  | Use                                      |
 | ------------------------------------------ | ---------------------------------------- |
