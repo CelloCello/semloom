@@ -7,6 +7,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { comparisonDocument } from './helpers.mjs';
 import { compile } from '../dist/index.js';
+import { technicalGuide } from './fixtures/technical-guide.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const cli = (...args) =>
@@ -209,6 +210,72 @@ test('richtext CLI exports its schema, matches library output and preserves old 
       assert.match(failure.stderr, /\/sections\/0\/blocks\/0\/content\/0\//);
       assert.match(failure.stderr, diagnostic);
       assert.equal(readFileSync(output, 'utf8'), previous);
+    }
+  }
+});
+
+test('List/Code CLI builds initial and edited technical guides and reports nested failures without replacing output', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'semloom-guide-cli-'));
+  const inputFile = join(directory, 'guide.json');
+  const output = join(directory, 'guide.html');
+  const schema = JSON.parse(cli('schema').stdout);
+  for (const kind of ['list', 'code'])
+    assert.ok(
+      schema.definitions.block.oneOf.some(
+        (choice) => choice.properties.kind.const === kind,
+      ),
+    );
+  assert.match(cli('--help').stdout, /richtext, list, code/);
+  for (const edited of [false, true]) {
+    const input = technicalGuide(edited);
+    writeFileSync(inputFile, JSON.stringify(input));
+    assert.equal(cli('validate', inputFile).status, 0);
+    const built = cli('build', inputFile, '--explain', '-o', output);
+    assert.equal(built.status, 0, built.stderr);
+    assert.equal(built.stdout, '');
+    assert.match(built.stderr, /"selected": "list.nested"/);
+    assert.match(built.stderr, /"selected": "code.block"/);
+    assert.equal(readFileSync(output, 'utf8'), compile(input).html);
+  }
+  const previous = readFileSync(output);
+  for (const [edit, path, code] of [
+    [
+      (d) => {
+        d.sections[0].blocks[1].items[0].children.items[1].content[0].href =
+          '#missing';
+      },
+      '/sections/0/blocks/1/items/0/children/items/1/content/0/href',
+      'INVALID_ANCHOR',
+    ],
+    [
+      (d) => {
+        d.sections[0].blocks[1].items[0].children.items[1].content[0].href =
+          'javascript:alert(1)';
+      },
+      '/sections/0/blocks/1/items/0/children/items/1/content/0/href',
+      'UNSAFE_URL',
+    ],
+    [
+      (d) => {
+        d.sections[1].blocks[0].text = 'nul\u0000';
+      },
+      '/sections/1/blocks/0/text',
+      'SCHEMA_PATTERN',
+    ],
+  ]) {
+    const invalid = technicalGuide(true);
+    edit(invalid);
+    writeFileSync(inputFile, JSON.stringify(invalid));
+    for (const args of [
+      ['validate', inputFile],
+      ['build', inputFile, '-o', output],
+    ]) {
+      const failed = cli(...args);
+      assert.equal(failed.status, 2, failed.stderr);
+      assert.ok(failed.stderr.includes(inputFile));
+      assert.ok(failed.stderr.includes(path));
+      assert.ok(failed.stderr.includes(code));
+      assert.deepEqual(readFileSync(output), previous);
     }
   }
 });

@@ -97,6 +97,8 @@ Flat surfaces, no shadows. Cards use a single border; no nested card decorations
 
 ## Components
 
+Lists use native ordered/unordered markers and bounded indentation; each item's text uses the Rich Text measure and inline styles. Code uses a quiet bordered Theme surface with an optional language caption, local monospace fonts and a focusable scrolling region. Screen preserves code whitespace without wrapping; print wraps long lines without altering DOM text. No highlighting, execution controls or copy runtime is added.
+
 Comparison cards and tables show the same ordered fields. Block citations sit outside the variant. Sources with no URL remain plain text; source links use visible underlines. Focus rings and print URLs preserve access and traceability.
 
 Insights use a quiet bordered aside with an explicit author-supplied level label. Metrics use compact definition lists, 1.4rem values and secondary comparison values without derived trend colors. Steps remain complete ordered lists; the stepper spreads short sequences across columns and collapses on mobile/print. Timelines display raw time labels in input order. These components and local Plugin CSS consume the same paper/ink/accent/line/space tokens.

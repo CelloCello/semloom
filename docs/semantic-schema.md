@@ -10,6 +10,8 @@ Common fields are `kind`, optional `id` and optional unique `sourceIds`. IDs are
 
 - `prose`: nonempty `text`, at most 100,000 characters. All text, including Markdown/HTML-like strings, displays literally; no inline formatting or automatic links.
 - `richtext`: `content` is an ordered array of inline runs, rendered by `richtext.paragraph`. Each run has nonempty `text`, optional `marks` and optional `href`. See the inline contract below; existing plain-text fields do not interpret these structures.
+- `list`: explicit boolean `ordered` and nonempty `items`, rendered by `list.nested`. Each item has inline `content` and optional `children`, which is another `{ ordered, items }` group. See the list contract below.
+- `code`: nonempty literal `text` up to 100,000 Unicode code points and optional nonempty `language` up to 100 characters, rendered by `code.block`. The language is a display label, not an executable mode or syntax-highlighting instruction. Whitespace, blank lines, tabs and CRLF/CR are preserved in DOM text; long lines scroll within the focusable code region and wrap for print. NUL and unpaired surrogates are rejected because they cannot round-trip through a UTF-8 HTML file. No code is executed. `CodeBlock` and `codeLimits` are exported for library callers.
 - `comparison`: nonempty `subject`, `fields` (1–50), `items` (1–1,000). A field has unique `key`, `label` and optional `unit`. An item has `name` and `attributes`; only declared field keys may appear. Values are strings (up to 20,000 characters), finite numbers, booleans or null. Missing/null display “未提供”; zero, false and empty string are preserved. Input field and item order is preserved.
 - `insight`: `level` is `info`, `success`, `warning` or `error`; nonempty `text` is limited to 20,000 characters. The level is supplied by the author, not inferred from the text.
 - `metrics`: 1–100 items with nonempty `label` and finite numeric `value`; optional `unit`, `comparisonValue` and `comparisonLabel`. A comparison label requires a comparison value; the same unit applies to both. Zero and negative values are preserved. No differences, percentage changes, unit conversion or good/bad judgments are calculated.
@@ -36,6 +38,28 @@ Limits: each run and the sum of run texts are at most 100,000 Unicode code point
 
 No nested runs, raw HTML, Markdown parsing, inferred links or inline citations are supported. Use separate richtext blocks for separate paragraphs, and block-level `sourceIds` for evidence. All other existing string fields remain literal, including `prose.text`, comparison values and Plugin fields. See [the complete example](../examples/richtext.json).
 
+## List content
+
+A list group requires `ordered: true` for an ordered list or `false` for an unordered list, plus 1–1,000 items. Each item requires `content` using the same inline runs, limits, URL policy and resolved-fragment checks as Rich Text. Optional `children` is a list group with its own order mode; mixed ordered/unordered nesting is supported. All groups and items retain input order; list items are not document anchors or Override targets.
+
+```json
+{
+  "kind": "list",
+  "ordered": false,
+  "items": [
+    {
+      "content": [{ "text": "Prepare", "marks": ["strong"] }],
+      "children": {
+        "ordered": true,
+        "items": [{ "content": [{ "text": "Validate the input" }] }]
+      }
+    }
+  ]
+}
+```
+
+Limits: eight list-group levels, including the root, and 1,000 total items per block. The Schema bounds nesting and each group's size; semantic validation checks the total item count and every item's inline content without truncation. A list is a collection, while `steps` describes a sequence of operations with titled steps. `ListContent`, `ListItem`, `ListBlock` and `listLimits` are exported for library callers. The [technical guide](../examples/technical-guide.json) combines nested lists, Rich Text and literal code with block citations.
+
 ## References
 
 Document `sources` is optional. A source has unique `id`, plain `title`, optional absolute HTTP(S) `url` or an existing document fragment. Credentials, whitespace/control characters and other schemes are rejected. No URL is fetched during build or on report load.
@@ -48,6 +72,6 @@ The exported schema validates structure. Uniqueness across nodes, total node cou
 
 Config accepts `theme: "minimal" | "editorial" | "ocean" | "graphite" | "signal" | "midnight"`, `layout: "document" | "sidebar"`, an `overrides` object and a `plugins` array of explicit local `.js`/`.mjs`/`.cjs` module paths. Defaults are `minimal`/`document`. Relative paths resolve from the config directory. The same loaded Registry is used by Schema export, validate, build and list. Theme affects CSS tokens only; Layout participates in presentation context. See [Themes and Layouts](themes.md).
 
-Each override maps an explicit block ID to a compatible full Variant ID: `comparison.cards`, `comparison.table`, `prose.paragraph`, `richtext.paragraph`, `insight.callout`, `metrics.summary`, `steps.list`, `steps.stepper`, `timeline.vertical`, or a loaded Plugin contribution. Unknown targets, sections, automatic IDs and unsupported selections are errors. No permissive fallback is provided. See [Plugin authoring](plugin-authoring.md) for registration, compatibility and assets.
+Each override maps an explicit block ID to a compatible full Variant ID: `comparison.cards`, `comparison.table`, `prose.paragraph`, `richtext.paragraph`, `list.nested`, `code.block`, `insight.callout`, `metrics.summary`, `steps.list`, `steps.stepper`, `timeline.vertical`, or a loaded Plugin contribution. Unknown targets, sections, automatic IDs and unsupported selections are errors. No permissive fallback is provided. See [Plugin authoring](plugin-authoring.md) for registration, compatibility and assets.
 
 Config also accepts `interactive: boolean` (default `false`). Build flags `--interactive` / `--no-interactive` override a valid config; supplying both is an error. This flag does not alter semantic validation, build-time selection or the initial static content. The browser selector contains only supported Variants with adapters, including low-score compatible ones; fewer than two candidates produces no selector or switching payload. Runtime data contains resolved block IDs and the same validated content, frozen against adapter mutation. Block sources remain outside the replaceable View. See [interactive reports](interactive.md).

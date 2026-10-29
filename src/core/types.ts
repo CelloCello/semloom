@@ -32,6 +32,22 @@ export interface RichTextBlock extends Block {
   kind: 'richtext';
   content: InlineRun[];
 }
+export interface ListItem {
+  content: InlineRun[];
+  children?: ListContent;
+}
+export interface ListContent {
+  ordered: boolean;
+  items: ListItem[];
+}
+export interface ListBlock extends Block, ListContent {
+  kind: 'list';
+}
+export interface CodeBlock extends Block {
+  kind: 'code';
+  text: string;
+  language?: string;
+}
 export interface ComparisonBlock extends Block {
   kind: 'comparison';
   subject: string;

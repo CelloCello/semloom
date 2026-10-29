@@ -10,7 +10,7 @@ Keep the content in JSON, choose a presentation, and share the HTML. Reports wor
 
 ## What you get
 
-- **Structured content:** prose, rich text, comparisons, insights, metrics, steps and timelines, with block-level source references.
+- **Structured content:** prose, rich text, nested lists, code, comparisons, insights, metrics, steps and timelines, with block-level source references.
 - **Reusable presentation:** six Themes, two Layouts and compatible block Variants; change appearance while preserving the data.
 - **Clear validation:** export JSON Schema, catch invalid fields/references, and inspect presentation choices with `--explain`.
 - **Optional interaction:** switch compatible comparison views offline. Complete content stays readable without JavaScript.
@@ -71,7 +71,7 @@ semloom validate report.json
 semloom build report.json -o reports/project-update.html --explain
 ```
 
-Existing text fields display literally. Use the explicit `richtext` kind for emphasis, inline code and links; see the [Rich Text example](examples/richtext.json). Source references belong to blocks; the compiler checks their relationships but does not verify factual claims or calculate metrics. See the [data contract](docs/semantic-schema.md) for supported fields and limits.
+Existing text fields display literally. Use the explicit `richtext` kind for emphasis, inline code and links; see the [Rich Text example](examples/richtext.json). The [technical guide](examples/technical-guide.json) combines this inline content with nested lists and literal code blocks. Source references belong to blocks; the compiler checks their relationships but does not verify factual claims or calculate metrics. See the [data contract](docs/semantic-schema.md) for supported fields and limits.
 
 ## Choose a look
 

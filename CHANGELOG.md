@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add bounded mixed ordered/unordered List groups that reuse inline marks/links and a literal Code block with optional language label, keyboard-accessible scrolling, CRLF preservation and print wrapping.
+
 - Add `richtext` paragraphs with bounded flat runs, combined strong/emphasis/inline-code marks and validated links. Existing text fields remain literal; citations stay at block level.
 - Share inline Schema, semantic validation and rendering internally; export inline types and limits for library callers. Source URLs and inline links use the same resolved-document reference checks.
 

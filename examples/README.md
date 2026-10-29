@@ -4,6 +4,13 @@ Use these semantic documents, presentation configs and trusted local Plugin modu
 
 ## Choose a report
 
+For nested ordered/unordered lists, inline links and literal command blocks, use [technical-guide.json](technical-guide.json). It describes a built-checkout workflow with source references; commands are displayed as content and are not executed by the compiler. From the checkout root:
+
+```sh
+pnpm semloom validate examples/technical-guide.json
+pnpm semloom build examples/technical-guide.json -o reports/technical-guide.html --explain
+```
+
 | Goal                                              | Document                                       | Presentation                                                                                                             |
 | ------------------------------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
 | Read a documentation-backed research comparison   | [comparison.json](comparison.json)             | Auto selects a table; optional [cards override](presentation.json).                                                      |

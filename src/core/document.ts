@@ -1,12 +1,14 @@
 import type { Registry } from './registry.js';
 import { checkSchema, documentSchema, limits } from './schema.js';
 import { validateInlineContent } from './inline.js';
+import { validateListContent } from './list.js';
 import { validateUrlReference } from './url.js';
 import {
   fail,
   type Block,
   type ComparisonBlock,
   type Document,
+  type ListBlock,
   type RichTextBlock,
   type Section,
 } from './types.js';
@@ -139,13 +141,16 @@ export function resolveDocument(
     if (source.url !== undefined)
       validateUrlReference(source.url, `/sources/${i}/url`, anchors);
   }
-  for (const block of blocks)
+  for (const block of blocks) {
     if (block.data.kind === 'richtext')
       validateInlineContent(
         (block.data as RichTextBlock).content,
         `${block.path}/content`,
         anchors,
       );
+    if (block.data.kind === 'list')
+      validateListContent(block.data as ListBlock, block.path, anchors);
+  }
   return { data, sections, blocks };
 }
 function validateComparison(block: ComparisonBlock, path: string) {

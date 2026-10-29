@@ -27,7 +27,7 @@ Usage:
   semloom themes list
   semloom plugins list
 
-Supports prose, comparison, insight, metrics, steps, timeline, richtext.
+Supports prose, comparison, insight, metrics, steps, timeline, richtext, list, code.
 Themes: ${themeNames.join(', ')}. Layouts: document, sidebar.
 Trusted local plugins: set plugins in --config (paths relative to config file).
 Use --interactive for offline Variant switching; default off. --no-interactive overrides config.

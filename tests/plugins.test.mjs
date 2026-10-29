@@ -53,8 +53,10 @@ test('built-in schemas retain the six-kind literal fixture, zero/negative metric
       .map((k) => k.kind)
       .sort(),
     [
+      'code',
       'comparison',
       'insight',
+      'list',
       'metrics',
       'prose',
       'richtext',

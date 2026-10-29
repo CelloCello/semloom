@@ -20,9 +20,11 @@ Compile structured meaning into consistent reports without asking the agent to w
 
 ## Operating Context
 
-CLI or library build; direct `file://` reading, offline use, desktop/375px and print. Seven built-in kinds cover prose, rich text, comparisons, insights, metrics, ordered steps and timelines; trusted local modules can add kinds and Variants through the shared Registry.
+CLI or library build; direct `file://` reading, offline use, desktop/375px and print. Nine built-in kinds cover prose, rich text, nested lists, code, comparisons, insights, metrics, ordered steps and timelines; trusted local modules can add kinds and Variants through the shared Registry.
 
 ## Capabilities and Constraints
+
+Lists support mixed ordered/unordered groups with bounded nesting and shared inline runs. Code blocks retain literal text and whitespace, including CRLF, with local scrolling and print wrapping; language labels do not execute or highlight code.
 
 Existing text fields remain literal. The explicit `richtext` kind adds bounded inline runs with emphasis, code and validated links, without parsing Markdown or raw HTML. Citations stay at block level and presentation selection happens at build time. Optional `interactive` reports allow offline switching among compatible Variants with browser adapters; default is static. HTML must preserve data and sources, escape input and remain readable without JavaScript. Failed Views retain the prior content; successful switches dispose prior resources. Performance/token advantages require controlled evaluation rather than inference from individual reports.
 
