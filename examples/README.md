@@ -9,7 +9,8 @@ Use these semantic documents, presentation configs and trusted local Plugin modu
 | Read a documentation-backed research comparison   | [comparison.json](comparison.json)             | Auto selects a table; optional [cards override](presentation.json).                                                      |
 | Explore a complete illustrative PR handoff report | [pr-daily.json](pr-daily.json)                 | All six kinds; optional [editorial/sidebar](editorial-sidebar.json).                                                     |
 | Write a process explanation with sources          | [report-workflow.json](report-workflow.json)   | Authoring, validation and editing workflow; reuse [editorial/sidebar](editorial-sidebar.json).                           |
-| Learn the shape of every built-in kind            | [blocks.json](blocks.json)                     | All six kinds; optional [steps list override](steps-list.json).                                                          |
+| Learn the six original kinds                      | [blocks.json](blocks.json)                     | Six literal-content kinds; optional [steps list override](steps-list.json).                                              |
+| Format a paragraph with marks and links           | [richtext.json](richtext.json)                 | Rich Text with combined marks, a forward link and unchanged literal prose.                                               |
 | See Auto choose comparison cards                  | [cards.json](cards.json)                       | Illustrative collaboration data, without an override.                                                                    |
 | Add a local kind and comparison Variant           | [Plugin report](comparison-plugin/report.json) | [Plugin config](comparison-plugin/presentation.json), registration, templates and browser adapter in the same directory. |
 

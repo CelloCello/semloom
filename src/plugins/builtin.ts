@@ -4,6 +4,7 @@ import { Registry } from '../core/registry.js';
 import type { ComparisonBlock, Plugin, ProseBlock } from '../core/types.js';
 import { html } from '../html/html.js';
 import { contentKinds } from './content.js';
+import { richTextKind } from './richtext.js';
 
 const short = { type: 'string', maxLength: 1000 };
 const cell = {
@@ -121,6 +122,7 @@ const builtin: Plugin = {
       ],
     },
     ...contentKinds,
+    richTextKind,
   ],
 };
 function compact(block: ComparisonBlock): boolean {

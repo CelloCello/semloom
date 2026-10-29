@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Add `richtext` paragraphs with bounded flat runs, combined strong/emphasis/inline-code marks and validated links. Existing text fields remain literal; citations stay at block level.
+- Share inline Schema, semantic validation and rendering internally; export inline types and limits for library callers. Source URLs and inline links use the same resolved-document reference checks.
+
 ## 0.1.0-alpha.1 — release candidate
 
 - Semantic JSON compilation for prose, comparison, insight, metrics, steps and timeline; plain-text content and block-level source references.

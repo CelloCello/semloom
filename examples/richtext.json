@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "1.0",
+  "title": "Rich Text 報告",
+  "sources": [
+    {
+      "id": "semloom",
+      "title": "Semloom repository",
+      "url": "https://github.com/CelloCello/semloom"
+    }
+  ],
+  "sections": [
+    {
+      "id": "overview",
+      "title": "結構化段落",
+      "blocks": [
+        {
+          "id": "rich-content",
+          "kind": "richtext",
+          "content": [
+            { "text": "用 " },
+            { "text": "結構化片段", "marks": ["strong"] },
+            { "text": " 表達內容，保留空白與換行。\n" },
+            { "text": "compile()", "marks": ["code", "emphasis"] },
+            { "text": " 可輸出 HTML；" },
+            { "text": "實作細節", "href": "#details", "marks": ["strong"] },
+            { "text": " 與 " },
+            {
+              "text": "專案文件",
+              "href": "https://github.com/CelloCello/semloom"
+            },
+            { "text": " 使用明確連結，不解析 Markdown。" }
+          ],
+          "sourceIds": ["semloom"]
+        }
+      ]
+    },
+    {
+      "id": "details",
+      "title": "實作細節",
+      "blocks": [
+        {
+          "id": "plain-content",
+          "kind": "prose",
+          "text": "舊 prose 仍顯示原文：**粗體**、`code`、<strong>HTML</strong>。"
+        }
+      ]
+    }
+  ]
+}

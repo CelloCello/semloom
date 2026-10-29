@@ -10,7 +10,7 @@ Semloom 將語意 JSON 編譯成一份獨立的 HTML 報告，適合研究比較
 
 ## 可以做什麼
 
-- **結構化內容**：段落、比較、重點提示、數值摘要、步驟與時間軸，支援區塊層級的來源引用。
+- **結構化內容**：段落、Rich Text、比較、重點提示、數值摘要、步驟與時間軸，支援區塊層級的來源引用。
 - **可重用的呈現方式**：六款 Theme、兩種 Layout，以及相容的區塊 Variant；調整外觀時保留語意資料。
 - **明確的驗證**：匯出 JSON Schema、檢查欄位與引用，透過 `--explain` 查看實際呈現選擇。
 - **可選的互動功能**：離線切換相容的比較呈現；停用 JavaScript 時仍保留完整內容。
@@ -71,7 +71,7 @@ semloom validate report.json
 semloom build report.json -o reports/project-update.html --explain
 ```
 
-所有內容字串都視為純文字。來源引用屬於區塊，編譯器會檢查引用關係，但不會查證事實或替作者計算指標。支援欄位與限制請見[資料契約](docs/semantic-schema.md)。
+既有文字欄位仍照原文顯示；強調、行內程式碼與連結使用明確的 `richtext` kind，請見 [Rich Text 範例](examples/richtext.json)。來源引用屬於區塊，編譯器會檢查引用關係，但不會查證事實或替作者計算指標。支援欄位與限制請見[資料契約](docs/semantic-schema.md)。
 
 ## 選擇外觀
 

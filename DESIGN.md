@@ -83,6 +83,8 @@ The default remains minimal. Midnight explicitly sets `--color-scheme: dark`; ot
 
 Local system fonts support CJK without downloads. Body line height is 1.75; prose measure is 72ch. Display title ranges from 2rem to 3.4rem. Content strings preserve line breaks and wrap long values; no inline Markdown styling.
 
+Rich Text uses the same prose measure and whitespace behavior, with semantic strong/emphasis, underlined links and wrapping inline code. Code uses local monospace fonts at 0.9em, inherits text color and uses the Theme's table-header surface for a quiet background. Existing plain-text fields keep their literal presentation.
+
 ## Layout
 
 Page max width 76rem, desktop padding 4rem/3rem and mobile padding 2rem/1.1rem. Cards collapse to one column below 600px. Tables scroll inside an accessible, focusable region; the page must not scroll horizontally. Print removes navigation and uses wrapping table cells and repeated headers.

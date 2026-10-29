@@ -22,6 +22,16 @@ export interface ProseBlock extends Block {
   kind: 'prose';
   text: string;
 }
+export type InlineMark = 'strong' | 'emphasis' | 'code';
+export interface InlineRun {
+  text: string;
+  marks?: InlineMark[];
+  href?: string;
+}
+export interface RichTextBlock extends Block {
+  kind: 'richtext';
+  content: InlineRun[];
+}
 export interface ComparisonBlock extends Block {
   kind: 'comparison';
   subject: string;

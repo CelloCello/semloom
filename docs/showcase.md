@@ -17,7 +17,7 @@ The same documentation-backed JSON Schema/JTD data becomes a table selected by A
 pnpm semloom build examples/pr-daily.json --config examples/editorial-sidebar.json -o reports/showcase/pr-daily.html --explain
 ```
 
-This explicitly illustrative report uses all six kinds: context, a limitation, metrics, a PR comparison, next steps and a timeline. It shows what the next reader needs to check and which statements have sources. It is not connected to real GitHub/CI state, and the compiler does not derive performance or risk conclusions.
+This explicitly illustrative report uses the six original kinds: context, a limitation, metrics, a PR comparison, next steps and a timeline. It shows what the next reader needs to check and which statements have sources. It is not connected to real GitHub/CI state, and the compiler does not derive performance or risk conclusions.
 
 ## Report authoring workflow
 

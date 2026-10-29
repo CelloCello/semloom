@@ -89,6 +89,14 @@ h6 {
   max-width: var(--measure);
   margin: 0;
 }
+.semloom-richtext code {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.9em;
+  background: var(--table-head);
+  color: inherit;
+  padding: 0.1em 0.25em;
+  border-radius: 0.2em;
+}
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));

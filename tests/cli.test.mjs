@@ -6,6 +6,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { comparisonDocument } from './helpers.mjs';
+import { compile } from '../dist/index.js';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const cli = (...args) =>
@@ -148,4 +149,66 @@ test('CLI overrides config values after validating config and does not rewrite t
     ).status,
     2,
   );
+});
+
+test('richtext CLI exports its schema, matches library output and preserves old output on inline failures', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'semloom-richtext-cli-'));
+  const output = join(directory, 'report.html');
+  const inputFile = join(directory, 'report.json');
+  const config = join(directory, 'presentation.json');
+  const example = JSON.parse(readFileSync('examples/richtext.json', 'utf8'));
+  writeFileSync(inputFile, JSON.stringify(example));
+  writeFileSync(
+    config,
+    JSON.stringify({ overrides: { 'rich-content': 'richtext.paragraph' } }),
+  );
+  const schema = JSON.parse(cli('schema').stdout);
+  assert.ok(
+    schema.definitions.block.oneOf.some(
+      (choice) => choice.properties.kind.const === 'richtext',
+    ),
+  );
+  assert.match(cli('--help').stdout, /timeline, richtext/);
+  const valid = cli('validate', inputFile);
+  assert.equal(valid.status, 0, valid.stderr);
+  const built = cli(
+    'build',
+    inputFile,
+    '--config',
+    config,
+    '--explain',
+    '-o',
+    output,
+  );
+  assert.equal(built.status, 0, built.stderr);
+  assert.equal(built.stdout, '');
+  assert.match(built.stderr, /"selected": "richtext.paragraph"/);
+  assert.match(built.stderr, /"origin": "override"/);
+  const previous = readFileSync(output, 'utf8');
+  assert.equal(
+    previous,
+    compile(example, { overrides: { 'rich-content': 'richtext.paragraph' } })
+      .html,
+  );
+  for (const [run, diagnostic] of [
+    [{ text: 'link', href: 'javascript:alert(1)' }, /UNSAFE_URL/],
+    [{ text: 'link', href: '#missing' }, /INVALID_ANCHOR/],
+    [{ text: 'link', href: '#%zz' }, /INVALID_ANCHOR/],
+    [{ text: 'x', children: [] }, /SCHEMA_ADDITIONALPROPERTIES/],
+  ]) {
+    const invalid = structuredClone(example);
+    invalid.sections[0].blocks[0].content = [run];
+    writeFileSync(inputFile, JSON.stringify(invalid));
+    for (const args of [
+      ['validate', inputFile],
+      ['build', inputFile, '-o', output],
+    ]) {
+      const failure = cli(...args);
+      assert.equal(failure.status, 2);
+      assert.ok(failure.stderr.includes(inputFile));
+      assert.match(failure.stderr, /\/sections\/0\/blocks\/0\/content\/0\//);
+      assert.match(failure.stderr, diagnostic);
+      assert.equal(readFileSync(output, 'utf8'), previous);
+    }
+  }
 });

@@ -1,11 +1,13 @@
 import type { Registry } from './registry.js';
-import { checkSchema, documentSchema, limits, safeUrl } from './schema.js';
+import { checkSchema, documentSchema, limits } from './schema.js';
+import { validateInlineContent } from './inline.js';
+import { validateUrlReference } from './url.js';
 import {
   fail,
-  SemloomError,
   type Block,
   type ComparisonBlock,
   type Document,
+  type RichTextBlock,
   type Section,
 } from './types.js';
 
@@ -48,17 +50,6 @@ export function resolveDocument(
         'Source IDs must be unique.',
       );
     sources.add(source.id);
-    if (source.url !== undefined) {
-      try {
-        safeUrl(source.url);
-      } catch (error) {
-        if (error instanceof SemloomError)
-          throw new SemloomError(
-            error.diagnostics.map((d) => ({ ...d, path: `/sources/${i}/url` })),
-          );
-        throw error;
-      }
-    }
   }
   const reserve = (node: Section | Block, path: string) => {
     if (node.id !== undefined) {
@@ -145,25 +136,16 @@ export function resolveDocument(
     ...(data.sources ?? []).map((s) => sourceAnchor(s.id)),
   ]);
   for (const [i, source] of (data.sources ?? []).entries()) {
-    if (source.url?.startsWith('#')) {
-      let target: string;
-      try {
-        target = decodeURIComponent(source.url.slice(1));
-      } catch {
-        fail(
-          `/sources/${i}/url`,
-          'INVALID_ANCHOR',
-          'Invalid percent encoding.',
-        );
-      }
-      if (!anchors.has(target))
-        fail(
-          `/sources/${i}/url`,
-          'INVALID_ANCHOR',
-          'Anchor does not exist in this document.',
-        );
-    }
+    if (source.url !== undefined)
+      validateUrlReference(source.url, `/sources/${i}/url`, anchors);
   }
+  for (const block of blocks)
+    if (block.data.kind === 'richtext')
+      validateInlineContent(
+        (block.data as RichTextBlock).content,
+        `${block.path}/content`,
+        anchors,
+      );
   return { data, sections, blocks };
 }
 function validateComparison(block: ComparisonBlock, path: string) {

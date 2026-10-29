@@ -36,6 +36,7 @@ export function compile(
 }
 export { createRegistry, resolveDocument, planDocument, parseConfig };
 export { documentSchema, limits } from './core/schema.js';
+export { inlineLimits } from './core/inline.js';
 export { Registry } from './core/registry.js';
 export { SemloomError, themeNames, layoutNames } from './core/types.js';
 export type * from './core/types.js';

@@ -45,14 +45,22 @@ const plugin = (overrides = {}) => ({
   ...overrides,
 });
 
-test('six built-in schemas validate and render literal data, including zero/negative metrics and raw event order', () => {
+test('built-in schemas retain the six-kind literal fixture, zero/negative metrics and raw event order', () => {
   const registry = createRegistry();
   assert.deepEqual(
     registry
       .definitions()
       .map((k) => k.kind)
       .sort(),
-    ['comparison', 'insight', 'metrics', 'prose', 'steps', 'timeline'],
+    [
+      'comparison',
+      'insight',
+      'metrics',
+      'prose',
+      'richtext',
+      'steps',
+      'timeline',
+    ],
   );
   const validate = new Ajv({ strict: true }).compile(documentSchema(registry));
   assert.equal(validate(blocks), true, JSON.stringify(validate.errors));

@@ -5,7 +5,7 @@ Semloom is one TypeScript package in a pnpm workspace. Source boundaries separat
 A clean prepack build ships ESM/runtime declarations, docs and examples in a compiled tarball, without source maps or development files. `scripts/package-smoke.mjs` installs one real archive into isolated consumers to verify public exports and local browser-adapter paths. See [package installation and verification](releases.md).
 
 - `src/core`: public data types, Registry, exported JSON Schema, semantic validation, deterministic IDs, Planner and CSS dependency/hash handling. No filesystem or browser API.
-- `src/plugins`: six built-in kinds use the same `Registry.register()` manifest interface as local Plugins. Content schemas cannot redefine Core's `id`, `kind` or `sourceIds` envelope. The filesystem/module adapter resolves explicitly configured local modules; it does not install or discover packages.
+- `src/plugins`: seven built-in kinds use the same `Registry.register()` manifest interface as local Plugins. Content schemas cannot redefine Core's `id`, `kind` or `sourceIds` envelope. The filesystem/module adapter resolves explicitly configured local modules; it does not install or discover packages.
 - `src/html`: a central escaping template helper, document/sidebar composer and progressive navigation. `themes/` defines built-in tokens and fallback, `styles/` owns shared component rules and stylesheet composition, and `layouts/` owns page flow and responsive/print Layout rules. Core validates reference relationships; the composer adds block citations outside variant output.
 - `src/cli`: argument/config parsing, bounded JSON input, diagnostics and atomic output replacement. Library `compile()` never writes files.
 
@@ -16,6 +16,8 @@ A clean prepack build ships ESM/runtime declarations, docs and examples in a com
 Schema uses Ajv 8 in strict mode with no coercion, removal or default insertion. JSON Schema draft-07 provides a portable exported structural contract. Relationships such as unique IDs, reference targets and comparison field keys require a second semantic validation pass; they are documented rather than falsely advertised as pure JSON Schema constraints. Section recursion is represented by eight bounded definitions.
 
 Planner first checks support, then sorts descending scores with a code-point Variant-ID tie-break. It uses data size, field count and text length, never viewport or theme. An override can choose a lower-score compatible variant. IDs reserve every explicit Section/Block ID before allocating any automatic ID; source anchors have a separate reserved namespace.
+
+`core/inline.ts` supplies a self-contained flat-run Schema and semantic validation; `html/inline.ts` renders validated runs with the escaping helper. The `richtext` kind uses these shared contracts without changing existing literal fields. After resolving all IDs, `resolveDocument()` validates aggregate inline text limits and checks links against the same `core/url.ts` policy and fragment rules used by source URLs. Future content kinds that accept runs must explicitly call the shared semantic validator for their run locations; arbitrary Plugin fields are not interpreted as inline content.
 
 ## Output and trust boundary
 
