@@ -7,6 +7,7 @@ import { contentKinds } from './content.js';
 import { richTextKind } from './richtext.js';
 import { listKind } from './list.js';
 import { codeKind } from './code.js';
+import { hierarchyKind } from './hierarchy.js';
 
 const short = { type: 'string', maxLength: 1000 };
 const cell = {
@@ -127,6 +128,7 @@ const builtin: Plugin = {
     richTextKind,
     listKind,
     codeKind,
+    hierarchyKind,
   ],
 };
 function compact(block: ComparisonBlock): boolean {

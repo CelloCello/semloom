@@ -10,7 +10,7 @@ Keep the content in JSON, choose a presentation, and share the HTML. Reports wor
 
 ## What you get
 
-- **Structured content:** prose, rich text, nested lists, code, comparisons, insights, metrics, steps and timelines, with block-level source references.
+- **Structured content:** prose, rich text, nested lists, code, comparisons, insights, metrics, steps, timelines and hierarchy trees/mindmaps, with block-level source references.
 - **Reusable presentation:** six built-in Themes, two Layout bases, local Theme/Layout extensions and compatible block Variants; change appearance while preserving the data.
 - **Clear validation:** export JSON Schema, catch invalid fields/references, and inspect presentation choices with `--explain`.
 - **Optional interaction:** switch compatible comparison views offline. Complete content stays readable without JavaScript.
@@ -71,7 +71,7 @@ semloom validate report.json
 semloom build report.json -o reports/project-update.html --explain
 ```
 
-Existing text fields display literally. Use the explicit `richtext` kind for emphasis, inline code and links; see the [Rich Text example](examples/richtext.json). The [technical guide](examples/technical-guide.json) combines this inline content with nested lists and literal code blocks. Source references belong to blocks; the compiler checks their relationships but does not verify factual claims or calculate metrics. See the [data contract](docs/semantic-schema.md) for supported fields and limits.
+Existing text fields display literally. Use the explicit `richtext` kind for emphasis, inline code and links; see the [Rich Text example](examples/richtext.json). The [technical guide](examples/technical-guide.json) combines this inline content with nested lists and literal code blocks. The [hierarchy example](examples/hierarchy.json) renders as an indented tree by default; its [mindmap config](examples/hierarchy-mindmap.json) selects an offline Markmap with mouse/keyboard node folding, an external Theme and right-side TOC. Each built-in Theme supplies its own [six-color branch palette](docs/themes.md#hierarchy-branch-colors). Narrow screens retain the diagram with local scrolling; no-JS, initialization failure and print retain the complete tree. Source references belong to blocks; the compiler checks their relationships but does not verify factual claims or calculate metrics. See the [data contract](docs/semantic-schema.md) for supported fields and limits.
 
 ## Choose a look
 

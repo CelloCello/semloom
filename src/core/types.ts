@@ -71,6 +71,14 @@ export interface CodeBlock extends Block {
   text: string;
   language?: string;
 }
+export interface HierarchyNode {
+  label: string;
+  children?: HierarchyNode[];
+}
+export interface HierarchyBlock extends Block {
+  kind: 'hierarchy';
+  root: HierarchyNode;
+}
 export interface ComparisonBlock extends Block {
   kind: 'comparison';
   subject: string;

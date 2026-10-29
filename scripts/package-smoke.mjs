@@ -111,6 +111,16 @@ for (const binary of runtimes) {
       'examples/comparison.json',
       'examples/pr-daily.json',
       'examples/report-workflow.json',
+      'examples/hierarchy.json',
+      'examples/hierarchy-mindmap.json',
+      'examples/hierarchy-palettes.json',
+      'examples/hierarchy-reference.json',
+      'examples/hierarchy-reference-mindmap.json',
+      'dist/core/hierarchy.js',
+      'dist/browser/mindmap.js',
+      'docs/licenses/d3-flextree.txt',
+      'dist/plugins/hierarchy.js',
+      'dist/html/styles/hierarchy.js',
       'examples/comparison-plugin/browser.mjs',
       'CHANGELOG.md',
     ])
@@ -460,6 +470,68 @@ for (const binary of runtimes) {
       ].join('\n'),
     );
     run(binary, ['presentation-smoke.mjs'], consumer);
+    run(binary, [cli, 'validate', 'examples/hierarchy.json'], consumer);
+    for (const view of ['tree', 'mindmap']) {
+      run(
+        binary,
+        [
+          cli,
+          'build',
+          'examples/hierarchy.json',
+          ...(view === 'mindmap'
+            ? ['--config', 'examples/hierarchy-mindmap.json']
+            : []),
+          '-o',
+          `reports/hierarchy-${view}.html`,
+          '--explain',
+        ],
+        consumer,
+      );
+    }
+    await writeFile(
+      join(consumer, 'hierarchy-smoke.mjs'),
+      [
+        "import assert from 'node:assert/strict';",
+        "import {readFileSync,writeFileSync} from 'node:fs';",
+        "import {resolve} from 'node:path';",
+        `import {compile,parseConfig,loadPresentation,hierarchyLimits,themeNames} from ${JSON.stringify(manifest.name)};`,
+        "const input=JSON.parse(readFileSync('examples/hierarchy.json','utf8'));",
+        "const config=parseConfig(JSON.parse(readFileSync('examples/hierarchy-mindmap.json','utf8')));",
+        "const catalog=await loadPresentation(config,resolve('examples'));",
+        'assert.deepEqual(hierarchyLimits,{depth:8,nodes:1000,label:1000});',
+        "for(const view of ['tree','mindmap']){",
+        "const output=compile(input,view==='tree'?{}:config,undefined,catalog);",
+        "assert.equal(output.html,readFileSync(`reports/hierarchy-${view}.html`,'utf8'));",
+        "assert.equal(output.plan.blocks.find(block=>block.kind==='hierarchy').selected,`hierarchy.${view}`);",
+        'assert.ok(output.html.includes(\'class="semloom-hierarchy-root"\'));',
+        "if(view==='mindmap'){assert.ok(output.html.includes('data-semloom-mindmap'));assert.ok(output.html.includes('markmap-view 0.18.12'));assert.ok(output.html.includes('d3-flextree'));}else{assert.ok(!output.html.includes('data-semloom-mindmap'));}",
+        "assert.ok(!output.html.includes('data-semloom-interactive'));",
+        '}',
+        "const paletteInput=JSON.parse(readFileSync('examples/hierarchy-palettes.json','utf8'));",
+        'const palettes=new Set();let baseline;',
+        'for(const theme of themeNames){',
+        "const output=compile(paletteInput,{theme,overrides:{'architecture-map':'hierarchy.mindmap'}});",
+        'assert.deepEqual(output.document.data,paletteInput);',
+        'if(baseline)assert.deepEqual(output.plan,baseline);else baseline=output.plan;',
+        "const colors=Array.from({length:6},(_,i)=>output.html.match(new RegExp('--semloom-mindmap-branch-'+(i+1)+':(#[a-f0-9]{6})'))[1]);",
+        'assert.equal(new Set(colors).size,6);palettes.add(colors.join());',
+        'writeFileSync(`reports/mindmap-palette-${theme}.html`,output.html);',
+        '}',
+        'assert.equal(palettes.size,themeNames.length);',
+      ].join('\n'),
+    );
+    run(binary, ['hierarchy-smoke.mjs'], consumer);
+    await writeFile(
+      join(consumer, 'types-hierarchy.mts'),
+      [
+        `import {compile,hierarchyLimits,type HierarchyNode,type HierarchyBlock,type Document} from ${JSON.stringify(manifest.name)};`,
+        "const root:HierarchyNode={label:'Root',children:[{label:'Child'}]};",
+        "const block:HierarchyBlock={id:'map',kind:'hierarchy',root};",
+        "const data:Document={schemaVersion:'1.0',title:'T',sections:[{title:'S',blocks:[block]}]};",
+        "const output:string=compile(data,{overrides:{map:'hierarchy.mindmap'}}).html;",
+        'void [output,hierarchyLimits.nodes];',
+      ].join('\n'),
+    );
     await writeFile(
       join(consumer, 'types-node.mts'),
       `import {compile,createPresentation,parseConfig,loadPresentation,type Document,type ThemeDefinition,type LayoutDefinition,type ThemeTokens} from ${JSON.stringify(manifest.name)};\nconst data:Document={schemaVersion:'1.0',title:'T',sections:[{title:'S'}]};\nconst tokens:Partial<ThemeTokens>={accent:'#123456'};\nconst theme:ThemeDefinition={id:'consumer.typed',themeApiVersion:'1.0',tokens};\nconst layout:LayoutDefinition={id:'consumer.typed',layoutApiVersion:'1.0',base:'sidebar'};\nconst catalog=createPresentation({themes:[theme],layouts:[layout]});\nconst output:string=compile(data,{theme:theme.id,layout:layout.id},undefined,catalog).html;\nvoid [output,loadPresentation(parseConfig())];\n`,
@@ -481,7 +553,10 @@ for (const binary of runtimes) {
             strict: true,
             noEmit: true,
           },
-          files: [`types-${target}.mts`],
+          files: [
+            `types-${target}.mts`,
+            ...(target === 'node' ? ['types-hierarchy.mts'] : []),
+          ],
         }),
       );
       run(
@@ -509,6 +584,9 @@ for (const binary of runtimes) {
       'interactive',
       'plugin-interactive',
       'presentation',
+      'hierarchy-tree',
+      'hierarchy-mindmap',
+      ...installedThemes.map((theme) => `mindmap-palette-${theme}`),
     ]) {
       const file = join(consumer, `reports/${name}.html`);
       const content = await readFile(file);

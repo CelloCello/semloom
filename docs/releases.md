@@ -102,4 +102,4 @@ A compiled archive can be downloaded and installed from a GitHub Release asset w
 
 Package version, `pluginApiVersion`, kind `dataVersion`, Document `schemaVersion` and individual Plugin versions have separate responsibilities. Changing the package label does not change a Plugin identifier or exact dependency requirements.
 
-Generated HTML contains the MIT notice for embedded Semloom runtime code. That notice does not grant rights to input content or cited sources. See the [license](../LICENSE) and [evaluation methodology](evaluation.md).
+Generated HTML contains the MIT notice for embedded Semloom runtime code. When a built-in mindmap is selected, its JSON payload also preserves the full notices for Markmap and the contributing browser dependencies, including upstream-embedded [d3-flextree](licenses/d3-flextree.txt). These notices do not grant rights to input content or cited sources. See the [license](../LICENSE) and [evaluation methodology](evaluation.md).

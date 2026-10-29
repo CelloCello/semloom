@@ -10,6 +10,7 @@ import {
   type HtmlFragment,
   type ThemeName,
   type ResolvedPresentation,
+  type HierarchyBlock,
 } from '../core/types.js';
 import { fragment, heading, html, isFragment } from './html.js';
 import { stylesheetCss } from './styles/index.js';
@@ -20,6 +21,7 @@ import { printThemeCss } from './themes/index.js';
 import { layoutPrintCss } from './layouts/document.js';
 import { planInteractive } from '../browser/plan.js';
 import { bundleInteractive, jsonForHtml } from '../browser/bundle.js';
+import { bundleMindmap } from '../browser/mindmap-bundle.js';
 
 export function renderDocument(
   document: ResolvedDocument,
@@ -33,6 +35,19 @@ export function renderDocument(
     ? planInteractive(document, plan, registry)
     : { blocks: [], adapters: new Map() };
   const runtime = bundleInteractive(runtimePlan);
+  const mindmapBlocks = plan.blocks
+    .filter(
+      (block) =>
+        block.kind === 'hierarchy' && block.selected === 'hierarchy.mindmap',
+    )
+    .map((block) => ({
+      id: block.id,
+      root: (
+        document.blocks.find((item) => item.id === block.id)!
+          .data as HierarchyBlock
+      ).root,
+    }));
+  const mindmap = mindmapBlocks.length ? bundleMindmap() : undefined;
   const interactiveBlocks = new Map(
     runtimePlan.blocks.map((block) => [block.id, block]),
   );
@@ -142,7 +157,7 @@ export function renderDocument(
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <meta
           http-equiv="Content-Security-Policy"
-          content="default-src 'none'; script-src 'sha256-${navigationHash}'${runtime ? ` 'sha256-${runtime.hash}'` : ''}; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'"
+          content="default-src 'none'; script-src 'sha256-${navigationHash}'${runtime ? ` 'sha256-${runtime.hash}'` : ''}${mindmap ? ` 'sha256-${mindmap.hash}'` : ''}; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'"
         />
         <title>${document.data.title}</title>
         ${fragment(`<!-- Semloom runtime license (report content is separate)\n${runtimeLicenseText}\n-->`)}
@@ -196,6 +211,7 @@ export function renderDocument(
         </div>
         ${fragment(`<script data-semloom-navigation>${navigationScript}</script>`)}
         ${runtime ? fragment(`<script type="application/json" id="semloom-interactive-data">${jsonForHtml(runtimePlan.blocks)}</script><script data-semloom-interactive>${runtime.script}</script>`) : ''}
+        ${mindmap ? fragment(`<script type="application/json" id="semloom-mindmap-data">${jsonForHtml({ blocks: mindmapBlocks, licenses: mindmap.licenses })}</script><script data-semloom-mindmap>${mindmap.script}</script>`) : ''}
       </body>
     </html>`;
   return page.value + '\n';

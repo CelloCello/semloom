@@ -17,6 +17,7 @@ Common fields are `kind`, optional `id` and optional unique `sourceIds`. IDs are
 - `metrics`: 1–100 items with nonempty `label` and finite numeric `value`; optional `unit`, `comparisonValue` and `comparisonLabel`. A comparison label requires a comparison value; the same unit applies to both. Zero and negative values are preserved. No differences, percentage changes, unit conversion or good/bad judgments are calculated.
 - `steps`: optional `title` and 1–200 items, each with nonempty `title` and optional `description` (up to 20,000 characters). Both list/stepper show all content in input order; stepper is a static sequence, not a wizard or progress tracker. Auto favors stepper for 2–5 short steps, otherwise list; compatible overrides can select either.
 - `timeline`: optional `title` and 1–200 items with `time`, `title`, optional `description`. Time is nonempty author-provided text, not parsed, normalized, timezone-converted or sorted. The vertical list preserves input order.
+- `hierarchy`: one `root` node with a literal `label` and optional ordered `children`. Default `hierarchy.tree` and explicit `hierarchy.mindmap` share the same data; see the hierarchy contract below.
 
 ## Inline content
 
@@ -60,6 +61,25 @@ A list group requires `ordered: true` for an ordered list or `false` for an unor
 
 Limits: eight list-group levels, including the root, and 1,000 total items per block. The Schema bounds nesting and each group's size; semantic validation checks the total item count and every item's inline content without truncation. A list is a collection, while `steps` describes a sequence of operations with titled steps. `ListContent`, `ListItem`, `ListBlock` and `listLimits` are exported for library callers. The [technical guide](../examples/technical-guide.json) combines nested lists, Rich Text and literal code with block citations.
 
+## Hierarchy content
+
+Each node requires a nonempty plain-text `label` of at most 1,000 Unicode code points. Optional `children` is an array of the same node shape; an empty array is a leaf. Limits are eight levels and 1,000 total nodes per block, both including the root. The self-contained Schema bounds depth and per-array size; semantic validation checks the aggregate node count. Errors report the input path without truncating content. `HierarchyNode`, `HierarchyBlock` and `hierarchyLimits` are public exports.
+
+```json
+{
+  "id": "concepts",
+  "kind": "hierarchy",
+  "root": {
+    "label": "Report",
+    "children": [{ "label": "Content" }, { "label": "Presentation" }]
+  }
+}
+```
+
+Use `{"overrides":{"concepts":"hierarchy.mindmap"}}` in presentation config for an offline Markmap. The JSON contract remains unchanged: labels are escaped into Markmap `content`, and children are recursively adapted without Markdown. The embedded renderer provides native curves, junctions and node folding; a junction also works with Enter/Space and exposes its expanded state. Each main branch keeps its color throughout its descendants. Zoom/pan are disabled. At every screen width, including 701px and 375px, the enhanced diagram uses natural dimensions and local scrolling. Labels wrap at 224px. The full parent-first nested list remains visible until setup succeeds, then is hidden on screen; no-JS, setup failure and print show the complete list, even if branches were folded. Theme controls fonts, ink, leading and [branch colors](themes.md#hierarchy-branch-colors). Sources stay on the block outside the diagram. This renderer enhancement is selected by the mindmap Variant and does not require `interactive: true`, which controls Variant switching only.
+
+Hierarchy nodes are report content, distinct from document Sections and TOC entries. They have no IDs, links, per-node citations, coordinates or Override targets. Select the Variant using the block's explicit ID. This contract represents a tree, without cross-links, dragging or graph cycles. See the [concept report](../examples/hierarchy.json) and its [mindmap config](../examples/hierarchy-mindmap.json), which also selects an external Theme and right-side TOC Layout.
+
 ## References
 
 Document `sources` is optional. A source has unique `id`, plain `title`, optional absolute HTTP(S) `url` or an existing document fragment. Credentials, whitespace/control characters and other schemes are rejected. No URL is fetched during build or on report load.
@@ -72,6 +92,6 @@ The exported schema validates structure. Uniqueness across nodes, total node cou
 
 Config accepts registered `theme`/`layout` IDs, optional `themes`/`layouts` arrays of explicit local JSON manifests, an `overrides` object and a `plugins` array of explicit local `.js`/`.mjs`/`.cjs` paths. Defaults remain `minimal`/`document`; built-in names continue working. Registration paths resolve from the config directory. Schema export, validate, build and list use the same Registry and presentation catalog. Theme changes appearance; the Layout base participates in context. See [Themes and Layouts](themes.md) and [external manifests](presentation-authoring.md).
 
-Each override maps an explicit block ID to a compatible full Variant ID: `comparison.cards`, `comparison.table`, `prose.paragraph`, `richtext.paragraph`, `list.nested`, `code.block`, `insight.callout`, `metrics.summary`, `steps.list`, `steps.stepper`, `timeline.vertical`, or a loaded Plugin contribution. Unknown targets, sections, automatic IDs and unsupported selections are errors. No permissive fallback is provided. See [Plugin authoring](plugin-authoring.md) for registration, compatibility and assets.
+Each override maps an explicit block ID to a compatible full Variant ID: `comparison.cards`, `comparison.table`, `prose.paragraph`, `richtext.paragraph`, `list.nested`, `code.block`, `insight.callout`, `metrics.summary`, `steps.list`, `steps.stepper`, `timeline.vertical`, `hierarchy.tree`, `hierarchy.mindmap`, or a loaded Plugin contribution. Unknown targets, sections, automatic IDs and unsupported selections are errors. No permissive fallback is provided. See [Plugin authoring](plugin-authoring.md) for registration, compatibility and assets.
 
 Config also accepts `interactive: boolean` (default `false`). Build flags `--interactive` / `--no-interactive` override a valid config; supplying both is an error. This flag does not alter semantic validation, build-time selection or the initial static content. The browser selector contains only supported Variants with adapters, including low-score compatible ones; fewer than two candidates produces no selector or switching payload. Runtime data contains resolved block IDs and the same validated content, frozen against adapter mutation. Block sources remain outside the replaceable View. See [interactive reports](interactive.md).

@@ -2,3 +2,9 @@
   font-weight: 600;
   background: var(--table-head);
 }
+
+[data-theme='example.paper'] .semloom-hierarchy-mindmap {
+  --semloom-mindmap-branch-1: #bc6918;
+  --semloom-mindmap-branch-2: #527d3e;
+  --semloom-mindmap-branch-3: #b34949;
+}

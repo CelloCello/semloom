@@ -29,7 +29,7 @@ Usage:
   semloom layouts list [--config presentation.json]
   semloom plugins list
 
-Supports prose, comparison, insight, metrics, steps, timeline, richtext, list, code.
+Supports prose, comparison, insight, metrics, steps, timeline, richtext, list, code, hierarchy.
 Themes: ${themeNames.join(', ')}. Layouts: document, sidebar.
 Trusted local plugins: set plugins in --config (paths relative to config file).
 Local Theme/Layout JSON: set themes/layouts in --config, then select registered IDs with --theme/--layout.

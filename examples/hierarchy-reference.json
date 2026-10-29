@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "1.0",
+  "title": "Markmap 心智圖視覺參考",
+  "sections": [
+    {
+      "title": "曲線、底線與分支配色",
+      "blocks": [
+        {
+          "kind": "hierarchy",
+          "id": "visual-map",
+          "root": {
+            "label": "markmap",
+            "children": [
+              { "label": "beautiful" },
+              { "label": "useful" },
+              { "label": "easy" },
+              { "label": "interactive" }
+            ]
+          },
+          "sourceIds": ["reference"]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "reference",
+      "title": "使用者提供的 Markmap 外觀參考；此例保留原節點文字，使用 Markmap renderer 並支援節點開合。"
+    }
+  ]
+}

@@ -2,12 +2,14 @@ import type { Registry } from './registry.js';
 import { checkSchema, documentSchema, limits } from './schema.js';
 import { validateInlineContent } from './inline.js';
 import { validateListContent } from './list.js';
+import { validateHierarchy } from './hierarchy.js';
 import { validateUrlReference } from './url.js';
 import {
   fail,
   type Block,
   type ComparisonBlock,
   type Document,
+  type HierarchyBlock,
   type ListBlock,
   type RichTextBlock,
   type Section,
@@ -150,6 +152,11 @@ export function resolveDocument(
       );
     if (block.data.kind === 'list')
       validateListContent(block.data as ListBlock, block.path, anchors);
+    if (block.data.kind === 'hierarchy')
+      validateHierarchy(
+        (block.data as HierarchyBlock).root,
+        `${block.path}/root`,
+      );
   }
   return { data, sections, blocks };
 }

@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { compile, themeNames, layoutNames } from '../dist/index.js';
-import { resolveTheme } from '../dist/html/themes/index.js';
+import { resolveTheme, themeCss } from '../dist/html/themes/index.js';
+import { expectedMindmapPalettes } from './fixtures/mindmap-palettes.mjs';
 import { research } from './helpers.mjs';
 
 test('all themes and layouts preserve data, selections and theme-independent navigation markup', () => {
@@ -71,6 +72,53 @@ test('theme text, links, focus and selection stay legible on their surfaces', ()
       name,
     );
   }
+});
+
+test('each built-in Theme emits six distinct visible mindmap colors; external Themes inherit by color scheme', () => {
+  const palettes = [];
+  for (const name of themeNames) {
+    const css = themeCss(name),
+      tokens = resolveTheme(name);
+    const colors = Array.from(
+      { length: 6 },
+      (_, i) =>
+        css.match(
+          new RegExp(`--semloom-mindmap-branch-${i + 1}:(#[a-f0-9]{6})`),
+        )[1],
+    );
+    assert.deepEqual(colors, expectedMindmapPalettes[name]);
+    assert.equal(new Set(colors).size, 6, name);
+    for (const color of colors)
+      for (const key of ['paper', 'surface']) {
+        const a = luminance(color),
+          b = luminance(tokens[key]);
+        assert.ok(
+          (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05) >= 3,
+          `${name}: branch ${color} on ${key}`,
+        );
+      }
+    palettes.push(colors.join(','));
+  }
+  assert.equal(new Set(palettes).size, themeNames.length);
+  const external = themeCss({
+    id: 'example.inherit',
+    themeApiVersion: '1.0',
+    tokens: { accent: '#123456' },
+  });
+  for (const [i, color] of expectedMindmapPalettes.minimal.entries())
+    assert.ok(external.includes(`--semloom-mindmap-branch-${i + 1}:${color}`));
+  const dark = themeCss({
+    id: 'example.dark',
+    themeApiVersion: '1.0',
+    tokens: { 'color-scheme': 'dark' },
+  });
+  for (const [i, color] of expectedMindmapPalettes.midnight.entries())
+    assert.ok(dark.includes(`--semloom-mindmap-branch-${i + 1}:${color}`));
+  assert.equal(
+    Object.keys(resolveTheme('minimal')).some((key) => key.includes('mindmap')),
+    false,
+    'component variables do not expand public tokens',
+  );
 });
 
 test('CSP authorizes only the exact static navigation script, independent of document payloads', () => {

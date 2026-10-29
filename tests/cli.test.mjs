@@ -6,7 +6,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { comparisonDocument } from './helpers.mjs';
-import { compile } from '../dist/index.js';
+import { compile, parseConfig, loadPresentation } from '../dist/index.js';
+import { hierarchyDocument } from './fixtures/hierarchy.mjs';
 import { technicalGuide } from './fixtures/technical-guide.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
@@ -277,5 +278,71 @@ test('List/Code CLI builds initial and edited technical guides and reports neste
       assert.ok(failed.stderr.includes(code));
       assert.deepEqual(readFileSync(output), previous);
     }
+  }
+});
+
+test('Hierarchy CLI builds initial/edit tree and mindmap through the same schema and preserves output on failure', async () => {
+  const directory = mkdtempSync(join(tmpdir(), 'semloom-hierarchy-cli-'));
+  const inputFile = join(directory, 'hierarchy.json');
+  const outputFile = join(directory, 'hierarchy.html');
+  const raw = JSON.parse(
+    readFileSync('examples/hierarchy-mindmap.json', 'utf8'),
+  );
+  const config = {
+    ...raw,
+    themes: raw.themes.map((p) => join(root, 'examples', p)),
+    layouts: raw.layouts.map((p) => join(root, 'examples', p)),
+  };
+  const catalog = await loadPresentation(parseConfig(config));
+  const configFile = join(directory, 'presentation.json');
+  const schema = JSON.parse(cli('schema').stdout);
+  assert.ok(
+    schema.definitions.block.oneOf.some(
+      (choice) => choice.properties.kind.const === 'hierarchy',
+    ),
+  );
+  assert.match(cli('--help').stdout, /code, hierarchy/);
+  for (const variant of ['hierarchy.tree', 'hierarchy.mindmap']) {
+    config.overrides['architecture-map'] = variant;
+    writeFileSync(configFile, JSON.stringify(config));
+    for (const edited of [false, true]) {
+      const input = hierarchyDocument(edited);
+      writeFileSync(inputFile, JSON.stringify(input));
+      assert.equal(
+        cli('validate', inputFile, '--config', configFile).status,
+        0,
+      );
+      const built = cli(
+        'build',
+        inputFile,
+        '--config',
+        configFile,
+        '--explain',
+        '-o',
+        outputFile,
+      );
+      assert.equal(built.status, 0, built.stderr);
+      assert.ok(built.stderr.includes(`"selected": "${variant}"`));
+      assert.equal(
+        readFileSync(outputFile, 'utf8'),
+        compile(input, config, undefined, catalog).html,
+      );
+    }
+  }
+  const previous = readFileSync(outputFile);
+  const invalid = hierarchyDocument();
+  invalid.sections[0].blocks[1].root.children[0].label = '';
+  writeFileSync(inputFile, JSON.stringify(invalid));
+  for (const args of [
+    ['validate', inputFile],
+    ['build', inputFile, '-o', outputFile],
+  ]) {
+    const failed = cli(...args);
+    assert.equal(failed.status, 2);
+    assert.ok(failed.stderr.includes(inputFile));
+    assert.ok(
+      failed.stderr.includes('/sections/0/blocks/1/root/children/0/label'),
+    );
+    assert.deepEqual(readFileSync(outputFile), previous);
   }
 });

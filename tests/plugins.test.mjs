@@ -55,6 +55,7 @@ test('built-in schemas retain the six-kind literal fixture, zero/negative metric
     [
       'code',
       'comparison',
+      'hierarchy',
       'insight',
       'list',
       'metrics',

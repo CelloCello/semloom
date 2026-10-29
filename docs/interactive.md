@@ -1,14 +1,16 @@
 # Interactive reports
 
+This page describes optional **Variant switching**. The selected built-in `hierarchy.mindmap` separately includes an offline Markmap enhancement with node folding, even when `interactive` is false. Its no-JS, setup-failure and print output is the complete hierarchy tree. Choose `hierarchy.tree` for an entirely static hierarchy without that runtime. See the [hierarchy contract](semantic-schema.md#hierarchy-content).
+
 Set `interactive: true` in config or use `build --interactive`. The default is `false`; `--no-interactive` overrides a true config. The compiler still emits the complete build-selected HTML. JavaScript adds optional switching, while no-JS and initialization failure retain the original readable content and citations.
 
 ## Candidates and output
 
 Only Variants whose build-time `supports` check passed and which declare a browser adapter become candidates. Score affects the initial Auto selection, not manual eligibility. A block with fewer than two candidates gets no selector or switching data. A static-only selected Variant remains the initial View; the selector starts at a disabled “目前建置版型” placeholder, and that Variant is not offered as a switch target.
 
-Built-in comparison cards/table have adapters. The local example adds comparison rows; its note panel remains static-only. Steps and other kinds remain static unless a Plugin supplies enough compatible adapters. `plugins list` reports declared `browserVariants`, not per-document compatibility or proof that an entry bundles successfully.
+Built-in comparison cards/table have switching adapters. The local example adds comparison rows; its note panel remains static-only. Other kinds have no switching selector unless a Plugin supplies enough compatible adapters. The built-in mindmap enhancement is independent of that selector. `plugins list` reports declared `browserVariants`, not every built-in enhancement, per-document compatibility or proof that an entry bundles successfully.
 
-The output contains one bundle for the report and one JSON payload covering only switchable blocks. Adapters and their shared local dependencies are bundled once by module identity; no pre-rendered copies of alternative DOM are embedded. CSS uses the existing asset ID/content-hash/dependency rules, including selected static and all eligible candidate assets. The exact bundle receives a SHA-256 CSP authorization. JSON escapes HTML delimiters and line separators and is never interpolated into executable code.
+Switching adds one bundle for the report and one JSON payload covering only switchable blocks. Adapters and their shared local dependencies are bundled once by module identity; no pre-rendered copies of alternative DOM are embedded. A selected built-in mindmap has its separate enhancement bundle/payload, as described above. CSS uses the existing asset ID/content-hash/dependency rules, including selected static and all eligible candidate assets. Each exact executable bundle receives a SHA-256 CSP authorization. JSON escapes HTML delimiters and line separators and is never interpolated into executable code.
 
 There are no runtime downloads, Agent calls, input/config writes or saved choices. Reopening/reloading starts at the build selection. Theme, Layout, section IDs, navigation state and Core-owned block citations remain outside the replaced content. Print shows the current complete View and sources, hiding switching controls/errors.
 

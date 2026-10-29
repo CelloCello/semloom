@@ -2,6 +2,8 @@
 
 Plugins are trusted Node.js modules. The CLI loads only explicitly configured local `.js`, `.mjs` or `.cjs` files, with a default-exported manifest. It does not install packages, download modules, scan directories or sandbox build-time code.
 
+For a hierarchy Variant, extend `hierarchy` at data version `1.0` and consume its [bounded node contract](semantic-schema.md#hierarchy-content). Preserve every label, parent/child relationship and sibling order. Nodes are content inside one block; they do not create Sections, TOC entries or Override targets. Core owns the block's citations. The built-ins emit a complete native list; the selected built-in `hierarchy.mindmap` has a Core-owned offline Markmap enhancement with folding, separate from optional Variant-switching adapters. Local Variants do not implicitly acquire that enhancement. Keep wide diagrams locally scrollable and retain all content for no-JS, failure and print. See [branch color customization](themes.md#hierarchy-branch-colors).
+
 ## Run the example
 
 ```sh
