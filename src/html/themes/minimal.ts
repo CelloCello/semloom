@@ -1,5 +1,22 @@
 // The minimal theme also supplies fallback tokens for every built-in Theme.
-export const minimalTokens = {
+import type { ThemeTokens } from '../../core/theme.js';
+export type MindmapPalette = readonly [
+  string,
+  string,
+  string,
+  string,
+  string,
+  string,
+];
+export const minimalMindmapPalette: MindmapPalette = [
+  '#237747',
+  '#2463b5',
+  '#ad590f',
+  '#8545b3',
+  '#b3374f',
+  '#857000',
+];
+export const minimalTokens: ThemeTokens = {
   'color-scheme': 'light',
   paper: '#faf9f6',
   ink: '#242923',
@@ -21,4 +38,4 @@ export const minimalTokens = {
   selection: '#cde2d3',
 };
 
-export type ThemeTokens = typeof minimalTokens;
+export type { ThemeTokens } from '../../core/theme.js';

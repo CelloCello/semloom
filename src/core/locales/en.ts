@@ -1,0 +1,33 @@
+import type { ReportMessages } from './types.js';
+
+export const english: ReportMessages = Object.freeze({
+  locale: 'en',
+  toc: 'Contents',
+  tocWithSources: 'Contents and sources',
+  dataSources: 'Data sources',
+  sources: 'Sources',
+  skipToContent: 'Skip to content',
+  footer: 'Semloom · A standalone, offline semantic report',
+  blockSources: 'Sources for this block',
+  displayAs: 'Display as',
+  currentView: 'Current view',
+  item: 'Item',
+  notProvided: 'Not provided',
+  info: 'Information',
+  success: 'Success',
+  warning: 'Warning',
+  error: 'Error',
+  comparisonValue: 'Comparison value',
+  separator: ': ',
+  code: 'Code',
+  mindmap: 'Mind map',
+  mindmapHelp: 'Mind map; use node buttons to expand or collapse',
+  collapse: 'Collapse',
+  expand: 'Expand',
+  switchFailed:
+    'Unable to switch views. The original content has been kept. Retry or choose another view.',
+  cleanupFailed: 'The view changed, but cleanup of the previous view failed.',
+  cards: 'Cards',
+  table: 'Table',
+  responsive: 'Responsive',
+});

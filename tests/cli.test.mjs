@@ -1,11 +1,21 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import {
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { comparisonDocument } from './helpers.mjs';
+import { compile, parseConfig, loadPresentation } from '../dist/index.js';
+import { hierarchyDocument } from './fixtures/hierarchy.mjs';
+import { technicalGuide } from './fixtures/technical-guide.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const cli = (...args) =>
@@ -13,6 +23,90 @@ const cli = (...args) =>
     cwd: root,
     encoding: 'utf8',
   });
+test('CLI protects loaded inputs through symlink aliases while allowing separate output paths', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'semloom-output-alias-'));
+  const physical = join(directory, 'physical'),
+    alias = join(directory, 'alias');
+  mkdirSync(physical);
+  symlinkSync(physical, alias, 'dir');
+  const fixtures = {
+    'input.json': JSON.stringify({
+      schemaVersion: '1.0',
+      title: 'Paths',
+      sections: [
+        {
+          title: 'Content',
+          blocks: [{ kind: 'prose', text: 'Preserve inputs' }],
+        },
+      ],
+    }),
+    'config.json': JSON.stringify({
+      themes: ['./theme.json'],
+      layouts: ['./layout.json'],
+      theme: 'review.theme',
+      layout: 'review.layout',
+    }),
+    'theme.json': JSON.stringify({
+      id: 'review.theme',
+      themeApiVersion: '1.0',
+      cssFile: './theme.css',
+    }),
+    'layout.json': JSON.stringify({
+      id: 'review.layout',
+      layoutApiVersion: '1.0',
+      base: 'document',
+      cssFile: './layout.css',
+    }),
+    'theme.css': '.prose{font-weight:500}',
+    'layout.css': '.page{max-width:60rem}',
+  };
+  for (const [name, text] of Object.entries(fixtures))
+    writeFileSync(join(physical, name), text);
+  try {
+    for (const name of Object.keys(fixtures)) {
+      const link = join(directory, `${name}.link`);
+      symlinkSync(join(physical, name), link, 'file');
+      for (const [source, output] of [
+        [alias, join(physical, name)],
+        [physical, join(alias, name)],
+        [physical, link],
+      ]) {
+        const result = cli(
+          'build',
+          join(source, 'input.json'),
+          '--config',
+          join(source, 'config.json'),
+          '-o',
+          output,
+        );
+        assert.equal(result.status, 2, result.stderr);
+        assert.match(
+          result.stderr,
+          /Output must not overwrite input or configuration/u,
+        );
+        for (const [file, text] of Object.entries(fixtures))
+          assert.equal(readFileSync(join(physical, file), 'utf8'), text);
+      }
+    }
+    for (const output of [
+      join(alias, 'new.html'),
+      join(alias, 'nested', 'new.html'),
+    ]) {
+      const result = cli(
+        'build',
+        join(alias, 'input.json'),
+        '--config',
+        join(alias, 'config.json'),
+        '-o',
+        output,
+      );
+      assert.equal(result.status, 0, result.stderr);
+      assert.match(readFileSync(output, 'utf8'), /^<!doctype html>/u);
+    }
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
 test('CLI help, listing, Schema stdout and validate work from compiled output', () => {
   const version = JSON.parse(
     readFileSync(join(root, 'package.json'), 'utf8'),
@@ -148,4 +242,198 @@ test('CLI overrides config values after validating config and does not rewrite t
     ).status,
     2,
   );
+});
+
+test('richtext CLI exports its schema, matches library output and preserves old output on inline failures', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'semloom-richtext-cli-'));
+  const output = join(directory, 'report.html');
+  const inputFile = join(directory, 'report.json');
+  const config = join(directory, 'presentation.json');
+  const example = JSON.parse(readFileSync('examples/richtext.json', 'utf8'));
+  writeFileSync(inputFile, JSON.stringify(example));
+  writeFileSync(
+    config,
+    JSON.stringify({ overrides: { 'rich-content': 'richtext.paragraph' } }),
+  );
+  const schema = JSON.parse(cli('schema').stdout);
+  assert.ok(
+    schema.definitions.block.oneOf.some(
+      (choice) => choice.properties.kind.const === 'richtext',
+    ),
+  );
+  assert.match(cli('--help').stdout, /timeline, richtext/);
+  const valid = cli('validate', inputFile);
+  assert.equal(valid.status, 0, valid.stderr);
+  const built = cli(
+    'build',
+    inputFile,
+    '--config',
+    config,
+    '--explain',
+    '-o',
+    output,
+  );
+  assert.equal(built.status, 0, built.stderr);
+  assert.equal(built.stdout, '');
+  assert.match(built.stderr, /"selected": "richtext.paragraph"/);
+  assert.match(built.stderr, /"origin": "override"/);
+  const previous = readFileSync(output, 'utf8');
+  assert.equal(
+    previous,
+    compile(example, { overrides: { 'rich-content': 'richtext.paragraph' } })
+      .html,
+  );
+  for (const [run, diagnostic] of [
+    [{ text: 'link', href: 'javascript:alert(1)' }, /UNSAFE_URL/],
+    [{ text: 'link', href: '#missing' }, /INVALID_ANCHOR/],
+    [{ text: 'link', href: '#%zz' }, /INVALID_ANCHOR/],
+    [{ text: 'x', children: [] }, /SCHEMA_ADDITIONALPROPERTIES/],
+  ]) {
+    const invalid = structuredClone(example);
+    invalid.sections[0].blocks[0].content = [run];
+    writeFileSync(inputFile, JSON.stringify(invalid));
+    for (const args of [
+      ['validate', inputFile],
+      ['build', inputFile, '-o', output],
+    ]) {
+      const failure = cli(...args);
+      assert.equal(failure.status, 2);
+      assert.ok(failure.stderr.includes(inputFile));
+      assert.match(failure.stderr, /\/sections\/0\/blocks\/0\/content\/0\//);
+      assert.match(failure.stderr, diagnostic);
+      assert.equal(readFileSync(output, 'utf8'), previous);
+    }
+  }
+});
+
+test('List/Code CLI builds initial and edited technical guides and reports nested failures without replacing output', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'semloom-guide-cli-'));
+  const inputFile = join(directory, 'guide.json');
+  const output = join(directory, 'guide.html');
+  const schema = JSON.parse(cli('schema').stdout);
+  for (const kind of ['list', 'code'])
+    assert.ok(
+      schema.definitions.block.oneOf.some(
+        (choice) => choice.properties.kind.const === kind,
+      ),
+    );
+  assert.match(cli('--help').stdout, /richtext, list, code/);
+  for (const edited of [false, true]) {
+    const input = technicalGuide(edited);
+    writeFileSync(inputFile, JSON.stringify(input));
+    assert.equal(cli('validate', inputFile).status, 0);
+    const built = cli('build', inputFile, '--explain', '-o', output);
+    assert.equal(built.status, 0, built.stderr);
+    assert.equal(built.stdout, '');
+    assert.match(built.stderr, /"selected": "list.nested"/);
+    assert.match(built.stderr, /"selected": "code.block"/);
+    assert.equal(readFileSync(output, 'utf8'), compile(input).html);
+  }
+  const previous = readFileSync(output);
+  for (const [edit, path, code] of [
+    [
+      (d) => {
+        d.sections[0].blocks[1].items[0].children.items[1].content[0].href =
+          '#missing';
+      },
+      '/sections/0/blocks/1/items/0/children/items/1/content/0/href',
+      'INVALID_ANCHOR',
+    ],
+    [
+      (d) => {
+        d.sections[0].blocks[1].items[0].children.items[1].content[0].href =
+          'javascript:alert(1)';
+      },
+      '/sections/0/blocks/1/items/0/children/items/1/content/0/href',
+      'UNSAFE_URL',
+    ],
+    [
+      (d) => {
+        d.sections[1].blocks[0].text = 'nul\u0000';
+      },
+      '/sections/1/blocks/0/text',
+      'SCHEMA_PATTERN',
+    ],
+  ]) {
+    const invalid = technicalGuide(true);
+    edit(invalid);
+    writeFileSync(inputFile, JSON.stringify(invalid));
+    for (const args of [
+      ['validate', inputFile],
+      ['build', inputFile, '-o', output],
+    ]) {
+      const failed = cli(...args);
+      assert.equal(failed.status, 2, failed.stderr);
+      assert.ok(failed.stderr.includes(inputFile));
+      assert.ok(failed.stderr.includes(path));
+      assert.ok(failed.stderr.includes(code));
+      assert.deepEqual(readFileSync(output), previous);
+    }
+  }
+});
+
+test('Hierarchy CLI builds initial/edit tree and mindmap through the same schema and preserves output on failure', async () => {
+  const directory = mkdtempSync(join(tmpdir(), 'semloom-hierarchy-cli-'));
+  const inputFile = join(directory, 'hierarchy.json');
+  const outputFile = join(directory, 'hierarchy.html');
+  const raw = JSON.parse(
+    readFileSync('examples/hierarchy-mindmap.json', 'utf8'),
+  );
+  const config = {
+    ...raw,
+    themes: raw.themes.map((p) => join(root, 'examples', p)),
+    layouts: raw.layouts.map((p) => join(root, 'examples', p)),
+  };
+  const catalog = await loadPresentation(parseConfig(config));
+  const configFile = join(directory, 'presentation.json');
+  const schema = JSON.parse(cli('schema').stdout);
+  assert.ok(
+    schema.definitions.block.oneOf.some(
+      (choice) => choice.properties.kind.const === 'hierarchy',
+    ),
+  );
+  assert.match(cli('--help').stdout, /code, hierarchy/);
+  for (const variant of ['hierarchy.tree', 'hierarchy.mindmap']) {
+    config.overrides['architecture-map'] = variant;
+    writeFileSync(configFile, JSON.stringify(config));
+    for (const edited of [false, true]) {
+      const input = hierarchyDocument(edited);
+      writeFileSync(inputFile, JSON.stringify(input));
+      assert.equal(
+        cli('validate', inputFile, '--config', configFile).status,
+        0,
+      );
+      const built = cli(
+        'build',
+        inputFile,
+        '--config',
+        configFile,
+        '--explain',
+        '-o',
+        outputFile,
+      );
+      assert.equal(built.status, 0, built.stderr);
+      assert.ok(built.stderr.includes(`"selected": "${variant}"`));
+      assert.equal(
+        readFileSync(outputFile, 'utf8'),
+        compile(input, config, undefined, catalog).html,
+      );
+    }
+  }
+  const previous = readFileSync(outputFile);
+  const invalid = hierarchyDocument();
+  invalid.sections[0].blocks[1].root.children[0].label = '';
+  writeFileSync(inputFile, JSON.stringify(invalid));
+  for (const args of [
+    ['validate', inputFile],
+    ['build', inputFile, '-o', outputFile],
+  ]) {
+    const failed = cli(...args);
+    assert.equal(failed.status, 2);
+    assert.ok(failed.stderr.includes(inputFile));
+    assert.ok(
+      failed.stderr.includes('/sections/0/blocks/1/root/children/0/label'),
+    );
+    assert.deepEqual(readFileSync(outputFile), previous);
+  }
 });

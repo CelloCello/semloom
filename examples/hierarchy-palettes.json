@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "1.0",
+  "title": "Mindmap：Theme 分支配色",
+  "sections": [
+    {
+      "id": "palette-demo",
+      "title": "專案思考",
+      "blocks": [
+        {
+          "kind": "hierarchy",
+          "id": "architecture-map",
+          "root": {
+            "label": "專案思考",
+            "children": [
+              { "label": "研究", "children": [{ "label": "蒐集背景" }] },
+              { "label": "規劃", "children": [{ "label": "界定範圍" }] },
+              { "label": "設計", "children": [{ "label": "探索方案" }] },
+              { "label": "開發", "children": [{ "label": "實現想法" }] },
+              { "label": "驗證", "children": [{ "label": "核對結果" }] },
+              { "label": "交付", "children": [{ "label": "分享成果" }] },
+              { "label": "後續", "children": [{ "label": "回顧改進" }] }
+            ]
+          },
+          "sourceIds": ["illustration"]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "illustration",
+      "title": "示意資料：用於比較 Theme 的分支配色，不代表實際專案進度。"
+    }
+  ]
+}

@@ -1,3 +1,5 @@
+import type { ThemeTokens } from './theme.js';
+export type { ThemeTokens } from './theme.js';
 export type JsonSchema = Record<string, unknown>;
 export type Cell = string | number | boolean | null;
 export const themeNames = [
@@ -11,6 +13,27 @@ export const themeNames = [
 export const layoutNames = ['document', 'sidebar'] as const;
 export type ThemeName = (typeof themeNames)[number];
 export type LayoutName = (typeof layoutNames)[number];
+export interface ThemeDefinition {
+  id: string;
+  themeApiVersion: '1.0';
+  tokens?: Partial<ThemeTokens>;
+  css?: string;
+}
+export interface LayoutDefinition {
+  id: string;
+  layoutApiVersion: '1.0';
+  base: LayoutName;
+  css?: string;
+}
+export interface PresentationNames {
+  themes: readonly string[];
+  layouts: readonly string[];
+}
+export interface ResolvedPresentation {
+  base: LayoutName;
+  theme?: ThemeDefinition;
+  layout?: LayoutDefinition;
+}
 
 export interface Block {
   id?: string;
@@ -21,6 +44,40 @@ export interface Block {
 export interface ProseBlock extends Block {
   kind: 'prose';
   text: string;
+}
+export type InlineMark = 'strong' | 'emphasis' | 'code';
+export interface InlineRun {
+  text: string;
+  marks?: InlineMark[];
+  href?: string;
+}
+export interface RichTextBlock extends Block {
+  kind: 'richtext';
+  content: InlineRun[];
+}
+export interface ListItem {
+  content: InlineRun[];
+  children?: ListContent;
+}
+export interface ListContent {
+  ordered: boolean;
+  items: ListItem[];
+}
+export interface ListBlock extends Block, ListContent {
+  kind: 'list';
+}
+export interface CodeBlock extends Block {
+  kind: 'code';
+  text: string;
+  language?: string;
+}
+export interface HierarchyNode {
+  label: string;
+  children?: HierarchyNode[];
+}
+export interface HierarchyBlock extends Block {
+  kind: 'hierarchy';
+  root: HierarchyNode;
 }
 export interface ComparisonBlock extends Block {
   kind: 'comparison';
@@ -72,11 +129,17 @@ export interface Document {
   sections: Section[];
 }
 export interface Config {
-  theme: ThemeName;
-  layout: LayoutName;
+  theme: string;
+  layout: string;
+  themes?: string[];
+  layouts?: string[];
   overrides: Record<string, string>;
   plugins: string[];
   interactive: boolean;
+}
+export interface NormalizedConfig extends Config {
+  themes: string[];
+  layouts: string[];
 }
 export interface PresentationContext {
   locale: string;

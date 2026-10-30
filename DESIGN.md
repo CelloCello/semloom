@@ -83,11 +83,17 @@ The default remains minimal. Midnight explicitly sets `--color-scheme: dark`; ot
 
 Local system fonts support CJK without downloads. Body line height is 1.75; prose measure is 72ch. Display title ranges from 2rem to 3.4rem. Content strings preserve line breaks and wrap long values; no inline Markdown styling.
 
+Rich Text uses the same prose measure and whitespace behavior, with semantic strong/emphasis, underlined links and wrapping inline code. Code uses local monospace fonts at 0.9em, inherits text color and uses the Theme's table-header surface for a quiet background. Existing plain-text fields keep their literal presentation.
+
 ## Layout
+
+External Layouts select an existing base and use `data-layout-id` for scoped placement CSS. The right-side TOC example mirrors desktop sidebar placement while retaining its 800px disclosure, static fallback, keyboard/focus and single-column print behavior. External Themes independently provide validated tokens and optional scoped CSS; Core print resets follow them.
 
 Page max width 76rem, desktop padding 4rem/3rem and mobile padding 2rem/1.1rem. Cards collapse to one column below 600px. Tables scroll inside an accessible, focusable region; the page must not scroll horizontally. Print removes navigation and uses wrapping table cells and repeated headers.
 
 Sidebar expands the page to 96rem with a 15rem sticky TOC and a flexible reading column. At 800px and below it becomes an in-flow mobile disclosure; no-JS keeps all links visible. Focus rings, a skip link and an explicit current-section mark support keyboard reading. Deep TOC indentation flattens after three levels. Print restores a single column and hides navigation controls.
+
+All Themes use the same TOC card, inheriting ink, table-hover background, line and radius tokens. With sources its fixed title is “目錄與資料來源” and a separate link leads to the source list; without sources it says “目錄”. Mobile sidebar joins the existing button and navigation visually, with a CSS triangle reflecting `aria-expanded` and no duplicate heading. Desktop sidebar remains open. Section/source navigation shares focus handling and the current-location mark. No-JS or setup failure retains the complete card, and print hides it.
 
 ## Elevation & Depth
 
@@ -95,6 +101,16 @@ Flat surfaces, no shadows. Cards use a single border; no nested card decorations
 
 ## Components
 
+Complete [report workflows](examples/report-workflows/README.md) compose these components within the same document frame. Content edits retain unaffected values, field order and source references; Theme/Layout changes retain the content. Long Chinese hierarchy labels wrap, code scrolls locally on screen, and print retains full text with light surfaces.
+
+Lists use native ordered/unordered markers and bounded indentation; each item's text uses the Rich Text measure and inline styles. Code uses a quiet bordered Theme surface with an optional language caption, local monospace fonts and a focusable scrolling region. Screen preserves code whitespace without wrapping; print wraps long lines without altering DOM text. No highlighting, execution controls or copy runtime is added.
+
+Hierarchy tree uses a complete native nested list with bounded indentation and bordered Theme surfaces. Mindmap uses the real Markmap renderer for text underlines, smooth branches and circular junctions. Theme fonts, ink, paper, leading and six branch colors apply; descendants retain their main branch color. Labels wrap at 224px. Native Markmap measures and lays out text, and its junctions fold/unfold via mouse or Enter/Space with accessible button labels, expanded state and focus rings. Animation, zoom and pan are disabled. The SVG uses natural dimensions in a focusable scrolling region, including 701px and 375px; it is never replaced with a list just because the screen narrows. The original full tree stays visible until successful setup, then is hidden from screen reading. No-JS, setup failure and print show that complete tree; print never loses folded descendants. Content nodes remain separate from document headings and navigation.
+
+Each built-in Theme owns six separated mindmap hues suited to its palette; Graphite keeps a neutral page with restrained colored branches. Colors repeat after branch six, while labels and geometry remain independent cues. The renderer reads Theme CSS variables instead of keeping a separate palette. External light Themes inherit Minimal and dark Themes inherit Midnight, based on `color-scheme`; scoped CSS can override individual colors. Values, contrast and color-distance checks live in [Themes](docs/themes.md#hierarchy-branch-colors).
+
 Comparison cards and tables show the same ordered fields. Block citations sit outside the variant. Sources with no URL remain plain text; source links use visible underlines. Focus rings and print URLs preserve access and traceability.
+
+The external reading preset uses a light gray ground, navy text, blue accents and local system fonts. Its independent paper-style sidebar Layout puts one Theme surface behind the title, content and footer. Theme CSS styles existing metrics and insights; the shared TOC card follows the selected Theme in every Layout. Opt-in `comparison.responsive` embeds the same data as a table and cards: CSS exposes cards at 760px and below, a table above, and a table in print, without JavaScript.
 
 Insights use a quiet bordered aside with an explicit author-supplied level label. Metrics use compact definition lists, 1.4rem values and secondary comparison values without derived trend colors. Steps remain complete ordered lists; the stepper spreads short sequences across columns and collapses on mobile/print. Timelines display raw time labels in input order. These components and local Plugin CSS consume the same paper/ink/accent/line/space tokens.

@@ -1,4 +1,12 @@
-import type { ThemeTokens } from './minimal.js';
+import type { ThemeTokens, MindmapPalette } from './minimal.js';
+export const oceanMindmapPalette: MindmapPalette = [
+  '#176ea5',
+  '#00806b',
+  '#b45b15',
+  '#7a49b4',
+  '#52762b',
+  '#b43a69',
+];
 
 export const oceanTokens: Partial<ThemeTokens> = {
   paper: '#f4f8fc',

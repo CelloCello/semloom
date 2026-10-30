@@ -1,9 +1,20 @@
 import { fileURLToPath } from 'node:url';
-import { renderCards, renderTable, display, valueFor } from './comparison.js';
+import {
+  renderCards,
+  renderTable,
+  renderResponsive,
+  display,
+  valueFor,
+} from './comparison.js';
 import { Registry } from '../core/registry.js';
 import type { ComparisonBlock, Plugin, ProseBlock } from '../core/types.js';
 import { html } from '../html/html.js';
 import { contentKinds } from './content.js';
+import { richTextKind } from './richtext.js';
+import { listKind } from './list.js';
+import { codeKind } from './code.js';
+import { hierarchyKind } from './hierarchy.js';
+import { reportVariant } from '../core/report-messages.js';
 
 const short = { type: 'string', maxLength: 1000 };
 const cell = {
@@ -87,6 +98,31 @@ const builtin: Plugin = {
       },
       variants: [
         {
+          id: 'comparison.responsive',
+          supports: () => ({
+            supported: true,
+            reason:
+              'Ordered fields remain available as a table or cards at every width.',
+          }),
+          // Explicit opt-in preserves the existing Auto cards/table decisions.
+          score: () => 0,
+          render: renderResponsive,
+          assets: [
+            {
+              id: 'semloom.comparison-responsive',
+              type: 'css',
+              content: `.semloom-comparison-responsive > .semloom-comparison-narrow{display:none}@media screen and (max-width:760px){.semloom-comparison-responsive > .semloom-comparison-wide{display:none}.semloom-comparison-responsive > .semloom-comparison-narrow{display:block}.semloom-comparison-responsive .cards{grid-template-columns:minmax(0,1fr)}}@media print{.semloom-comparison-responsive > .semloom-comparison-wide{display:block}.semloom-comparison-responsive > .semloom-comparison-narrow{display:none}}`,
+            },
+          ],
+          browser: {
+            entry: fileURLToPath(
+              new URL('../browser/adapters/responsive.js', import.meta.url),
+            ),
+            exportName: 'createView',
+            label: reportVariant('comparison.responsive').label,
+          },
+        },
+        {
           id: 'comparison.cards',
           supports: () => ({
             supported: true,
@@ -99,7 +135,7 @@ const builtin: Plugin = {
               new URL('../browser/adapters/cards.js', import.meta.url),
             ),
             exportName: 'createView',
-            label: '卡片',
+            label: reportVariant('comparison.cards').label,
           },
         },
         {
@@ -115,12 +151,16 @@ const builtin: Plugin = {
               new URL('../browser/adapters/table.js', import.meta.url),
             ),
             exportName: 'createView',
-            label: '表格',
+            label: reportVariant('comparison.table').label,
           },
         },
       ],
     },
     ...contentKinds,
+    richTextKind,
+    listKind,
+    codeKind,
+    hierarchyKind,
   ],
 };
 function compact(block: ComparisonBlock): boolean {

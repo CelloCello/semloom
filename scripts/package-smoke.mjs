@@ -93,6 +93,12 @@ for (const binary of runtimes) {
       `${archiveSha256}  ${packed.filename}\n`,
     );
     const names = packed.files.map((file) => file.path);
+    const workflowCases = JSON.parse(
+      await readFile(
+        resolve(root, 'examples/report-workflows/cases.json'),
+        'utf8',
+      ),
+    );
     for (const required of [
       'LICENSE',
       'README.zh-TW.md',
@@ -103,14 +109,45 @@ for (const binary of runtimes) {
       'dist/browser/runtime.js',
       'dist/browser/adapters/cards.js',
       'dist/browser/adapters/table.js',
+      'dist/browser/adapters/responsive.js',
+      'dist/core/report-messages.js',
+      'dist/core/locales/zh-TW.js',
+      'dist/core/locales/en.js',
+      'dist/core/locales/types.d.ts',
       'dist/cli/main.js',
       'docs/interactive.md',
+      'docs/localization.md',
       'docs/releases.md',
       'docs/skills.md',
       'skills/semloom/SKILL.md',
       'examples/comparison.json',
       'examples/pr-daily.json',
       'examples/report-workflow.json',
+      'examples/reading-report.json',
+      'examples/reading-presentation.json',
+      'examples/presentation/reading.json',
+      'examples/presentation/paper-sidebar.json',
+      'examples/presentation/styles/reading.css',
+      'examples/presentation/styles/paper-sidebar.css',
+      'examples/hierarchy.json',
+      'examples/hierarchy-mindmap.json',
+      'examples/hierarchy-palettes.json',
+      'examples/report-workflows/README.md',
+      'examples/report-workflows/cases.json',
+      ...workflowCases.flatMap((scenario) =>
+        [
+          scenario.initial,
+          scenario.edited,
+          ...scenario.variants.map((variant) => variant.config),
+        ].map((name) => `examples/report-workflows/${name}`),
+      ),
+      'examples/hierarchy-reference.json',
+      'examples/hierarchy-reference-mindmap.json',
+      'dist/core/hierarchy.js',
+      'dist/browser/mindmap.js',
+      'docs/licenses/d3-flextree.txt',
+      'dist/plugins/hierarchy.js',
+      'dist/html/styles/hierarchy.js',
       'examples/comparison-plugin/browser.mjs',
       'CHANGELOG.md',
     ])
@@ -267,7 +304,7 @@ for (const binary of runtimes) {
       // Resolve every skill reference from its physical location, not .agents/.
       const instructions = await readFile(join(skillLink, 'SKILL.md'), 'utf8');
       for (const match of instructions.matchAll(/\[[^\]]*\]\(([^)]+)\)/gu))
-        await access(resolve(physicalSkill, match[1]));
+        await access(resolve(physicalSkill, match[1].split('#')[0]));
       assert.equal(invoke('--version').trim(), manifest.version);
       const config =
         mode === 'checkout'
@@ -399,9 +436,294 @@ for (const binary of runtimes) {
       `import assert from 'node:assert/strict';\nimport {compile} from ${JSON.stringify(manifest.name)};\nimport {safeUrl} from ${JSON.stringify(`${manifest.name}/browser`)};\nimport {readFileSync} from 'node:fs';\nsafeUrl('https://example.com');\nconst output=compile(JSON.parse(readFileSync('examples/comparison.json','utf8')),{interactive:true});\nassert.ok(output.html.includes('data-semloom-interactive'));\n`,
     );
     run(binary, ['library-smoke.mjs'], consumer);
+    const presentationConfig = 'examples/presentation/presentation.json';
+    for (const category of ['themes', 'layouts']) {
+      const listed = JSON.parse(
+        run(
+          binary,
+          [cli, category, 'list', '--config', presentationConfig],
+          consumer,
+        ),
+      );
+      assert.ok(
+        listed.includes(
+          category === 'themes' ? 'example.paper' : 'example.right-sidebar',
+        ),
+      );
+    }
+    run(binary, [cli, 'schema', '--config', presentationConfig], consumer);
+    run(
+      binary,
+      [
+        cli,
+        'validate',
+        'examples/technical-guide.json',
+        '--config',
+        presentationConfig,
+      ],
+      consumer,
+    );
+    run(
+      binary,
+      [
+        cli,
+        'build',
+        'examples/technical-guide.json',
+        '--config',
+        presentationConfig,
+        '-o',
+        'reports/presentation.html',
+      ],
+      consumer,
+    );
+    await writeFile(
+      join(consumer, 'presentation-smoke.mjs'),
+      [
+        "import assert from 'node:assert/strict';",
+        "import {readFileSync} from 'node:fs';",
+        "import {resolve} from 'node:path';",
+        `import {compile,parseConfig,loadPresentation,createPresentation} from ${JSON.stringify(manifest.name)};`,
+        "const input=JSON.parse(readFileSync('examples/technical-guide.json','utf8'));",
+        "const config=parseConfig(JSON.parse(readFileSync('examples/presentation/presentation.json','utf8')));",
+        "const catalog=await loadPresentation(config,resolve('examples/presentation'));",
+        'const output=compile(input,config,undefined,catalog);',
+        "assert.equal(output.html,readFileSync('reports/presentation.html','utf8'));",
+        "assert.equal(output.plan.context.layout,'sidebar');",
+        'assert.ok(output.html.includes(\'data-layout-id="example.right-sidebar"\'));',
+        "assert.ok(output.html.includes('grid-column: 2'));",
+        "assert.ok(output.html.includes('font-weight: 600'));",
+        "const pure=createPresentation({themes:[{id:'consumer.pure',themeApiVersion:'1.0',tokens:{accent:'#123456'}}],layouts:[{id:'consumer.reading',layoutApiVersion:'1.0',base:'document',css:'.page{max-width:60rem}'}]});",
+        "assert.equal(compile(input,{theme:'consumer.pure',layout:'consumer.reading'},undefined,pure).plan.context.layout,'document');",
+      ].join('\n'),
+    );
+    run(binary, ['presentation-smoke.mjs'], consumer);
+    for (const interactive of [false, true]) {
+      const name = `reports/reading-${interactive}.html`;
+      run(
+        binary,
+        [
+          cli,
+          'build',
+          'examples/reading-report.json',
+          '--config',
+          'examples/reading-presentation.json',
+          ...(interactive ? ['--interactive'] : []),
+          '-o',
+          name,
+        ],
+        consumer,
+      );
+      const reading = await readFile(join(consumer, name), 'utf8');
+      assert.ok(reading.includes('data-theme="example.reading"'));
+      assert.ok(reading.includes('data-layout-id="example.paper-sidebar"'));
+      assert.ok(reading.includes('data-variant="comparison.responsive"'));
+      assert.ok(reading.includes('data-semloom-mindmap'));
+      assert.ok(reading.includes('semloom-comparison-wide'));
+      assert.ok(reading.includes('semloom-comparison-narrow'));
+    }
+    for (const locale of ['en-US', 'fr-FR']) {
+      const document = JSON.parse(
+        await readFile(join(consumer, 'examples/reading-report.json'), 'utf8'),
+      );
+      document.locale = locale;
+      const comparisonMetric = document.sections[0].blocks[1].items[0];
+      delete comparisonMetric.comparisonLabel;
+      comparisonMetric.unit = 'jours';
+      const input = `reports/reading-${locale}.json`;
+      await writeFile(join(consumer, input), JSON.stringify(document));
+      for (const interactive of [false, true]) {
+        const name = `reports/reading-${locale}-${interactive}.html`;
+        run(
+          binary,
+          [
+            cli,
+            'build',
+            input,
+            '--config',
+            'examples/reading-presentation.json',
+            ...(interactive ? ['--interactive'] : []),
+            '-o',
+            name,
+          ],
+          consumer,
+        );
+        const output = await readFile(join(consumer, name), 'utf8');
+        assert.ok(output.includes(`lang="${locale}"`));
+        assert.ok(
+          output.includes(
+            `data-ui-locale="${locale === 'en-US' ? 'en' : 'zh-TW'}"`,
+          ),
+        );
+        assert.ok(
+          output.includes(
+            locale === 'en-US' ? '>Contents and sources<' : '>目錄與資料來源<',
+          ),
+        );
+        assert.ok(output.includes('專案週報試作：讓搜尋與匯出更好用'));
+        assert.deepEqual(
+          JSON.parse(await readFile(join(consumer, input), 'utf8')),
+          document,
+        );
+      }
+    }
+    run(binary, [cli, 'validate', 'examples/hierarchy.json'], consumer);
+    for (const view of ['tree', 'mindmap']) {
+      run(
+        binary,
+        [
+          cli,
+          'build',
+          'examples/hierarchy.json',
+          ...(view === 'mindmap'
+            ? ['--config', 'examples/hierarchy-mindmap.json']
+            : []),
+          '-o',
+          `reports/hierarchy-${view}.html`,
+          '--explain',
+        ],
+        consumer,
+      );
+    }
+    await writeFile(
+      join(consumer, 'hierarchy-smoke.mjs'),
+      [
+        "import assert from 'node:assert/strict';",
+        "import {readFileSync,writeFileSync} from 'node:fs';",
+        "import {resolve} from 'node:path';",
+        `import {compile,parseConfig,loadPresentation,hierarchyLimits,themeNames} from ${JSON.stringify(manifest.name)};`,
+        "const input=JSON.parse(readFileSync('examples/hierarchy.json','utf8'));",
+        "const config=parseConfig(JSON.parse(readFileSync('examples/hierarchy-mindmap.json','utf8')));",
+        "const catalog=await loadPresentation(config,resolve('examples'));",
+        'assert.deepEqual(hierarchyLimits,{depth:8,nodes:1000,label:1000});',
+        "for(const view of ['tree','mindmap']){",
+        "const output=compile(input,view==='tree'?{}:config,undefined,catalog);",
+        "assert.equal(output.html,readFileSync(`reports/hierarchy-${view}.html`,'utf8'));",
+        "assert.equal(output.plan.blocks.find(block=>block.kind==='hierarchy').selected,`hierarchy.${view}`);",
+        'assert.ok(output.html.includes(\'class="semloom-hierarchy-root"\'));',
+        "if(view==='mindmap'){assert.ok(output.html.includes('data-semloom-mindmap'));assert.ok(output.html.includes('markmap-view 0.18.12'));assert.ok(output.html.includes('d3-flextree'));}else{assert.ok(!output.html.includes('data-semloom-mindmap'));}",
+        "assert.ok(!output.html.includes('data-semloom-interactive'));",
+        '}',
+        "const paletteInput=JSON.parse(readFileSync('examples/hierarchy-palettes.json','utf8'));",
+        'const palettes=new Set();let baseline;',
+        'for(const theme of themeNames){',
+        "const output=compile(paletteInput,{theme,overrides:{'architecture-map':'hierarchy.mindmap'}});",
+        'assert.deepEqual(output.document.data,paletteInput);',
+        'if(baseline)assert.deepEqual(output.plan,baseline);else baseline=output.plan;',
+        "const colors=Array.from({length:6},(_,i)=>output.html.match(new RegExp('--semloom-mindmap-branch-'+(i+1)+':(#[a-f0-9]{6})'))[1]);",
+        'assert.equal(new Set(colors).size,6);palettes.add(colors.join());',
+        'writeFileSync(`reports/mindmap-palette-${theme}.html`,output.html);',
+        '}',
+        'assert.equal(palettes.size,themeNames.length);',
+      ].join('\n'),
+    );
+    run(binary, ['hierarchy-smoke.mjs'], consumer);
+    const workflowOutputs = [];
+    for (const scenario of workflowCases)
+      for (const variant of scenario.variants) {
+        const config = `examples/report-workflows/${variant.config}`;
+        JSON.parse(run(binary, [cli, 'schema', '--config', config], consumer));
+        for (const phase of ['initial', 'edited']) {
+          const input = `examples/report-workflows/${scenario[phase]}`;
+          const name = `workflow-${scenario.id}-${phase}-${variant.id}`;
+          run(binary, [cli, 'validate', input, '--config', config], consumer);
+          run(
+            binary,
+            [
+              cli,
+              'build',
+              input,
+              '--config',
+              config,
+              '--theme',
+              phase === 'initial' ? 'example.paper' : 'example.night',
+              '--explain',
+              '-o',
+              `reports/${name}.html`,
+            ],
+            consumer,
+          );
+          workflowOutputs.push(name);
+        }
+      }
+    assert.equal(
+      workflowOutputs.length,
+      10,
+      'All three workflows and five Variant configs must produce initial/edit artifacts.',
+    );
+    await writeFile(
+      join(consumer, 'report-workflows-smoke.mjs'),
+      [
+        "import assert from 'node:assert/strict';",
+        "import {readFileSync,writeFileSync} from 'node:fs';",
+        "import {resolve} from 'node:path';",
+        `import {compile,parseConfig,loadPresentation} from ${JSON.stringify(manifest.name)};`,
+        "const read=name=>JSON.parse(readFileSync('examples/report-workflows/'+name,'utf8'));",
+        'const results=[];',
+        "for(const scenario of read('cases.json'))for(const variant of scenario.variants){",
+        'const config=parseConfig(read(variant.config));',
+        "const catalog=await loadPresentation(config,resolve('examples/report-workflows'));",
+        "for(const phase of ['initial','edited']){",
+        'const input=read(scenario[phase]),original=structuredClone(input);',
+        "const options={...config,theme:phase==='initial'?'example.paper':'example.night'};",
+        'const output=compile(input,options,undefined,catalog);',
+        'assert.deepEqual(input,original);assert.deepEqual(output.document.data,original);',
+        "assert.equal(output.plan.context.layout,'sidebar');",
+        'if(variant.blockId)assert.equal(output.plan.blocks.find(block=>block.id===variant.blockId).selected,variant.selected);',
+        'const name=`workflow-${scenario.id}-${phase}-${variant.id}`;',
+        "assert.equal(output.html,readFileSync(`reports/${name}.html`,'utf8'));",
+        "writeFileSync(`reports/${name}.plan.json`,JSON.stringify(output.plan,null,2)+'\\n');",
+        'results.push({scenario:scenario.id,phase,variant:variant.id,name,theme:options.theme,plan:output.plan});',
+        '}}',
+        "assert.equal(results.length,10,'Installed workflow coverage must include all ten initial/edit artifacts.');",
+        "writeFileSync('reports/report-workflows.json',JSON.stringify(results,null,2)+'\\n');",
+      ].join('\n'),
+    );
+    run(binary, ['report-workflows-smoke.mjs'], consumer);
+    await writeFile(
+      join(consumer, 'paths-smoke.mjs'),
+      [
+        "import assert from 'node:assert/strict';",
+        "import {mkdirSync,writeFileSync,readFileSync,symlinkSync} from 'node:fs';",
+        "import {resolve} from 'node:path';",
+        "import {spawnSync} from 'node:child_process';",
+        "mkdirSync('path-inputs');symlinkSync(resolve('path-inputs'),'path-alias','dir');",
+        "const fixtures={'input.json':readFileSync('examples/technical-guide.json','utf8'),'config.json':JSON.stringify({themes:['./theme.json'],layouts:['./layout.json'],theme:'consumer.paths',layout:'consumer.paths'}),'theme.json':JSON.stringify({id:'consumer.paths',themeApiVersion:'1.0',cssFile:'./theme.css'}),'layout.json':JSON.stringify({id:'consumer.paths',layoutApiVersion:'1.0',base:'document',cssFile:'./layout.css'}),'theme.css':'.prose{font-weight:500}','layout.css':'.page{max-width:60rem}'};",
+        "for(const [name,text] of Object.entries(fixtures))writeFileSync('path-inputs/'+name,text);",
+        `const cli=${JSON.stringify(cli)};`,
+        "for(const name of Object.keys(fixtures)){const result=spawnSync(process.execPath,[cli,'build','path-alias/input.json','--config','path-alias/config.json','-o','path-inputs/'+name],{encoding:'utf8'});assert.equal(result.status,2,result.stderr);assert.match(result.stderr,/Output must not overwrite input or configuration/u);}",
+        "for(const [name,text] of Object.entries(fixtures))assert.equal(readFileSync('path-inputs/'+name,'utf8'),text);",
+        'console.log(JSON.stringify({protectedSources:Object.keys(fixtures).length}));',
+      ].join('\n'),
+    );
+    run(binary, ['paths-smoke.mjs'], consumer);
+    await writeFile(
+      join(consumer, 'types-hierarchy.mts'),
+      [
+        `import {compile,hierarchyLimits,type HierarchyNode,type HierarchyBlock,type Document} from ${JSON.stringify(manifest.name)};`,
+        "const root:HierarchyNode={label:'Root',children:[{label:'Child'}]};",
+        "const block:HierarchyBlock={id:'map',kind:'hierarchy',root};",
+        "const data:Document={schemaVersion:'1.0',title:'T',sections:[{title:'S',blocks:[block]}]};",
+        "const output:string=compile(data,{overrides:{map:'hierarchy.mindmap'}}).html;",
+        'void [output,hierarchyLimits.nodes];',
+      ].join('\n'),
+    );
     await writeFile(
       join(consumer, 'types-node.mts'),
-      `import {compile, type Document} from ${JSON.stringify(manifest.name)};\nconst data:Document={schemaVersion:'1.0',title:'T',sections:[{title:'S'}]};\nconst output:string=compile(data).html;\nvoid output;\n`,
+      [
+        `import {compile,createPresentation,parseConfig,loadPresentation,resolveDocument,planDocument,createRegistry,type Config,type NormalizedConfig,type Document,type ThemeDefinition,type LayoutDefinition,type ThemeTokens} from ${JSON.stringify(manifest.name)};`,
+        "const data:Document={schemaVersion:'1.0',title:'T',sections:[{title:'S'}]};",
+        "const tokens:Partial<ThemeTokens>={accent:'#123456'};",
+        "const theme:ThemeDefinition={id:'consumer.typed',themeApiVersion:'1.0',tokens};",
+        "const layout:LayoutDefinition={id:'consumer.typed',layoutApiVersion:'1.0',base:'sidebar'};",
+        'const catalog=createPresentation({themes:[theme],layouts:[layout]});',
+        'const output:string=compile(data,{theme:theme.id,layout:layout.id},undefined,catalog).html;',
+        "const legacy:Config={theme:'minimal',layout:'document',overrides:{},plugins:[],interactive:false};",
+        'const normalized:NormalizedConfig=parseConfig(legacy);',
+        'const themePaths:string[]=normalized.themes;',
+        'const layoutPaths:string[]=parseConfig().layouts;',
+        'const registry=createRegistry();',
+        'void [output,compile(data,legacy),planDocument(resolveDocument(data,registry),legacy,registry),loadPresentation(legacy),themePaths,layoutPaths];',
+      ].join('\n'),
     );
     await writeFile(
       join(consumer, 'types-browser.mts'),
@@ -420,7 +742,10 @@ for (const binary of runtimes) {
             strict: true,
             noEmit: true,
           },
-          files: [`types-${target}.mts`],
+          files: [
+            `types-${target}.mts`,
+            ...(target === 'node' ? ['types-hierarchy.mts'] : []),
+          ],
         }),
       );
       run(
@@ -447,6 +772,11 @@ for (const binary of runtimes) {
       'report-workflow',
       'interactive',
       'plugin-interactive',
+      'presentation',
+      'hierarchy-tree',
+      'hierarchy-mindmap',
+      ...installedThemes.map((theme) => `mindmap-palette-${theme}`),
+      ...workflowOutputs,
     ]) {
       const file = join(consumer, `reports/${name}.html`);
       const content = await readFile(file);

@@ -5,7 +5,10 @@ import {
   themeNames,
   layoutNames,
   type Config,
+  type NormalizedConfig,
   type JsonSchema,
+  type PresentationNames,
+  fail,
 } from './types.js';
 
 export const limits = {
@@ -188,8 +191,30 @@ const configSchema: JsonSchema = {
   type: 'object',
   additionalProperties: false,
   properties: {
-    theme: { enum: [...themeNames] },
-    layout: { enum: [...layoutNames] },
+    theme: {
+      type: 'string',
+      minLength: 1,
+      maxLength: 100,
+      pattern: '^[a-z][a-z0-9.-]*$',
+    },
+    layout: {
+      type: 'string',
+      minLength: 1,
+      maxLength: 100,
+      pattern: '^[a-z][a-z0-9.-]*$',
+    },
+    themes: {
+      type: 'array',
+      maxItems: 50,
+      uniqueItems: true,
+      items: { type: 'string', minLength: 1, maxLength: 4000 },
+    },
+    layouts: {
+      type: 'array',
+      maxItems: 50,
+      uniqueItems: true,
+      items: { type: 'string', minLength: 1, maxLength: 4000 },
+    },
     interactive: { type: 'boolean' },
     plugins: {
       type: 'array',
@@ -204,11 +229,30 @@ const configSchema: JsonSchema = {
     },
   },
 };
-export function parseConfig(input: unknown = {}): Config {
+export function parseConfig(
+  input: unknown = {},
+  names?: PresentationNames,
+): NormalizedConfig {
   checkSchema<Partial<Config>>(configSchema, input);
+  const themes =
+    names?.themes ?? (input.themes?.length ? undefined : themeNames);
+  const layouts =
+    names?.layouts ?? (input.layouts?.length ? undefined : layoutNames);
+  if (
+    themes &&
+    !(themes as readonly string[]).includes(input.theme ?? 'minimal')
+  )
+    fail('/theme', 'UNKNOWN_THEME', 'Theme is not registered.');
+  if (
+    layouts &&
+    !(layouts as readonly string[]).includes(input.layout ?? 'document')
+  )
+    fail('/layout', 'UNKNOWN_LAYOUT', 'Layout is not registered.');
   return {
     theme: input.theme ?? 'minimal',
     layout: input.layout ?? 'document',
+    themes: [...(input.themes ?? [])],
+    layouts: [...(input.layouts ?? [])],
     interactive: input.interactive ?? false,
     overrides: { ...input.overrides },
     plugins: [...(input.plugins ?? [])],

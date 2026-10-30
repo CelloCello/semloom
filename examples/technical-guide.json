@@ -1,0 +1,93 @@
+{
+  "schemaVersion": "1.0",
+  "title": "以語意資料撰寫技術指南",
+  "sources": [
+    { "id": "agent-guide", "title": "Semloom docs/agent-guide.md" },
+    { "id": "cli-guide", "title": "Semloom docs/cli-cookbook.md" }
+  ],
+  "sections": [
+    {
+      "id": "preparation",
+      "title": "準備報告",
+      "blocks": [
+        {
+          "id": "guide-intro",
+          "kind": "richtext",
+          "content": [
+            { "text": "以下指令在 " },
+            { "text": "已建置的 Semloom checkout", "marks": ["strong"] },
+            { "text": " 根目錄執行；請先檢查 " },
+            { "text": "操作指令", "href": "#build-command" },
+            { "text": " 與 " },
+            { "text": "原始指南", "href": "#semloom-source-agent-guide" },
+            { "text": "。內容是使用說明，不代表特定環境已執行成功。" }
+          ],
+          "sourceIds": ["agent-guide"]
+        },
+        {
+          "id": "guide-checklist",
+          "kind": "list",
+          "ordered": false,
+          "items": [
+            {
+              "content": [{ "text": "整理內容", "marks": ["strong"] }],
+              "children": {
+                "ordered": true,
+                "items": [
+                  {
+                    "content": [
+                      { "text": "確認 " },
+                      {
+                        "text": "examples/technical-guide.json",
+                        "marks": ["code"]
+                      },
+                      { "text": " 的來源與連結。" }
+                    ]
+                  },
+                  { "content": [{ "text": "保留輸入 JSON，方便後續重建。" }] }
+                ]
+              }
+            },
+            {
+              "content": [
+                { "text": "執行驗證與建置後，再閱讀 " },
+                {
+                  "text": "生成的 HTML",
+                  "href": "#review",
+                  "marks": ["emphasis"]
+                },
+                { "text": "。" }
+              ]
+            }
+          ],
+          "sourceIds": ["agent-guide", "cli-guide"]
+        }
+      ]
+    },
+    {
+      "id": "commands",
+      "title": "驗證與建置",
+      "blocks": [
+        {
+          "id": "build-command",
+          "kind": "code",
+          "language": "sh",
+          "text": "node dist/cli/main.js validate examples/technical-guide.json\n\nnode dist/cli/main.js build examples/technical-guide.json -o reports/guide.html --explain\n",
+          "sourceIds": ["cli-guide"]
+        }
+      ]
+    },
+    {
+      "id": "review",
+      "title": "閱讀與修改",
+      "blocks": [
+        {
+          "id": "review-notes",
+          "kind": "prose",
+          "text": "檢查清單順序、命令、來源與連結。修改輸入 JSON 後重新驗證及建置，讓生成的 HTML 與原始資料保持一致。",
+          "sourceIds": ["agent-guide"]
+        }
+      ]
+    }
+  ]
+}

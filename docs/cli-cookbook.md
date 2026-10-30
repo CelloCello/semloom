@@ -1,5 +1,7 @@
 # CLI cookbook
 
+Local Theme/Layout JSON registrations use `themes`/`layouts` in `--config`. Select their registered IDs with `--theme`/`--layout`; use `themes list --config ...` and `layouts list --config ...` to discover them. See [external presentation](presentation-authoring.md) for a right-side TOC, manifest-relative CSS and Library integration.
+
 Run from a checkout after the [README installation](../README.md). The compiler needs no LLM API key. Commands below use local inputs and write ignored output under `reports/`.
 
 `pnpm semloom --version` reports the installed package version. Plugin/API/data versions remain separate and are listed through `plugins list` or Schema metadata.

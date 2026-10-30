@@ -1,0 +1,31 @@
+// Built-in report UI only; user-authored content is outside this contract.
+export type ReportMessages = Readonly<{
+  locale: string;
+  toc: string;
+  tocWithSources: string;
+  dataSources: string;
+  sources: string;
+  skipToContent: string;
+  footer: string;
+  blockSources: string;
+  displayAs: string;
+  currentView: string;
+  item: string;
+  notProvided: string;
+  info: string;
+  success: string;
+  warning: string;
+  error: string;
+  comparisonValue: string;
+  separator: string;
+  code: string;
+  mindmap: string;
+  mindmapHelp: string;
+  collapse: string;
+  expand: string;
+  switchFailed: string;
+  cleanupFailed: string;
+  cards: string;
+  table: string;
+  responsive: string;
+}>;

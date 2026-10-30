@@ -1,0 +1,13 @@
+@media (min-width: 801px) {
+  [data-layout-id='example.right-sidebar'] .page {
+    grid-template-columns: minmax(0, 1fr) 15rem;
+  }
+  [data-layout-id='example.right-sidebar'] header,
+  [data-layout-id='example.right-sidebar'] main,
+  [data-layout-id='example.right-sidebar'] footer {
+    grid-column: 1;
+  }
+  [data-layout-id='example.right-sidebar'] nav {
+    grid-column: 2;
+  }
+}

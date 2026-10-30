@@ -45,14 +45,25 @@ const plugin = (overrides = {}) => ({
   ...overrides,
 });
 
-test('six built-in schemas validate and render literal data, including zero/negative metrics and raw event order', () => {
+test('built-in schemas retain the six-kind literal fixture, zero/negative metrics and raw event order', () => {
   const registry = createRegistry();
   assert.deepEqual(
     registry
       .definitions()
       .map((k) => k.kind)
       .sort(),
-    ['comparison', 'insight', 'metrics', 'prose', 'steps', 'timeline'],
+    [
+      'code',
+      'comparison',
+      'hierarchy',
+      'insight',
+      'list',
+      'metrics',
+      'prose',
+      'richtext',
+      'steps',
+      'timeline',
+    ],
   );
   const validate = new Ajv({ strict: true }).compile(documentSchema(registry));
   assert.equal(validate(blocks), true, JSON.stringify(validate.errors));
@@ -65,7 +76,7 @@ test('six built-in schemas validate and render literal data, including zero/nega
   assert.match(result.html, /前次提供值：2 件/);
   assert.match(result.html, />0 件</);
   assert.match(result.html, />-1 件</);
-  assert.match(result.html, /比較值：0 件/);
+  assert.match(result.html.replace(/<[^>]+>/gu, ''), /比較值：0 件/);
   assert.ok(
     result.html.indexOf('14:00（原始文字）') <
       result.html.indexOf('09:00（原始文字）'),

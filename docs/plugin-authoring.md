@@ -2,6 +2,8 @@
 
 Plugins are trusted Node.js modules. The CLI loads only explicitly configured local `.js`, `.mjs` or `.cjs` files, with a default-exported manifest. It does not install packages, download modules, scan directories or sandbox build-time code.
 
+For a hierarchy Variant, extend `hierarchy` at data version `1.0` and consume its [bounded node contract](semantic-schema.md#hierarchy-content). Preserve every label, parent/child relationship and sibling order. Nodes are content inside one block; they do not create Sections, TOC entries or Override targets. Core owns the block's citations. The built-ins emit a complete native list; the selected built-in `hierarchy.mindmap` has a Core-owned offline Markmap enhancement with folding, separate from optional Variant-switching adapters. Local Variants do not implicitly acquire that enhancement. Keep wide diagrams locally scrollable and retain all content for no-JS, failure and print. See [branch color customization](themes.md#hierarchy-branch-colors).
+
 ## Run the example
 
 ```sh
@@ -23,6 +25,8 @@ Each kind contribution has `kind`, `dataVersion: "1.0"`, `schema` and `variants`
 Each extension has `targetKind`, exact `targetDataVersion` and `variants`; it cannot provide or change a Schema. All kinds are collected before extensions resolve, independent of module order. Extensions may add a comparison Variant but cannot replace `comparison.cards` or change comparison data.
 
 Each Variant has `id`, `supports(data, presentationContext)`, `score(data, presentationContext)`, `render(data, renderContext)` and optional `assets`. Support returns `{ supported, reason }`; scores must be finite. A lower-scoring compatible Variant is still available to overrides. Context contains locale and layout; render context also includes the block's `headingLevel`. It does not expose a guessed viewport. Rendering must preserve the input fields, order, values, units and plain-text contract; it must not mutate data or create conclusions.
+
+`context.locale` keeps the original document value (or `zh-TW` when omitted), even when the [built-in UI language](localization.md) falls back. Plugins own their strings and declared browser labels; Core does not translate them.
 
 Use the public `html` tagged template and `heading` helper. Interpolated strings are escaped; fragments are recognized privately rather than by a user-forgeable JSON marker. Do not return hand-built fragment objects. Markup must contain no remote resource dependencies, scripts or event handlers. Block citations are composed outside your rendered content by Core, so do not manually duplicate `sourceIds` rendering.
 

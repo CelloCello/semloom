@@ -1,0 +1,16 @@
+{
+  "id": "example.paper",
+  "themeApiVersion": "1.0",
+  "tokens": {
+    "paper": "#fffaf1",
+    "ink": "#282b26",
+    "accent": "#674224",
+    "surface": "#ffffff",
+    "table-head": "#eee7d9",
+    "table-hover": "#f7f0e4",
+    "line": "#d9cebb",
+    "radius": "4px",
+    "body-leading": "1.85"
+  },
+  "cssFile": "./styles/paper.css"
+}

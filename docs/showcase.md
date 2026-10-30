@@ -11,13 +11,25 @@ pnpm semloom build examples/comparison.json --config examples/interactive.json -
 
 The same documentation-backed JSON Schema/JTD data becomes a table selected by Auto. Theme/Layout config changes the reading surface; the interactive version lets a reader choose cards while retaining ordered fields, values and block-level source links. It does not re-run research or certify the report's conclusions.
 
+## Complete initial/edit reports
+
+The [workflow examples](../examples/report-workflows/README.md) provide three complete tasks: append a tool-entry comparison row and revise a Rich Text conclusion; change one guide command and nested checklist item; move and rename a complete architecture subtree. Each includes initial/edited JSON and external paper/night plus right-side TOC configs. Comparison cards/table and hierarchy tree/mindmap use explicit Overrides.
+
+```sh
+pnpm semloom build examples/report-workflows/tools-edited.json --config examples/report-workflows/tools-cards.json --theme example.night -o reports/showcase/tools-edited.html --explain
+pnpm semloom build examples/report-workflows/guide-edited.json --config examples/report-workflows/guide-default.json --layout document -o reports/showcase/guide-edited.html --explain
+pnpm semloom build examples/report-workflows/architecture-edited.json --config examples/report-workflows/architecture-mindmap.json --theme example.night -o reports/showcase/architecture-edited.html --explain
+```
+
+See the workflow guide for validation, both phases and alternate Variants. These are fixed capability examples, not independent Agent cost experiments. Check exact text, relationships, sources, narrow screens, no-JS and print after rebuilding from the inputs.
+
 ## PR handoff
 
 ```sh
 pnpm semloom build examples/pr-daily.json --config examples/editorial-sidebar.json -o reports/showcase/pr-daily.html --explain
 ```
 
-This explicitly illustrative report uses all six kinds: context, a limitation, metrics, a PR comparison, next steps and a timeline. It shows what the next reader needs to check and which statements have sources. It is not connected to real GitHub/CI state, and the compiler does not derive performance or risk conclusions.
+This explicitly illustrative report uses the six original kinds: context, a limitation, metrics, a PR comparison, next steps and a timeline. It shows what the next reader needs to check and which statements have sources. It is not connected to real GitHub/CI state, and the compiler does not derive performance or risk conclusions.
 
 ## Report authoring workflow
 

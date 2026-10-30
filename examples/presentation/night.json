@@ -1,0 +1,16 @@
+{
+  "id": "example.night",
+  "themeApiVersion": "1.0",
+  "tokens": {
+    "color-scheme": "dark",
+    "paper": "#15201d",
+    "surface": "#20322b",
+    "ink": "#edf4ef",
+    "muted": "#b8cbbf",
+    "accent": "#b3dbb7",
+    "line": "#51685a",
+    "table-head": "#293f34",
+    "table-hover": "#25392f",
+    "selection": "#385340"
+  }
+}

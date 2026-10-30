@@ -1,0 +1,6 @@
+{
+  "themes": ["./paper.json", "./night.json"],
+  "layouts": ["./right-sidebar.json"],
+  "theme": "example.paper",
+  "layout": "example.right-sidebar"
+}

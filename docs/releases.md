@@ -1,6 +1,6 @@
 # Package installation and verification
 
-Semloom can be used from a source checkout or a compiled `.tgz` archive. The package is `0.1.0-alpha.1`, licensed under MIT, and supports Node 22.14+ within 22.x and Node 24.x. `private: true` prevents publishing to the npm registry; it does not control GitHub repository visibility or local archive installation.
+Semloom can be used from a source checkout or a compiled `.tgz` archive. The package is `0.1.0`, licensed under MIT, and supports Node 22.14+ within 22.x and Node 24.x. `private: true` prevents publishing to the npm registry; it does not control GitHub repository visibility or local archive installation.
 
 ## From source
 
@@ -76,6 +76,10 @@ Dependencies may need downloading during installation. Compilation and report re
 
 ## Verify a package
 
+The archive includes [three complete report workflows](../examples/report-workflows/README.md), their initial/edited semantic JSON and all presentation configs. Consumer smoke exports their effective Schemas, validates both phases and compares installed CLI HTML with the installed Library result, including explicit comparison and hierarchy Variants.
+
+The installed consumer checks include the external light/dark Theme and right-side TOC manifests, manifest-relative CSS, CLI listings/schema/validation/build, ESM file loading and pure data catalogs. Node-only declaration checks cover their public types without DOM libraries.
+
 ```sh
 pnpm test:package
 ```
@@ -92,12 +96,22 @@ pnpm test:package --node /absolute/path/to/node
 
 Repeat `--node` to install the same archive under multiple runtimes. `SHA256SUMS` identifies the tested artifact. Results apply to the tested runtime/platform; browser rendering is covered separately by `pnpm test:e2e`. The CI workflow configures Node 22.14/24 on Ubuntu/macOS and retains verification artifacts. It does not publish packages or create releases.
 
+From a checkout, the report-workflow browser test can also inspect the exact installed CLI artifacts recorded in a smoke receipt:
+
+```sh
+SEMLOOM_WORKFLOW_RECEIPT=reports/package/smoke-v22.14.0.json node scripts/playwright.mjs test tests/e2e/report-workflows.spec.ts
+```
+
+Use an existing receipt from the selected runtime while its temporary consumer still exists. The test verifies output hashes before inspecting content, sources, navigation, switching/folding, offline/no-JS and print at desktop/375px. It writes separate results under `reports/workflows/installed-<node>/`; it does not overwrite installed HTML. The test runner/development dependencies stay in the checkout.
+
 Use a maintained patch release within the supported Node lines. Node 22.14 is the feature minimum; other major versions are outside the declared support range. See the [Node release policy](https://nodejs.org/en/about/previous-releases).
 
 ## Distribution and versioning
 
 A compiled archive can be downloaded and installed from a GitHub Release asset when one is published. Installing an asset URL uses npm as an installer and does not require registry publication. Direct Git dependency installation is not a substitute for a compiled archive: the repository omits `dist/`, and Git install lifecycles need their own build setup. Clone/build or use a compiled `.tgz`. See [npm's Git-install behavior](https://docs.npmjs.com/cli/v11/commands/npm-install/).
 
-Package version, `pluginApiVersion`, kind `dataVersion`, Document `schemaVersion` and individual Plugin versions have separate responsibilities. Changing the package label does not change a Plugin identifier or exact dependency requirements.
+The `0.x` series is under active development; review the [changelog](../CHANGELOG.md) before upgrading. Package version, `pluginApiVersion`, kind `dataVersion`, Document `schemaVersion` and individual Plugin versions have separate responsibilities. Changing the package label does not change a Plugin identifier or exact dependency requirements.
 
-Generated HTML contains the MIT notice for embedded Semloom runtime code. That notice does not grant rights to input content or cited sources. See the [license](../LICENSE) and [evaluation methodology](evaluation.md).
+Release tags use `v<package version>`. Attach the verified `.tgz` and its `SHA256SUMS` to the matching GitHub Release. The changelog date records the release date; update it if publication is postponed.
+
+Generated HTML contains the MIT notice for embedded Semloom runtime code. When a built-in mindmap is selected, its JSON payload also preserves the full notices for Markmap and the contributing browser dependencies, including upstream-embedded [d3-flextree](licenses/d3-flextree.txt). These notices do not grant rights to input content or cited sources. See the [license](../LICENSE) and [evaluation methodology](evaluation.md).

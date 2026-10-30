@@ -14,6 +14,8 @@ From a source checkout, `pnpm benchmark` records byte counts, SHA-256, selected 
 
 ## Interpretation
 
+The separate [report workflows](../examples/report-workflows/README.md) exercise three content tasks with prescribed edits, unchanged data/IDs/references, explicit Variants and external presentation changes. Their unit/CLI and Chromium tests check fidelity and usable output, including exact code whitespace and complete tree fallback. They do not add model responses, usage measurements or new benchmark conditions.
+
 The original fixed and Auto conditions choose the same table; this does not establish a Planner-quality gain. Direct baselines have different styling and do not duplicate all interactive features. Browser navigation timings are proxies, not human reading time or a guaranteed first-paint measurement. Different Node versions, hardware, dependency caches, templates and features confound unpaired comparisons.
 
 Artifact replay does not generate new model responses. A controlled efficiency study would need independent/counterbalanced tasks, prompts and effective Schema, model/version, input/output usage, retries, complete wall-clock timing and predefined fidelity/quality scoring. No result is required to beat another tool. This project does not claim general token savings, superior Planner quality or human preference from the fixed samples.

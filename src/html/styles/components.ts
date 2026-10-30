@@ -89,6 +89,61 @@ h6 {
   max-width: var(--measure);
   margin: 0;
 }
+.semloom-richtext code,
+.semloom-code pre {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.9em;
+}
+.semloom-richtext code {
+  background: var(--table-head);
+  color: inherit;
+  padding: 0.1em 0.25em;
+  border-radius: 0.2em;
+}
+.semloom-list {
+  margin: 0;
+  padding-inline-start: 1.5rem;
+  max-width: var(--measure);
+}
+.semloom-list > li {
+  padding-inline-start: 0.2rem;
+  min-width: 0;
+}
+.semloom-list > li + li {
+  margin-block-start: 0.6rem;
+}
+.semloom-list .semloom-list {
+  margin-block-start: 0.5rem;
+}
+.semloom-code {
+  margin: 0;
+  min-width: 0;
+  max-width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.semloom-code figcaption {
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.875rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.semloom-code pre {
+  margin: 0;
+  padding: 1rem;
+  max-width: 100%;
+  overflow: auto;
+  white-space: pre;
+  overflow-wrap: normal;
+  line-height: 1.6;
+  tab-size: 4;
+}
+.semloom-code code {
+  font: inherit;
+}
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
@@ -204,23 +259,63 @@ tbody tr:hover {
 .skip-link:focus {
   transform: none;
 }
+[data-toc],
+.nav-toggle {
+  color: var(--ink);
+  background: var(--table-hover);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+[data-toc] {
+  padding: 1.25rem;
+}
+[data-toc] > ul {
+  list-style: none;
+  padding-left: 0;
+}
+[data-toc] a {
+  display: block;
+  padding: 0.35rem 0;
+  text-decoration: none;
+}
+[data-toc] a:hover {
+  text-decoration: underline;
+}
+.toc-sources {
+  margin: 1.25rem 0 0;
+}
 .nav-toggle {
   font: inherit;
-  color: var(--accent);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  padding: 0.65rem 1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 1rem 1.25rem;
   text-align: left;
   cursor: pointer;
+}
+.nav-toggle::before {
+  content: '';
+  flex: 0 0 auto;
+  border-top: 0.3em solid transparent;
+  border-bottom: 0.3em solid transparent;
+  border-left: 0.45em solid currentColor;
+}
+.nav-toggle[aria-expanded='true']::before {
+  transform: rotate(90deg);
 }
 .nav-toggle:hover {
   background: var(--table-head);
 }
 nav a[aria-current='location'] {
   font-weight: 700;
+  text-decoration: underline;
   text-decoration-thickness: 2px;
 }
 @media (max-width: 600px) {
+  .semloom-list {
+    padding-inline-start: 1.1rem;
+  }
   h2 {
     margin-top: 2.5rem;
     font-size: 1.4rem;
@@ -238,6 +333,14 @@ nav a[aria-current='location'] {
   }
 }
 @media print {
+  .semloom-code pre {
+    overflow: visible;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .semloom-code figcaption {
+    break-after: avoid;
+  }
   :focus {
     outline: none !important;
   }

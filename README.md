@@ -10,8 +10,8 @@ Keep the content in JSON, choose a presentation, and share the HTML. Reports wor
 
 ## What you get
 
-- **Structured content:** prose, comparisons, insights, metrics, steps and timelines, with block-level source references.
-- **Reusable presentation:** six Themes, two Layouts and compatible block Variants; change appearance while preserving the data.
+- **Structured content:** prose, rich text, nested lists, code, comparisons, insights, metrics, steps, timelines and hierarchy trees/mindmaps, with block-level source references.
+- **Reusable presentation:** six built-in Themes, two Layout bases, local Theme/Layout extensions and compatible block Variants; change appearance while preserving the data.
 - **Clear validation:** export JSON Schema, catch invalid fields/references, and inspect presentation choices with `--explain`.
 - **Optional interaction:** switch compatible comparison views offline. Complete content stays readable without JavaScript.
 - **Agent and library workflows:** a bundled skill, an ESM API and trusted local Plugin extensions.
@@ -71,9 +71,11 @@ semloom validate report.json
 semloom build report.json -o reports/project-update.html --explain
 ```
 
-All content strings are plain text. Source references belong to blocks; the compiler checks their relationships but does not verify factual claims or calculate metrics. See the [data contract](docs/semantic-schema.md) for supported fields and limits.
+Existing text fields remain literal. Use [Rich Text](examples/richtext.json) for inline formatting, the [technical guide](examples/technical-guide.json) for nested lists and code, or the [hierarchy example](examples/hierarchy.json) with its [mindmap config](examples/hierarchy-mindmap.json) for offline Markmap. See the [data contract](docs/semantic-schema.md) for limits, links and fallback behavior. Sources belong to blocks; Semloom checks references without verifying facts or calculating metrics.
 
 ## Choose a look
+
+For complete initial/edit tasks, see [three report workflows](examples/report-workflows/README.md): a tool comparison, a technical guide and architecture grouping. Each includes semantic inputs, exact edit boundaries and external Theme/Layout configs. Rebuild from JSON/config after edits; generated HTML needs no manual patching.
 
 ```sh
 semloom build report.json --theme midnight --layout sidebar -o reports/project-update.html
@@ -91,11 +93,17 @@ semloom themes list
 
 ![The same comparison report in all six Semloom Themes](docs/assets/themes.webp)
 
-Layout is a separate choice: `document` places the table of contents above the report; `sidebar` puts it beside desktop content and uses a mobile disclosure. All Themes work with both Layouts, and print uses a light palette.
+Layout is a separate choice: `document` places the table of contents above the report; `sidebar` puts it beside desktop content and uses a mobile disclosure. Every Theme styles the same TOC card and source-list entry with its own colors and corners. All Themes work with both Layouts, and print uses a light palette.
+
+Report `locale` selects built-in interface text: `en`/`en-*` uses English; omission or other accepted locales uses Traditional Chinese. Authored content stays unchanged. See [report languages](docs/localization.md) for fallback and accessibility behavior.
 
 From a checkout, run `pnpm demo:themes` and open `reports/themes/index.html` to compare all twelve combinations. See [Themes and Layouts](docs/themes.md) for styling and extension details.
 
 ## Work with a coding agent
+
+To create your own style or page arrangement, register local JSON manifests. The [external presentation guide](docs/presentation-authoring.md) includes light/dark Themes and a right-side TOC Layout; no edits or rebuild of Semloom are needed.
+
+The [reading preset](docs/presentation-authoring.md#reading-preset) combines a gray/navy Theme, a paper-style sidebar Layout and a responsive comparison table/cards Variant using one semantic input.
 
 Use the [bundled Semloom skill](skills/semloom/SKILL.md) to guide an agent through Schema discovery, semantic authoring, validation and rebuilding after edits. Follow the [skill installation guide](docs/skills.md) to register it with your agent; installing the package does not register the skill automatically.
 

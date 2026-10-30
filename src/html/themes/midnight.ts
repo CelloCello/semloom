@@ -1,4 +1,12 @@
-import type { ThemeTokens } from './minimal.js';
+import type { ThemeTokens, MindmapPalette } from './minimal.js';
+export const midnightMindmapPalette: MindmapPalette = [
+  '#43c6e6',
+  '#65d28c',
+  '#f5b544',
+  '#b897ff',
+  '#ff7a9b',
+  '#80abff',
+];
 
 export const midnightTokens: Partial<ThemeTokens> = {
   'color-scheme': 'dark',

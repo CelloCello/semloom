@@ -1,6 +1,12 @@
 import type { Registry } from './registry.js';
 import type { ResolvedDocument } from './document.js';
-import { fail, type Config, type PresentationContext } from './types.js';
+import {
+  fail,
+  layoutNames,
+  type Config,
+  type PresentationContext,
+  type LayoutName,
+} from './types.js';
 
 export interface PlannedBlock {
   id: string;
@@ -24,7 +30,15 @@ export function planDocument(
   document: ResolvedDocument,
   config: Config,
   registry: Registry,
+  baseLayout?: LayoutName,
 ): PresentationPlan {
+  const layout = baseLayout ?? config.layout;
+  if (!(layoutNames as readonly string[]).includes(layout))
+    fail(
+      '/layout',
+      'LAYOUT_RESOLUTION_REQUIRED',
+      'Pass the resolved base Layout when planning an external Layout.',
+    );
   for (const id of Object.keys(config.overrides)) {
     const block = document.blocks.find((b) => b.id === id);
     if (!block?.explicit)
@@ -36,7 +50,7 @@ export function planDocument(
   }
   const context: PresentationContext = {
     locale: document.data.locale ?? 'zh-TW',
-    layout: config.layout,
+    layout: layout as LayoutName,
   };
   return {
     context,

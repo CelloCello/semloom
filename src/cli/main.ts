@@ -1,5 +1,12 @@
 #!/usr/bin/env node
-import { readFile, mkdir, rename, rm, writeFile } from 'node:fs/promises';
+import {
+  readFile,
+  mkdir,
+  realpath,
+  rename,
+  rm,
+  writeFile,
+} from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { parseArgs } from 'node:util';
@@ -13,6 +20,7 @@ import {
   SemloomError,
   limits,
   themeNames,
+  loadPresentation,
 } from '../index.js';
 
 const help = `Semloom — weave meaning into form
@@ -22,14 +30,16 @@ Usage:
   semloom schema [--config presentation.json]
   semloom validate input.json [--config presentation.json]
   semloom build input.json -o output.html [--config presentation.json]
-                [--theme ${themeNames.join('|')}] [--layout document|sidebar] [--explain]
+                [--theme ID] [--layout ID] [--explain]
                 [--interactive | --no-interactive]
-  semloom themes list
+  semloom themes list [--config presentation.json]
+  semloom layouts list [--config presentation.json]
   semloom plugins list
 
-Supports prose, comparison, insight, metrics, steps, timeline.
+Supports prose, comparison, insight, metrics, steps, timeline, richtext, list, code, hierarchy.
 Themes: ${themeNames.join(', ')}. Layouts: document, sidebar.
 Trusted local plugins: set plugins in --config (paths relative to config file).
+Local Theme/Layout JSON: set themes/layouts in --config, then select registered IDs with --theme/--layout.
 Use --interactive for offline Variant switching; default off. --no-interactive overrides config.
 Exit codes: 0 success; 2 input/config/validation; 1 compilation/I/O.
 `;
@@ -57,6 +67,27 @@ async function atomicWrite(path: string, content: string): Promise<void> {
   } finally {
     await rm(temporary, { force: true });
   }
+}
+async function protectInputs(
+  output: string,
+  inputs: readonly string[],
+): Promise<void> {
+  const destination = resolve(output);
+  const reject = () =>
+    usage('Output must not overwrite input or configuration.');
+  if (inputs.some((file) => resolve(file) === destination)) reject();
+  let physicalOutput: string;
+  try {
+    physicalOutput = await realpath(destination);
+  } catch (error) {
+    // A missing destination cannot be one of the existing, loaded inputs.
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return;
+    throw error;
+  }
+  const physicalInputs = await Promise.all(
+    inputs.map((file) => realpath(file)),
+  );
+  if (physicalInputs.includes(physicalOutput)) reject();
 }
 async function main() {
   let args: ReturnType<typeof parseArgs>;
@@ -97,7 +128,11 @@ async function main() {
     return;
   }
   const [command, input] = positionals;
-  if (!['schema', 'validate', 'build', 'themes', 'plugins'].includes(command!))
+  if (
+    !['schema', 'validate', 'build', 'themes', 'layouts', 'plugins'].includes(
+      command!,
+    )
+  )
     usage('Unknown command. Run --help.');
   if (positionals.length !== (command === 'schema' ? 1 : 2))
     usage('Unexpected or missing command arguments.');
@@ -118,25 +153,34 @@ async function main() {
   const raw = configFile ? await jsonFile(configFile) : {};
   // Validate file before overrides so unknown or unsupported fields never disappear.
   const base = parseConfig(raw);
-  const options = parseConfig({
-    ...base,
-    ...(values.theme !== undefined ? { theme: values.theme } : {}),
-    ...(values.layout !== undefined ? { layout: values.layout } : {}),
-    ...(values['no-interactive']
-      ? { interactive: false }
-      : values.interactive !== undefined
-        ? { interactive: values.interactive }
-        : {}),
-  });
+  const directory = configFile ? dirname(resolve(configFile)) : process.cwd();
+  const presentation = await loadPresentation(base, directory);
+  // File selections must be valid even if a CLI flag would override them.
+  parseConfig(raw, presentation.names());
+  const options = parseConfig(
+    {
+      ...base,
+      ...(values.theme !== undefined ? { theme: values.theme } : {}),
+      ...(values.layout !== undefined ? { layout: values.layout } : {}),
+      ...(values['no-interactive']
+        ? { interactive: false }
+        : values.interactive !== undefined
+          ? { interactive: values.interactive }
+          : {}),
+    },
+    presentation.names(),
+  );
   const registry = await loadRegistry(
     options.plugins,
     configFile ? dirname(resolve(configFile)) : process.cwd(),
   );
-  if (command === 'themes' || command === 'plugins') {
+  if (command === 'themes' || command === 'layouts' || command === 'plugins') {
     if (input !== 'list') usage('Expected list.');
     process.stdout.write(
       JSON.stringify(
-        command === 'themes' ? themeNames : registry.list(),
+        command === 'plugins'
+          ? registry.list()
+          : presentation.names()[command as 'themes' | 'layouts'],
         null,
         2,
       ) + '\n',
@@ -148,19 +192,22 @@ async function main() {
   } else {
     const document = await jsonFile(input!);
     if (command === 'validate') {
-      planDocument(resolveDocument(document, registry), options, registry);
+      planDocument(
+        resolveDocument(document, registry),
+        options,
+        registry,
+        presentation.resolve(options.theme, options.layout).base,
+      );
       process.stdout.write(`${input}: valid\n`);
     } else {
       if (typeof values.output !== 'string')
         usage('build requires -o output.html.');
-      if (
-        [
-          resolve(input!),
-          ...(configFile ? [resolve(configFile)] : []),
-        ].includes(resolve(values.output))
-      )
-        usage('Output must not overwrite input or configuration.');
-      const result = compile(document, options, registry);
+      await protectInputs(values.output, [
+        input!,
+        ...(configFile ? [configFile] : []),
+        ...presentation.sourceFiles,
+      ]);
+      const result = compile(document, options, registry, presentation);
       if (values.explain)
         process.stderr.write(JSON.stringify(result.plan, null, 2) + '\n');
       await atomicWrite(values.output, result.html);

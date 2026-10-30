@@ -1,4 +1,12 @@
-import type { ThemeTokens } from './minimal.js';
+import type { ThemeTokens, MindmapPalette } from './minimal.js';
+export const graphiteMindmapPalette: MindmapPalette = [
+  '#356c50',
+  '#3c65a1',
+  '#925b20',
+  '#76519a',
+  '#9e4252',
+  '#808400',
+];
 
 export const graphiteTokens: Partial<ThemeTokens> = {
   paper: '#fafafa',

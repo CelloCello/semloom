@@ -1,0 +1,7 @@
+{
+  "themes": ["../presentation/paper.json", "../presentation/night.json"],
+  "layouts": ["../presentation/right-sidebar.json"],
+  "theme": "example.paper",
+  "layout": "example.right-sidebar",
+  "interactive": true
+}

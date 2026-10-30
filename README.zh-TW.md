@@ -10,8 +10,8 @@ Semloom 將語意 JSON 編譯成一份獨立的 HTML 報告，適合研究比較
 
 ## 可以做什麼
 
-- **結構化內容**：段落、比較、重點提示、數值摘要、步驟與時間軸，支援區塊層級的來源引用。
-- **可重用的呈現方式**：六款 Theme、兩種 Layout，以及相容的區塊 Variant；調整外觀時保留語意資料。
+- **結構化內容**：段落、Rich Text、巢狀清單、程式碼、比較、重點提示、數值摘要、步驟、時間軸與階層樹／mindmap，支援區塊層級的來源引用。
+- **可重用的呈現方式**：六款內建 Theme、兩種 Layout 基底、本機 Theme／Layout 擴充，以及相容的區塊 Variant；調整外觀時保留語意資料。
 - **明確的驗證**：匯出 JSON Schema、檢查欄位與引用，透過 `--explain` 查看實際呈現選擇。
 - **可選的互動功能**：離線切換相容的比較呈現；停用 JavaScript 時仍保留完整內容。
 - **Agent 與程式整合**：內附 skill、ESM API，並可載入可信任的本機 Plugin。
@@ -71,9 +71,11 @@ semloom validate report.json
 semloom build report.json -o reports/project-update.html --explain
 ```
 
-所有內容字串都視為純文字。來源引用屬於區塊，編譯器會檢查引用關係，但不會查證事實或替作者計算指標。支援欄位與限制請見[資料契約](docs/semantic-schema.md)。
+既有文字欄位仍照原文顯示。[Rich Text 範例](examples/richtext.json) 示範行內格式，[技術指南](examples/technical-guide.json) 結合巢狀清單與程式碼；[階層範例](examples/hierarchy.json) 搭配 [mindmap config](examples/hierarchy-mindmap.json) 可選離線 Markmap。限制、連結與備援行為請見[資料契約](docs/semantic-schema.md)。來源引用屬於區塊；Semloom 檢查引用關係，但不查證事實或計算指標。
 
 ## 選擇外觀
+
+完整初稿／修改任務請見[三種報告工作流](examples/report-workflows/README.md)：工具比較、技術指南與架構整理。各自提供語意輸入、明確修改範圍及外部 Theme／Layout configs；修改 JSON／config 後重新建置，無須手修生成的 HTML。
 
 ```sh
 semloom build report.json --theme midnight --layout sidebar -o reports/project-update.html
@@ -91,11 +93,17 @@ semloom themes list
 
 ![同一份比較報告套用六款 Semloom Theme](docs/assets/themes.webp)
 
-Layout 可獨立選擇：`document` 將目錄放在內容上方；`sidebar` 在桌機使用側邊目錄，手機則使用可展開目錄。所有 Theme 都能搭配兩種 Layout，列印時會轉為淺色色票。
+Layout 可獨立選擇：`document` 將目錄放在內容上方；`sidebar` 在桌機使用側邊目錄，手機則使用可展開目錄。各 Theme 的目錄卡片與資料來源入口採用各自的配色及圓角。所有 Theme 都能搭配兩種 Layout，列印時會轉為淺色色票。
+
+報告的 `locale` 會選擇內建介面語言：`en`／`en-*` 使用英文；省略或其他已通過驗證的 locale 使用繁體中文。使用者內容維持原文。fallback 與無障礙行為請見[報告語系](docs/localization.md)。
 
 在 checkout 中執行 `pnpm demo:themes`，再開啟 `reports/themes/index.html`，即可比較全部十二種組合。樣式與擴充方式請見 [Themes and Layouts](docs/themes.md)。
 
 ## 搭配 coding agent
+
+若要自行擴充風格或頁面配置，可註冊本機 JSON manifests。[外部呈現指南](docs/presentation-authoring.md) 提供淺／深色 Theme 與右側目錄 Layout 範例，不必修改或重建 Semloom。
+
+[閱讀風格範例](docs/presentation-authoring.md#reading-preset) 以同一份語意資料，組合灰底深藍 Theme、紙張式側欄 Layout，以及桌機表格／手機卡片的自適應 Comparison Variant。
 
 內附的 [Semloom skill](skills/semloom/SKILL.md) 可引導 Agent 讀取 Schema、撰寫語意資料、驗證及修改後重建。請依 [skill 安裝說明](docs/skills.md) 註冊到所用的 Agent；安裝套件不會自動完成 skill 註冊。
 

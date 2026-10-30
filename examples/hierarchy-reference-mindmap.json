@@ -1,0 +1,4 @@
+{
+  "theme": "midnight",
+  "overrides": { "visual-map": "hierarchy.mindmap" }
+}

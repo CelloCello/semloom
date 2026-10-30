@@ -7,6 +7,7 @@ import type {
   StyleAsset,
 } from '../core/types.js';
 import { heading, html } from '../html/html.js';
+import { reportMessages } from '../core/report-messages.js';
 
 const label = { type: 'string', minLength: 1, maxLength: 1000 };
 const text = { type: 'string', minLength: 1, maxLength: 20000 };
@@ -53,19 +54,16 @@ export const contentKinds: KindDefinition[] = [
         supports: always,
         score: () => 0,
         assets: [styles],
-        render: (data) => {
+        render: (data, context) => {
           const block = data as InsightBlock;
-          const labels = {
-            info: '資訊',
-            success: '成果',
-            warning: '注意',
-            error: '問題',
-          };
+          const messages = reportMessages(context.locale);
           return html`<aside
             class="semloom-insight"
             data-level="${block.level}"
           >
-            <p class="semloom-insight-label">${labels[block.level]}</p>
+            <p class="semloom-insight-label" lang="${messages.locale}">
+              ${messages[block.level]}
+            </p>
             <p class="prose">${block.text}</p>
           </aside>`;
         },
@@ -105,19 +103,21 @@ export const contentKinds: KindDefinition[] = [
         supports: always,
         score: () => 0,
         assets: [styles],
-        render: (data) =>
-          html`<dl class="semloom-metrics">
+        render: (data, context) => {
+          const messages = reportMessages(context.locale);
+          return html`<dl class="semloom-metrics">
             ${(data as MetricsBlock).items.map(
               (item) =>
                 html`<div class="semloom-metric">
                   <dt>${item.label}</dt>
                   <dd>
                     <span>${item.value}${item.unit ? ` ${item.unit}` : ''}</span
-                    >${item.comparisonValue !== undefined ? html`<span class="semloom-comparison">${item.comparisonLabel ?? '比較值'}：${item.comparisonValue}${item.unit ? ` ${item.unit}` : ''}</span>` : ''}
+                    >${item.comparisonValue !== undefined ? html`<span class="semloom-comparison" lang="${context.locale}">${item.comparisonLabel ?? html`<span lang="${messages.locale}">${messages.comparisonValue}</span>`}${messages.separator}${item.comparisonValue}${item.unit ? ` ${item.unit}` : ''}</span>` : ''}
                   </dd>
                 </div>`,
             )}
-          </dl>`,
+          </dl>`;
+        },
       },
     ],
   },
