@@ -26,6 +26,8 @@ Each extension has `targetKind`, exact `targetDataVersion` and `variants`; it ca
 
 Each Variant has `id`, `supports(data, presentationContext)`, `score(data, presentationContext)`, `render(data, renderContext)` and optional `assets`. Support returns `{ supported, reason }`; scores must be finite. A lower-scoring compatible Variant is still available to overrides. Context contains locale and layout; render context also includes the block's `headingLevel`. It does not expose a guessed viewport. Rendering must preserve the input fields, order, values, units and plain-text contract; it must not mutate data or create conclusions.
 
+`context.locale` keeps the original document value (or `zh-TW` when omitted), even when the [built-in UI language](localization.md) falls back. Plugins own their strings and declared browser labels; Core does not translate them.
+
 Use the public `html` tagged template and `heading` helper. Interpolated strings are escaped; fragments are recognized privately rather than by a user-forgeable JSON marker. Do not return hand-built fragment objects. Markup must contain no remote resource dependencies, scripts or event handlers. Block citations are composed outside your rendered content by Core, so do not manually duplicate `sourceIds` rendering.
 
 ## CSS assets

@@ -110,8 +110,13 @@ for (const binary of runtimes) {
       'dist/browser/adapters/cards.js',
       'dist/browser/adapters/table.js',
       'dist/browser/adapters/responsive.js',
+      'dist/core/report-messages.js',
+      'dist/core/locales/zh-TW.js',
+      'dist/core/locales/en.js',
+      'dist/core/locales/types.d.ts',
       'dist/cli/main.js',
       'docs/interactive.md',
+      'docs/localization.md',
       'docs/releases.md',
       'docs/skills.md',
       'skills/semloom/SKILL.md',
@@ -515,6 +520,51 @@ for (const binary of runtimes) {
       assert.ok(reading.includes('data-semloom-mindmap'));
       assert.ok(reading.includes('semloom-comparison-wide'));
       assert.ok(reading.includes('semloom-comparison-narrow'));
+    }
+    for (const locale of ['en-US', 'fr-FR']) {
+      const document = JSON.parse(
+        await readFile(join(consumer, 'examples/reading-report.json'), 'utf8'),
+      );
+      document.locale = locale;
+      const comparisonMetric = document.sections[0].blocks[1].items[0];
+      delete comparisonMetric.comparisonLabel;
+      comparisonMetric.unit = 'jours';
+      const input = `reports/reading-${locale}.json`;
+      await writeFile(join(consumer, input), JSON.stringify(document));
+      for (const interactive of [false, true]) {
+        const name = `reports/reading-${locale}-${interactive}.html`;
+        run(
+          binary,
+          [
+            cli,
+            'build',
+            input,
+            '--config',
+            'examples/reading-presentation.json',
+            ...(interactive ? ['--interactive'] : []),
+            '-o',
+            name,
+          ],
+          consumer,
+        );
+        const output = await readFile(join(consumer, name), 'utf8');
+        assert.ok(output.includes(`lang="${locale}"`));
+        assert.ok(
+          output.includes(
+            `data-ui-locale="${locale === 'en-US' ? 'en' : 'zh-TW'}"`,
+          ),
+        );
+        assert.ok(
+          output.includes(
+            locale === 'en-US' ? '>Contents and sources<' : '>目錄與資料來源<',
+          ),
+        );
+        assert.ok(output.includes('專案週報試作：讓搜尋與匯出更好用'));
+        assert.deepEqual(
+          JSON.parse(await readFile(join(consumer, input), 'utf8')),
+          document,
+        );
+      }
     }
     run(binary, [cli, 'validate', 'examples/hierarchy.json'], consumer);
     for (const view of ['tree', 'mindmap']) {

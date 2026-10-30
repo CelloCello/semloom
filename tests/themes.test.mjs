@@ -68,7 +68,7 @@ test('shared TOC exposes sources only when present and keeps one navigation regi
       { ...input, ...(sources ? { sources } : {}) },
       { layout: 'sidebar' },
     ).html;
-    assert.equal((html.match(/<nav /g) ?? []).length, 1);
+    assert.equal((html.match(/<nav\b/g) ?? []).length, 1);
     assert.equal(
       (html.match(/ data-toc-source>/g) ?? []).length,
       sources?.length ? 1 : 0,

@@ -14,6 +14,7 @@ import { richTextKind } from './richtext.js';
 import { listKind } from './list.js';
 import { codeKind } from './code.js';
 import { hierarchyKind } from './hierarchy.js';
+import { reportVariant } from '../core/report-messages.js';
 
 const short = { type: 'string', maxLength: 1000 };
 const cell = {
@@ -118,7 +119,7 @@ const builtin: Plugin = {
               new URL('../browser/adapters/responsive.js', import.meta.url),
             ),
             exportName: 'createView',
-            label: '自適應',
+            label: reportVariant('comparison.responsive').label,
           },
         },
         {
@@ -134,7 +135,7 @@ const builtin: Plugin = {
               new URL('../browser/adapters/cards.js', import.meta.url),
             ),
             exportName: 'createView',
-            label: '卡片',
+            label: reportVariant('comparison.cards').label,
           },
         },
         {
@@ -150,7 +151,7 @@ const builtin: Plugin = {
               new URL('../browser/adapters/table.js', import.meta.url),
             ),
             exportName: 'createView',
-            label: '表格',
+            label: reportVariant('comparison.table').label,
           },
         },
       ],

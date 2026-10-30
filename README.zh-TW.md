@@ -95,6 +95,8 @@ semloom themes list
 
 Layout 可獨立選擇：`document` 將目錄放在內容上方；`sidebar` 在桌機使用側邊目錄，手機則使用可展開目錄。各 Theme 的目錄卡片與資料來源入口採用各自的配色及圓角。所有 Theme 都能搭配兩種 Layout，列印時會轉為淺色色票。
 
+報告的 `locale` 會選擇內建介面語言：`en`／`en-*` 使用英文；省略或其他已通過驗證的 locale 使用繁體中文。使用者內容維持原文。fallback 與無障礙行為請見[報告語系](docs/localization.md)。
+
 在 checkout 中執行 `pnpm demo:themes`，再開啟 `reports/themes/index.html`，即可比較全部十二種組合。樣式與擴充方式請見 [Themes and Layouts](docs/themes.md)。
 
 ## 搭配 coding agent

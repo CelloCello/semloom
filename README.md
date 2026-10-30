@@ -95,6 +95,8 @@ semloom themes list
 
 Layout is a separate choice: `document` places the table of contents above the report; `sidebar` puts it beside desktop content and uses a mobile disclosure. Every Theme styles the same TOC card and source-list entry with its own colors and corners. All Themes work with both Layouts, and print uses a light palette.
 
+Report `locale` selects built-in interface text: `en`/`en-*` uses English; omission or other accepted locales uses Traditional Chinese. Authored content stays unchanged. See [report languages](docs/localization.md) for fallback and accessibility behavior.
+
 From a checkout, run `pnpm demo:themes` and open `reports/themes/index.html` to compare all twelve combinations. See [Themes and Layouts](docs/themes.md) for styling and extension details.
 
 ## Work with a coding agent

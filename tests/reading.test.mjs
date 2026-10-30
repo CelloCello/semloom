@@ -33,7 +33,7 @@ test('reading preset composes independent external presentation and explicit res
   assert.ok(output.html.includes('data-asset="semloom.comparison-responsive"'));
   assert.match(output.html, /data-theme="example.reading"/);
   assert.match(output.html, /data-layout-id="example.paper-sidebar"/);
-  assert.equal((output.html.match(/<nav /g) ?? []).length, 1);
+  assert.equal((output.html.match(/<nav\b/g) ?? []).length, 1);
   assert.deepEqual(output.document.data, original);
   const views = new Set(output.plan.blocks.map((b) => b.kind));
   assert.equal(views.size, 10);

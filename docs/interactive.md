@@ -4,6 +4,8 @@ This page describes optional **Variant switching**. The selected built-in `hiera
 
 Set `interactive: true` in config or use `build --interactive`. The default is `false`; `--no-interactive` overrides a true config. The compiler still emits the complete build-selected HTML. JavaScript adds optional switching, while no-JS and initialization failure retain the original readable content and citations.
 
+Built-in selector labels, runtime errors and mindmap accessible controls follow the document's [report UI language](localization.md). Browser adapters keep the original `context.locale`; Plugin-authored labels remain unchanged.
+
 ## Candidates and output
 
 Only Variants whose build-time `supports` check passed and which declare a browser adapter become candidates. Score affects the initial Auto selection, not manual eligibility. A block with fewer than two candidates gets no selector or switching data. A static-only selected Variant remains the initial View; the selector starts at a disabled “目前建置版型” placeholder, and that Variant is not offered as a switch target.

@@ -35,6 +35,8 @@ Theme names and Layout names come from the shared core contract. The Planner rec
 
 Output is deterministic for fixed inputs/code/dependencies. Atomic writes use a random temporary filename only, never a random value inside HTML. Compilation/validation happens before replacement; failures preserve old output and temporary files are cleaned.
 
+`core/report-messages.ts` is the browser-safe catalog for built-in report UI. Server renderers, adapters and runtime controls share locale resolution; the original document locale remains in content/Plugin context. It does not translate authored data or affect built-in Variant scoring. See [report languages](localization.md) for fallback and accessibility behavior.
+
 ## Extension boundary
 
 Plugin manifests separate `kinds` (content Schema plus initial Variants) from `extensions` (new Variants for an existing, exact data version). Registry checks Plugin/API/data versions, exact Plugin dependencies, duplicate IDs and schemas before reading a document. It validates all CSS declarations and dependency graphs, then emits only selected-Variant assets and their dependencies, ordered deterministically and deduplicated by content hash. The same asset ID with different content/dependencies is an error; contradictory ordering after deduplication is also rejected.

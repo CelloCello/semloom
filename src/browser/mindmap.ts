@@ -1,6 +1,7 @@
 import { Markmap } from 'markmap-view';
 import type { HierarchyNode } from '../core/types.js';
 import { toMindmapNode } from './hierarchy.js';
+import { reportMessages } from '../core/report-messages.js';
 
 interface Entry {
   id: string;
@@ -9,6 +10,8 @@ interface Entry {
 const svgNS = 'http://www.w3.org/2000/svg';
 
 async function enhance(entry: Entry, index: number) {
+  const locale = document.documentElement.lang;
+  const messages = reportMessages(locale);
   const block = document.getElementById(entry.id);
   const wrapper = block?.querySelector<HTMLElement>(
     '.semloom-hierarchy-mindmap',
@@ -39,7 +42,8 @@ async function enhance(entry: Entry, index: number) {
     diagram.style.visibility = 'hidden';
     const svg = document.createElementNS(svgNS, 'svg');
     svg.setAttribute('role', 'group');
-    svg.setAttribute('aria-label', '心智圖');
+    svg.setAttribute('aria-label', messages.mindmap);
+    svg.setAttribute('lang', messages.locale);
     svg.setAttribute('width', String(Math.max(1, diagram.clientWidth)));
     svg.setAttribute('height', '300');
     diagram.append(svg);
@@ -108,7 +112,7 @@ async function enhance(entry: Entry, index: number) {
         circle.setAttribute('tabindex', '0');
         circle.setAttribute(
           'aria-label',
-          `${expanded ? '收合' : '展開'} ${label}`,
+          `${expanded ? messages.collapse : messages.expand} ${label}`,
         );
         circle.setAttribute('aria-expanded', String(expanded));
         if (!circle.hasAttribute('data-semloom-toggle')) {
@@ -127,6 +131,8 @@ async function enhance(entry: Entry, index: number) {
           );
         }
       }
+      for (const label of svg.querySelectorAll('foreignObject'))
+        label.setAttribute('lang', locale);
     }
     const render = instance.renderData.bind(instance);
     instance.renderData = async (...args) => {

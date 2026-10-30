@@ -1,6 +1,7 @@
 import { codeLimits } from '../core/code.js';
 import type { CodeBlock, KindDefinition } from '../core/types.js';
 import { escape, fragment, html } from '../html/html.js';
+import { reportMessages } from '../core/report-messages.js';
 
 export const codeKind: KindDefinition = {
   kind: 'code',
@@ -31,8 +32,9 @@ export const codeKind: KindDefinition = {
         reason: 'Code is displayed literally with its original whitespace.',
       }),
       score: () => 0,
-      render: (data) => {
+      render: (data, context) => {
         const block = data as CodeBlock;
+        const messages = reportMessages(context.locale);
         // Encode CR after escaping: HTML parsing would otherwise normalize CRLF/CR.
         const text = fragment(escape(block.text).replace(/\r/g, '&#13;'));
         return html`<figure class="semloom-code">
@@ -40,8 +42,9 @@ export const codeKind: KindDefinition = {
           <pre
             tabindex="0"
             role="region"
-            aria-label="${block.language ? `程式碼：${block.language}` : '程式碼'}"
-          ><code>${text}</code></pre>
+            lang="${messages.locale}"
+            aria-label="${block.language ? `${messages.code}${messages.separator}${block.language}` : messages.code}"
+          ><code lang="${context.locale}">${text}</code></pre>
         </figure>`;
       },
     },

@@ -8,6 +8,7 @@ import type {
 } from '../core/types.js';
 import { html } from '../html/html.js';
 import { hierarchyCss } from '../html/styles/hierarchy.js';
+import { reportMessages } from '../core/report-messages.js';
 
 const styles: StyleAsset = {
   id: 'semloom.hierarchy',
@@ -43,7 +44,7 @@ export const hierarchyKind: KindDefinition = {
     }),
     score: () => (view === 'tree' ? 100 : 50),
     assets: [styles],
-    render: (data) => {
+    render: (data, context) => {
       const content = html`<ul class="semloom-hierarchy-root">
         ${renderNode((data as HierarchyBlock).root)}
       </ul>`;
@@ -55,7 +56,8 @@ export const hierarchyKind: KindDefinition = {
             <div
               class="semloom-mindmap-diagram"
               role="region"
-              aria-label="心智圖，可使用節點接點展開或收合"
+              aria-label="${reportMessages(context.locale).mindmapHelp}"
+              lang="${reportMessages(context.locale).locale}"
               tabindex="0"
               hidden
             ></div>

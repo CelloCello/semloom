@@ -76,7 +76,7 @@ test('built-in schemas retain the six-kind literal fixture, zero/negative metric
   assert.match(result.html, /前次提供值：2 件/);
   assert.match(result.html, />0 件</);
   assert.match(result.html, />-1 件</);
-  assert.match(result.html, /比較值：0 件/);
+  assert.match(result.html.replace(/<[^>]+>/gu, ''), /比較值：0 件/);
   assert.ok(
     result.html.indexOf('14:00（原始文字）') <
       result.html.indexOf('09:00（原始文字）'),

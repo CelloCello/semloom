@@ -4,6 +4,7 @@ import type {
   BrowserView,
   InteractiveBlock,
 } from './types.js';
+import { reportMessages } from '../core/report-messages.js';
 
 function freeze(value: unknown): void {
   if (value && typeof value === 'object') {
@@ -104,8 +105,7 @@ export function enhanceVariants(adapters: Map<string, BrowserAdapter>) {
         } catch {
           incoming?.release();
           select.value = entry.candidates.includes(selected) ? selected : '';
-          error.textContent =
-            '無法切換顯示方式，已保留原內容。請重試或選擇其他方式。';
+          error.textContent = reportMessages(entry.context.locale).switchFailed;
           error.hidden = false;
           select.focus({ preventScroll: true });
           return;
@@ -117,7 +117,9 @@ export function enhanceVariants(adapters: Map<string, BrowserAdapter>) {
         error.textContent = '';
         error.hidden = true;
         if (!previous()) {
-          error.textContent = '顯示方式已切換，但舊版型清理失敗。';
+          error.textContent = reportMessages(
+            entry.context.locale,
+          ).cleanupFailed;
           error.hidden = false;
         }
         select.focus({ preventScroll: true });
