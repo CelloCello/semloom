@@ -1,6 +1,6 @@
 {
   "name": "semloom",
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0",
   "description": "Compile semantic documents into standalone, offline HTML reports",
   "repository": {
     "type": "git",

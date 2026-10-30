@@ -1,6 +1,6 @@
 # Package installation and verification
 
-Semloom can be used from a source checkout or a compiled `.tgz` archive. The package is `0.1.0-alpha.1`, licensed under MIT, and supports Node 22.14+ within 22.x and Node 24.x. `private: true` prevents publishing to the npm registry; it does not control GitHub repository visibility or local archive installation.
+Semloom can be used from a source checkout or a compiled `.tgz` archive. The package is `0.1.0`, licensed under MIT, and supports Node 22.14+ within 22.x and Node 24.x. `private: true` prevents publishing to the npm registry; it does not control GitHub repository visibility or local archive installation.
 
 ## From source
 
@@ -110,6 +110,8 @@ Use a maintained patch release within the supported Node lines. Node 22.14 is th
 
 A compiled archive can be downloaded and installed from a GitHub Release asset when one is published. Installing an asset URL uses npm as an installer and does not require registry publication. Direct Git dependency installation is not a substitute for a compiled archive: the repository omits `dist/`, and Git install lifecycles need their own build setup. Clone/build or use a compiled `.tgz`. See [npm's Git-install behavior](https://docs.npmjs.com/cli/v11/commands/npm-install/).
 
-Package version, `pluginApiVersion`, kind `dataVersion`, Document `schemaVersion` and individual Plugin versions have separate responsibilities. Changing the package label does not change a Plugin identifier or exact dependency requirements.
+The `0.x` series is under active development; review the [changelog](../CHANGELOG.md) before upgrading. Package version, `pluginApiVersion`, kind `dataVersion`, Document `schemaVersion` and individual Plugin versions have separate responsibilities. Changing the package label does not change a Plugin identifier or exact dependency requirements.
+
+Release tags use `v<package version>`. Attach the verified `.tgz` and its `SHA256SUMS` to the matching GitHub Release. The changelog date records the release date; update it if publication is postponed.
 
 Generated HTML contains the MIT notice for embedded Semloom runtime code. When a built-in mindmap is selected, its JSON payload also preserves the full notices for Markmap and the contributing browser dependencies, including upstream-embedded [d3-flextree](licenses/d3-flextree.txt). These notices do not grant rights to input content or cited sources. See the [license](../LICENSE) and [evaluation methodology](evaluation.md).
