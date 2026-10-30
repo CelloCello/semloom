@@ -1,11 +1,11 @@
 import type { ThemeTokens, MindmapPalette } from './minimal.js';
 export const signalMindmapPalette: MindmapPalette = [
-  '#ae4433',
-  '#c26527',
-  '#967321',
-  '#527a4a',
-  '#3e7394',
-  '#845886',
+  '#c43c29',
+  '#b56c00',
+  '#748300',
+  '#1b835a',
+  '#246cd0',
+  '#9546bd',
 ];
 
 export const signalTokens: Partial<ThemeTokens> = {

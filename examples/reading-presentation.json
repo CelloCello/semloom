@@ -1,0 +1,11 @@
+{
+  "themes": ["./presentation/reading.json"],
+  "layouts": ["./presentation/paper-sidebar.json"],
+  "theme": "example.reading",
+  "layout": "example.paper-sidebar",
+  "overrides": {
+    "changes-comparison": "comparison.responsive",
+    "project-map": "hierarchy.mindmap",
+    "next-steps": "steps.list"
+  }
+}

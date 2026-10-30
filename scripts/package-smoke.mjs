@@ -109,6 +109,7 @@ for (const binary of runtimes) {
       'dist/browser/runtime.js',
       'dist/browser/adapters/cards.js',
       'dist/browser/adapters/table.js',
+      'dist/browser/adapters/responsive.js',
       'dist/cli/main.js',
       'docs/interactive.md',
       'docs/releases.md',
@@ -117,6 +118,12 @@ for (const binary of runtimes) {
       'examples/comparison.json',
       'examples/pr-daily.json',
       'examples/report-workflow.json',
+      'examples/reading-report.json',
+      'examples/reading-presentation.json',
+      'examples/presentation/reading.json',
+      'examples/presentation/paper-sidebar.json',
+      'examples/presentation/styles/reading.css',
+      'examples/presentation/styles/paper-sidebar.css',
       'examples/hierarchy.json',
       'examples/hierarchy-mindmap.json',
       'examples/hierarchy-palettes.json',
@@ -485,6 +492,30 @@ for (const binary of runtimes) {
       ].join('\n'),
     );
     run(binary, ['presentation-smoke.mjs'], consumer);
+    for (const interactive of [false, true]) {
+      const name = `reports/reading-${interactive}.html`;
+      run(
+        binary,
+        [
+          cli,
+          'build',
+          'examples/reading-report.json',
+          '--config',
+          'examples/reading-presentation.json',
+          ...(interactive ? ['--interactive'] : []),
+          '-o',
+          name,
+        ],
+        consumer,
+      );
+      const reading = await readFile(join(consumer, name), 'utf8');
+      assert.ok(reading.includes('data-theme="example.reading"'));
+      assert.ok(reading.includes('data-layout-id="example.paper-sidebar"'));
+      assert.ok(reading.includes('data-variant="comparison.responsive"'));
+      assert.ok(reading.includes('data-semloom-mindmap'));
+      assert.ok(reading.includes('semloom-comparison-wide'));
+      assert.ok(reading.includes('semloom-comparison-narrow'));
+    }
     run(binary, [cli, 'validate', 'examples/hierarchy.json'], consumer);
     for (const view of ['tree', 'mindmap']) {
       run(

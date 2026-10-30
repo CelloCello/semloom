@@ -1,0 +1,189 @@
+{
+  "schemaVersion": "1.0",
+  "title": "專案週報試作：讓搜尋與匯出更好用",
+  "locale": "zh-TW",
+  "sources": [
+    {
+      "id": "illustration",
+      "title": "自製展示資料：專案、數字、時間與驗證結果皆為虛構，不代表實際專案進度。"
+    },
+    {
+      "id": "semloom",
+      "title": "Semloom：語意資料與離線報告",
+      "url": "https://github.com/CelloCello/semloom"
+    }
+  ],
+  "sections": [
+    {
+      "id": "summary",
+      "title": "本週摘要",
+      "blocks": [
+        {
+          "id": "introduction",
+          "kind": "prose",
+          "text": "這份示意週報整理搜尋與匯出的調整、已知限制與下一步。所有進度與數字都只用來展示閱讀方式。",
+          "sourceIds": ["illustration"]
+        },
+        {
+          "id": "weekly-metrics",
+          "kind": "metrics",
+          "items": [
+            {
+              "label": "本週調整",
+              "value": 2,
+              "unit": "項",
+              "comparisonValue": 1,
+              "comparisonLabel": "前次展示值"
+            },
+            { "label": "待確認流程", "value": 3, "unit": "項" },
+            { "label": "已完成客戶驗收", "value": 0, "unit": "項" }
+          ],
+          "sourceIds": ["illustration"]
+        },
+        {
+          "id": "release-warning",
+          "kind": "insight",
+          "level": "warning",
+          "text": "已合併不等於已部署；展示中的檢查結果，也不代表真實客戶驗收。",
+          "sourceIds": ["illustration"]
+        }
+      ]
+    },
+    {
+      "id": "changes",
+      "title": "調整內容與限制",
+      "blocks": [
+        {
+          "id": "changes-comparison",
+          "kind": "comparison",
+          "subject": "從原本問題到目前做法",
+          "fields": [
+            { "key": "problem", "label": "原本問題" },
+            { "key": "approach", "label": "現在做法" },
+            { "key": "status", "label": "已知狀態" },
+            { "key": "pending", "label": "尚未確認" }
+          ],
+          "items": [
+            {
+              "name": "搜尋條件保留",
+              "attributes": {
+                "problem": "返回列表後需要重新設定條件。",
+                "approach": "將可分享的條件保留在網址，排除敏感資料。",
+                "status": "已合併；測試環境待回歸（展示值）。",
+                "pending": "跨帳號切換時是否清除條件，仍需驗收。"
+              }
+            },
+            {
+              "name": "匯出錯誤提示",
+              "attributes": {
+                "problem": "匯出失敗時不知道是否該重試。",
+                "approach": "區分權限不足與暫時失敗，提供對應下一步。",
+                "status": "已合併；尚未部署測試環境（展示值）。",
+                "pending": "手機與鍵盤流程仍需實際驗收。"
+              }
+            }
+          ],
+          "sourceIds": ["illustration"]
+        },
+        {
+          "id": "reading-note",
+          "kind": "richtext",
+          "content": [
+            { "text": "閱讀方式：", "marks": ["strong"] },
+            {
+              "text": "桌機顯示比較表格，窄螢幕顯示逐項卡片；內容與來源維持一致。"
+            }
+          ],
+          "sourceIds": ["semloom"]
+        }
+      ]
+    },
+    {
+      "id": "next",
+      "title": "下一步與驗證界線",
+      "blocks": [
+        {
+          "id": "next-steps",
+          "kind": "steps",
+          "title": "先驗證，再決定是否上線",
+          "items": [
+            {
+              "title": "補齊手機流程",
+              "description": "確認搜尋條件與錯誤提示在窄螢幕仍可完整閱讀。"
+            },
+            {
+              "title": "部署測試環境",
+              "description": "確認測試版本，重跑相同案例並保留紀錄。"
+            },
+            {
+              "title": "保留驗收結論",
+              "description": "區分已測範圍、未知結果與客戶驗收證據。"
+            }
+          ],
+          "sourceIds": ["illustration"]
+        },
+        {
+          "id": "checklist",
+          "kind": "list",
+          "ordered": false,
+          "items": [
+            { "content": [{ "text": "桌機、手機與列印皆能閱讀全部內容。" }] },
+            {
+              "content": [
+                { "text": "目錄、鍵盤與無 JavaScript 閱讀保留可用入口。" }
+              ]
+            }
+          ],
+          "sourceIds": ["semloom"]
+        },
+        {
+          "id": "build-command",
+          "kind": "code",
+          "language": "sh",
+          "text": "semloom build report.json --config presentation.json -o report.html\n",
+          "sourceIds": ["semloom"]
+        },
+        {
+          "id": "milestones",
+          "kind": "timeline",
+          "title": "示意事件，依輸入順序保留",
+          "items": [
+            {
+              "time": "週一（展示值）",
+              "title": "整理需求",
+              "description": "記錄問題與限制。"
+            },
+            {
+              "time": "週五（展示值）",
+              "title": "核對結果",
+              "description": "保留實際驗證的界線。"
+            }
+          ],
+          "sourceIds": ["illustration"]
+        }
+      ]
+    },
+    {
+      "id": "overview-map",
+      "title": "專案思考全貌",
+      "blocks": [
+        {
+          "id": "project-map",
+          "kind": "hierarchy",
+          "root": {
+            "label": "搜尋與匯出",
+            "children": [
+              { "label": "研究", "children": [{ "label": "釐清使用情境" }] },
+              { "label": "規劃", "children": [{ "label": "記錄範圍與限制" }] },
+              { "label": "設計", "children": [{ "label": "比較可行方案" }] },
+              { "label": "開發", "children": [{ "label": "保留原始資料" }] },
+              { "label": "驗證", "children": [{ "label": "核對內容與來源" }] },
+              { "label": "交付", "children": [{ "label": "記錄結果與未知" }] }
+            ]
+          },
+          "sourceIds": ["illustration"]
+        }
+      ]
+    }
+  ]
+}

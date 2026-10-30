@@ -141,6 +141,7 @@ export function renderDocument(
     </ul>`;
   }
   const sources = document.data.sources ?? [];
+  const tocTitle = sources.length ? '目錄與資料來源' : '目錄';
   const assets = registry.assetsFor([
     ...plan.blocks.map((block) => block.selected),
     ...runtimePlan.adapters.keys(),
@@ -187,10 +188,11 @@ export function renderDocument(
         <a class="skip-link" href="#semloom-main">跳至內容</a>
         <div class="page">
           <header><h1>${document.data.title}</h1></header>
-          ${plan.context.layout === 'sidebar' ? html`<button type="button" class="nav-toggle" data-nav-toggle aria-controls="semloom-toc" aria-expanded="false" hidden>開啟目錄</button>` : ''}
+          ${plan.context.layout === 'sidebar' ? html`<button type="button" class="nav-toggle" data-nav-toggle aria-controls="semloom-toc" aria-expanded="false" hidden>${tocTitle}</button>` : ''}
           <nav id="semloom-toc" data-toc aria-label="目錄">
-            <h2>目錄</h2>
+            <h2>${tocTitle}</h2>
             ${toc(document.sections)}
+            ${sources.length ? html`<p class="toc-sources"><a href="#semloom-sources" data-toc-source>資料來源</a></p>` : ''}
           </nav>
           <main id="semloom-main" tabindex="-1">
             ${renderSections(document.sections, 2)}${

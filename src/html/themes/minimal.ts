@@ -9,12 +9,12 @@ export type MindmapPalette = readonly [
   string,
 ];
 export const minimalMindmapPalette: MindmapPalette = [
-  '#3d7057',
-  '#426f79',
-  '#8a6a34',
-  '#70617d',
-  '#8c5b4c',
-  '#5c7088',
+  '#237747',
+  '#2463b5',
+  '#ad590f',
+  '#8545b3',
+  '#b3374f',
+  '#857000',
 ];
 export const minimalTokens: ThemeTokens = {
   'color-scheme': 'light',

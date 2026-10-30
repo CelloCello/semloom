@@ -233,7 +233,7 @@ export async function workflowFidelity(
     },
   );
   expect(
-    await page.locator('[data-toc] a').evaluateAll((links) =>
+    await page.locator('[data-toc] [data-section]').evaluateAll((links) =>
       links.map((link) => ({
         title: link.textContent,
         id: link.getAttribute('href')!.slice(1),
@@ -241,6 +241,10 @@ export async function workflowFidelity(
     ),
   ).toEqual(
     sections.map((section) => ({ title: section.title, id: section.id })),
+  );
+  await expect(page.locator('[data-toc-source]')).toHaveAttribute(
+    'href',
+    '#semloom-sources',
   );
   expect(await page.locator('.sources > ol > li').allTextContents()).toEqual(
     report.data.sources!.map((source) => source.title),

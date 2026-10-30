@@ -93,13 +93,15 @@ semloom themes list
 
 ![The same comparison report in all six Semloom Themes](docs/assets/themes.webp)
 
-Layout is a separate choice: `document` places the table of contents above the report; `sidebar` puts it beside desktop content and uses a mobile disclosure. All Themes work with both Layouts, and print uses a light palette.
+Layout is a separate choice: `document` places the table of contents above the report; `sidebar` puts it beside desktop content and uses a mobile disclosure. Every Theme styles the same TOC card and source-list entry with its own colors and corners. All Themes work with both Layouts, and print uses a light palette.
 
 From a checkout, run `pnpm demo:themes` and open `reports/themes/index.html` to compare all twelve combinations. See [Themes and Layouts](docs/themes.md) for styling and extension details.
 
 ## Work with a coding agent
 
 To create your own style or page arrangement, register local JSON manifests. The [external presentation guide](docs/presentation-authoring.md) includes light/dark Themes and a right-side TOC Layout; no edits or rebuild of Semloom are needed.
+
+The [reading preset](docs/presentation-authoring.md#reading-preset) combines a gray/navy Theme, a paper-style sidebar Layout and a responsive comparison table/cards Variant using one semantic input.
 
 Use the [bundled Semloom skill](skills/semloom/SKILL.md) to guide an agent through Schema discovery, semantic authoring, validation and rebuilding after edits. Follow the [skill installation guide](docs/skills.md) to register it with your agent; installing the package does not register the skill automatically.
 

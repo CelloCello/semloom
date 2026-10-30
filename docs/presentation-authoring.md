@@ -20,6 +20,21 @@ pnpm semloom build examples/technical-guide.json --config examples/presentation/
 
 Installed consumers use `semloom` or `npx --no-install semloom` with their own files. Use the same config for `schema`, `validate` and `build`. Every entry validates all registered definitions, including unused ones; an invalid config selection is rejected before CLI overrides. Listings return built-in names followed by sorted external IDs.
 
+## Reading preset
+
+Build the [illustrative weekly report](../examples/reading-report.json) with the [reading config](../examples/reading-presentation.json):
+
+```sh
+pnpm semloom build examples/reading-report.json --config examples/reading-presentation.json -o reports/reading/report.html
+pnpm semloom build examples/reading-report.json --config examples/reading-presentation.json --theme minimal --layout document -o reports/reading/baseline.html
+```
+
+Both commands use the same content and explicit Variants. External `example.reading` supplies gray/navy/blue styling and local system fonts; independent `example.paper-sidebar` places a Theme surface behind the title, content and footer. It inherits sidebar's single TOC, mobile disclosure, keyboard behavior and no-JS navigation, and works with built-in Themes. Copy the config, manifests and referenced CSS together; these IDs require registration.
+
+The config selects `comparison.responsive` for `changes-comparison`: a table above 760px, one-column cards at 760px and below, and a table in print. CSS exposes one complete representation at a time without JavaScript; embedding both increases HTML size. Core renders citations once. Auto retains its cards/table choices; interactive reports also offer “自適應”.
+
+Metrics, insights and steps reuse existing kinds. Mindmap keeps offline Markmap, six branch colors and the complete no-JS/print tree. Example progress and values are fictional.
+
 ## Manifest contracts
 
 Theme fields: `id`, `themeApiVersion: "1.0"`, optional `tokens`, optional `cssFile`. Layout fields: `id`, `layoutApiVersion: "1.0"`, `base: "document" | "sidebar"`, optional `cssFile`. IDs are 1–100 lowercase letters, digits, dots and hyphens, starting with a letter. Prefer names such as `example.paper`. Duplicate/reserved IDs, unknown fields and unsupported versions fail. Theme and Layout namespaces and API versions are separate from each other and from package/Document/Plugin versions.

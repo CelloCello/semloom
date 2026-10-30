@@ -58,6 +58,14 @@ export function renderTable(data: Block) {
   </div>`;
 }
 
+// Both representations use the same data contract; CSS exposes exactly one.
+export function renderResponsive(data: Block, context: RenderContext) {
+  return html`<div class="semloom-comparison-responsive">
+    <div class="semloom-comparison-wide">${renderTable(data)}</div>
+    <div class="semloom-comparison-narrow">${renderCards(data, context)}</div>
+  </div>`;
+}
+
 export function display(value: unknown): string {
   return value === undefined || value === null ? '未提供' : String(value);
 }

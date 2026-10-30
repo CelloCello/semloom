@@ -9,10 +9,14 @@ function enhanceNavigation() {
   try {
     const mobile = window.matchMedia('(max-width: 800px)');
     const links = [
-      ...nav.querySelectorAll<HTMLAnchorElement>('[data-section]'),
+      ...nav.querySelectorAll<HTMLAnchorElement>(
+        '[data-section], [data-toc-source]',
+      ),
     ];
     const entries = links.flatMap((link) => {
-      const heading = document.getElementById(link.dataset.section!);
+      const heading = document.getElementById(
+        link.dataset.section ?? 'semloom-sources',
+      );
       return heading ? [{ link, heading }] : [];
     });
     let open = false;
@@ -25,7 +29,6 @@ function enhanceNavigation() {
       if (!visible && nav!.contains(document.activeElement)) toggle.focus();
       nav!.dataset.open = String(visible);
       toggle.setAttribute('aria-expanded', String(visible));
-      toggle.textContent = visible ? '關閉目錄' : '開啟目錄';
     }
     toggle?.addEventListener('click', () => {
       open = !open;

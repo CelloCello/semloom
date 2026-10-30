@@ -67,6 +67,8 @@ Use `minimal`, `editorial`, `ocean`, `graphite`, `signal` or `midnight`; the dat
 
 ## Choose presentation
 
+The [reading report](reading-report.json) covers all ten built-in kinds with illustrative weekly-report data. Its [config](reading-presentation.json) selects the external reading Theme, paper-style sidebar Layout, responsive comparison and mindmap. Build it with the [reading preset commands](../docs/presentation-authoring.md#reading-preset); changing Theme/Layout keeps the input unchanged. `comparison.responsive` is an explicit choice: desktop table, cards at 760px and below, table in print, with no JavaScript required for that adaptation.
+
 [External presentation](presentation/presentation.json) registers paper/night Themes and a right-side TOC Layout. Keep its JSON manifests and `styles/` directory together when copying it into a report project; paths are relative to the config and each manifest. See [authoring](../docs/presentation-authoring.md) for creating your own definitions and the independent Theme/Layout selection.
 
 Configs are not semantic documents. Pass them with `--config` alongside a report rather than validating them as report input. Overrides target IDs in their intended report.

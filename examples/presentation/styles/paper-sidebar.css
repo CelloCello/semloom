@@ -1,0 +1,85 @@
+[data-layout-id='example.paper-sidebar'] .page {
+  position: relative;
+  isolation: isolate;
+  max-width: 85rem;
+  padding: 3rem 2.5rem;
+  grid-template-columns: 13.75rem minmax(0, 1fr);
+}
+[data-layout-id='example.paper-sidebar'] .page::before {
+  content: '';
+  grid-column: 2;
+  grid-row: 1 / span 3;
+  align-self: stretch;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  z-index: -1;
+}
+[data-layout-id='example.paper-sidebar'] .page > header {
+  grid-row: 1;
+  margin: 0 3rem;
+  padding: 2.5rem 0 1.8rem;
+  border-bottom: 2px solid var(--accent);
+}
+[data-layout-id='example.paper-sidebar'] .page > main {
+  grid-row: 2;
+  padding: 0 3rem;
+}
+[data-layout-id='example.paper-sidebar'] .page > footer {
+  grid-row: 3;
+  margin: 0 3rem;
+  padding: 1rem 0 2.5rem;
+}
+@media (min-width: 801px) and (max-width: 1050px) {
+  [data-layout-id='example.paper-sidebar'] .page {
+    grid-template-columns: 11.25rem minmax(0, 1fr);
+    column-gap: 1.75rem;
+    padding: 2rem 1.5rem;
+  }
+  [data-layout-id='example.paper-sidebar'] .page > header,
+  [data-layout-id='example.paper-sidebar'] .page > footer {
+    margin-inline: 1.75rem;
+  }
+  [data-layout-id='example.paper-sidebar'] .page > main {
+    padding-inline: 1.75rem;
+  }
+}
+@media (max-width: 800px) {
+  [data-layout-id='example.paper-sidebar'] .page {
+    padding: 1.75rem;
+  }
+  [data-layout-id='example.paper-sidebar'] .page::before {
+    position: absolute;
+    inset: 0.75rem;
+    border-radius: 10px;
+  }
+  [data-layout-id='example.paper-sidebar'] .page > header {
+    margin: 0 0 1.25rem;
+    padding: 0.75rem 0 1.5rem;
+  }
+  [data-layout-id='example.paper-sidebar'] .page > main {
+    padding: 0;
+  }
+  [data-layout-id='example.paper-sidebar'] .page > footer {
+    margin: 2rem 0 0;
+    padding-bottom: 1rem;
+  }
+}
+@media print {
+  @page {
+    margin: 16mm;
+  }
+  [data-layout-id='example.paper-sidebar'] .page::before {
+    display: none;
+  }
+  [data-layout-id='example.paper-sidebar'] .page > header,
+  [data-layout-id='example.paper-sidebar'] .page > main,
+  [data-layout-id='example.paper-sidebar'] .page > footer {
+    margin: 0;
+    padding: 0;
+  }
+  [data-layout-id='example.paper-sidebar'] .page > header {
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+  }
+}

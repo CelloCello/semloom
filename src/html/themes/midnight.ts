@@ -1,11 +1,11 @@
 import type { ThemeTokens, MindmapPalette } from './minimal.js';
 export const midnightMindmapPalette: MindmapPalette = [
-  '#82cbe2',
-  '#8dd3b0',
-  '#e7bf78',
-  '#c5a3e4',
-  '#eea1a7',
-  '#9bb9ef',
+  '#43c6e6',
+  '#65d28c',
+  '#f5b544',
+  '#b897ff',
+  '#ff7a9b',
+  '#80abff',
 ];
 
 export const midnightTokens: Partial<ThemeTokens> = {

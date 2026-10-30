@@ -19,8 +19,7 @@ export const sidebarCss = `
   top: 2rem;
   max-height: calc(100vh - 4rem);
   overflow: auto;
-  padding: 1rem 1rem 1.5rem 0;
-  border-bottom: 0;
+  padding: 1.25rem;
 }
 [data-layout='sidebar'] nav ul {
   list-style: none;
@@ -48,14 +47,27 @@ export const sidebarCss = `
   [data-layout='sidebar'] nav {
     position: static;
     max-height: none;
-    padding: 1rem 0;
-    border-bottom: 1px solid var(--line);
+    padding: 1.25rem;
   }
   [data-layout='sidebar'][data-nav-ready='true'] nav[data-open='false'] {
     display: none;
   }
   .nav-toggle {
     width: 100%;
+  }
+  [data-layout='sidebar'][data-nav-ready='true'] .nav-toggle[aria-expanded='true'] {
+    border-bottom: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+  [data-layout='sidebar'][data-nav-ready='true'] nav {
+    border-top: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    padding-top: 0.25rem;
+  }
+  [data-layout='sidebar'][data-nav-ready='true'] nav > h2 {
+    display: none;
   }
 }
 `;

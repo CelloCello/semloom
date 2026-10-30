@@ -15,7 +15,7 @@ import { comparisonDocument, research } from './helpers.mjs';
 function rejects(input, pattern, options) {
   assert.throws(() => compile(input, options), pattern);
 }
-test('cards/table share validated data, preserve field order, references, false/zero/empty/missing/null', () => {
+test('comparison views share validated data, preserve field order, references, false/zero/empty/missing/null', () => {
   const input = comparisonDocument({
     zero: 0,
     false: false,
@@ -30,11 +30,18 @@ test('cards/table share validated data, preserve field order, references, false/
   ];
   input.sections[0].blocks[0].sourceIds = ['source'];
   const copy = structuredClone(input);
-  for (const variant of ['comparison.cards', 'comparison.table']) {
+  for (const variant of [
+    'comparison.cards',
+    'comparison.table',
+    'comparison.responsive',
+  ]) {
     const result = compile(input, { overrides: { compare: variant } });
     assert.match(result.html, />0</);
     assert.match(result.html, />false</);
-    assert.equal((result.html.match(/未提供/g) ?? []).length, 2);
+    assert.equal(
+      (result.html.match(/未提供/g) ?? []).length,
+      variant === 'comparison.responsive' ? 4 : 2,
+    );
     assert.match(result.html, /來源 &lt;unsafe&gt;/);
     assert.match(result.html, /未引用/);
     assert.equal(result.plan.blocks[0].selected, variant);

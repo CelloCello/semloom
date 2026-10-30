@@ -1,0 +1,122 @@
+[data-theme='example.reading'] {
+  --semloom-mindmap-branch-1: #176ea5;
+  --semloom-mindmap-branch-2: #00806b;
+  --semloom-mindmap-branch-3: #b45b15;
+  --semloom-mindmap-branch-4: #7a49b4;
+  --semloom-mindmap-branch-5: #52762b;
+  --semloom-mindmap-branch-6: #b43a69;
+}
+[data-theme='example.reading'] h1 {
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  line-height: 1.35;
+  max-width: 30ch;
+}
+[data-theme='example.reading'] h2 {
+  font-size: 1.45rem;
+  line-height: 1.45;
+}
+[data-theme='example.reading'] h3 {
+  font-size: 1.16rem;
+}
+[data-theme='example.reading'] .block {
+  margin: 1.3rem 0 2rem;
+}
+[data-theme='example.reading'] .semloom-metrics {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11.25rem), 1fr));
+  gap: 0.8rem;
+}
+[data-theme='example.reading'] .semloom-metric {
+  padding: 1.1rem;
+  background: var(--table-hover);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+[data-theme='example.reading'] .semloom-metric dd {
+  font-size: 2rem;
+  color: var(--accent);
+  line-height: 1.5;
+}
+[data-theme='example.reading'] .semloom-insight {
+  border-left: 4px solid var(--accent);
+  background: var(--table-hover);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+[data-theme='example.reading'] .semloom-insight-label {
+  color: var(--accent);
+}
+[data-theme='example.reading'] .semloom-insight[data-level='warning'] {
+  border-color: #a26e14;
+  background: #fff7e6;
+}
+[data-theme='example.reading']
+  .semloom-insight[data-level='warning']
+  .semloom-insight-label {
+  color: #805206;
+}
+[data-theme='example.reading'] .semloom-insight[data-level='success'] {
+  border-color: #348164;
+  background: #edf7f1;
+}
+[data-theme='example.reading']
+  .semloom-insight[data-level='success']
+  .semloom-insight-label {
+  color: #246049;
+}
+[data-theme='example.reading'] .semloom-insight[data-level='error'] {
+  border-color: #b4414b;
+  background: #fff0f1;
+}
+[data-theme='example.reading']
+  .semloom-insight[data-level='error']
+  .semloom-insight-label {
+  color: #95323b;
+}
+[data-theme='example.reading'] .comparison-card {
+  padding: 1.2rem;
+}
+[data-theme='example.reading'] th,
+[data-theme='example.reading'] td {
+  min-width: 7.5rem;
+  padding: 0.85rem;
+  font-size: 0.86rem;
+}
+[data-theme='example.reading'] tbody tr:nth-child(even) {
+  background: var(--table-hover);
+}
+[data-theme='example.reading'] .citations {
+  font-size: 0.8rem;
+}
+@media print {
+  [data-theme='example.reading'] .block {
+    margin: 1rem 0 1.25rem;
+  }
+  [data-theme='example.reading'] .semloom-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  [data-theme='example.reading'] .semloom-metric dd {
+    font-size: 1.4rem;
+  }
+  [data-theme='example.reading'] h1 {
+    font-size: 24pt;
+    max-width: none;
+  }
+  [data-theme='example.reading'] .semloom-metric,
+  [data-theme='example.reading'] .semloom-insight[data-level],
+  [data-theme='example.reading'] tbody tr:nth-child(even) {
+    background: var(--surface);
+    border-color: var(--line);
+  }
+  [data-theme='example.reading'] .semloom-metric dd,
+  [data-theme='example.reading']
+    .semloom-insight[data-level]
+    .semloom-insight-label {
+    color: var(--ink);
+  }
+  [data-theme='example.reading'] th,
+  [data-theme='example.reading'] td {
+    min-width: 0;
+    padding: 0.35rem;
+    font-size: 8pt;
+  }
+}

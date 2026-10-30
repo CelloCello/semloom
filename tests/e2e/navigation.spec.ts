@@ -183,10 +183,11 @@ test('themes × layouts: deep/CJK anchors, scroll spy, keyboard disclosure, offl
           layout === 'sidebar' && testInfo.project.name === 'mobile';
         if (javaScriptEnabled && mobileSidebar) {
           await expect(nav).toBeHidden();
-          await expect(toggle).toHaveAccessibleName('開啟目錄');
+          await expect(toggle).toHaveAccessibleName('目錄與資料來源');
           await toggle.focus();
           await page.keyboard.press('Enter');
           await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+          await expect(toggle).toHaveAccessibleName('目錄與資料來源');
           await page.keyboard.press('Tab');
           await expect(nav.locator('a').first()).toBeFocused();
           await page.keyboard.press('Escape');
@@ -212,6 +213,14 @@ test('themes × layouts: deep/CJK anchors, scroll spy, keyboard disclosure, offl
                 target,
               ),
           ).toBe(true);
+        await expect(nav.locator('[data-toc-source]')).toHaveAttribute(
+          'href',
+          '#semloom-sources',
+        );
+        await expect(nav).toHaveCSS(
+          'border-top-style',
+          javaScriptEnabled && mobileSidebar ? 'none' : 'solid',
+        );
         await nav
           .locator('a')
           .filter({ hasText: '同名中文章節' })
@@ -235,6 +244,16 @@ test('themes × layouts: deep/CJK anchors, scroll spy, keyboard disclosure, offl
           await expect(
             nav.locator('[aria-current="location"]'),
           ).toHaveAttribute('data-section', 'summary');
+        }
+        if (javaScriptEnabled && mobileSidebar) await toggle.click();
+        const sourceLink = nav.locator('[data-toc-source]');
+        await sourceLink.focus();
+        await page.keyboard.press('Enter');
+        await expect(page).toHaveURL(/#semloom-sources$/u);
+        if (javaScriptEnabled) {
+          await expect(page.locator('#semloom-sources')).toBeFocused();
+          await expect(sourceLink).toHaveAttribute('aria-current', 'location');
+          if (mobileSidebar) await expect(nav).toBeHidden();
         }
         expect(
           await page.evaluate(

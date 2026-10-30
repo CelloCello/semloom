@@ -1,5 +1,11 @@
 import { fileURLToPath } from 'node:url';
-import { renderCards, renderTable, display, valueFor } from './comparison.js';
+import {
+  renderCards,
+  renderTable,
+  renderResponsive,
+  display,
+  valueFor,
+} from './comparison.js';
 import { Registry } from '../core/registry.js';
 import type { ComparisonBlock, Plugin, ProseBlock } from '../core/types.js';
 import { html } from '../html/html.js';
@@ -90,6 +96,31 @@ const builtin: Plugin = {
         required: ['subject', 'fields', 'items'],
       },
       variants: [
+        {
+          id: 'comparison.responsive',
+          supports: () => ({
+            supported: true,
+            reason:
+              'Ordered fields remain available as a table or cards at every width.',
+          }),
+          // Explicit opt-in preserves the existing Auto cards/table decisions.
+          score: () => 0,
+          render: renderResponsive,
+          assets: [
+            {
+              id: 'semloom.comparison-responsive',
+              type: 'css',
+              content: `.semloom-comparison-responsive > .semloom-comparison-narrow{display:none}@media screen and (max-width:760px){.semloom-comparison-responsive > .semloom-comparison-wide{display:none}.semloom-comparison-responsive > .semloom-comparison-narrow{display:block}.semloom-comparison-responsive .cards{grid-template-columns:minmax(0,1fr)}}@media print{.semloom-comparison-responsive > .semloom-comparison-wide{display:block}.semloom-comparison-responsive > .semloom-comparison-narrow{display:none}}`,
+            },
+          ],
+          browser: {
+            entry: fileURLToPath(
+              new URL('../browser/adapters/responsive.js', import.meta.url),
+            ),
+            exportName: 'createView',
+            label: '自適應',
+          },
+        },
         {
           id: 'comparison.cards',
           supports: () => ({

@@ -93,9 +93,9 @@ Plugin CSS should consume these variables, with fallbacks when helpful, and inhe
 
 Layout is chosen at build time, with priority CLI option → config → `document` default. It is not inferred from content or Theme. The renderer sets `data-layout`; `layouts/document.ts` supplies the shared frame and `layouts/sidebar.ts` overrides it for sidebar. To add another built-in Layout, extend `layoutNames`, add its CSS to `layouts/` and stylesheet composition, and update the renderer/navigation only if it needs different structure or controls. Validate all Themes and the responsive/no-JS/print behavior together.
 
-`document` places the full TOC above content. `sidebar` uses a sticky, independently scrollable desktop TOC. At widths up to 800px it becomes an in-flow disclosure above content. It is never a modal and does not trap focus. Every Section, up to eight levels deep, has a TOC anchor; IDs are encoded in links and looked up directly rather than interpolated into selectors.
+All Themes share a bordered TOC card using their ink, background, line and radius tokens. Its title is “目錄與資料來源” when sources exist, otherwise “目錄”; a separate “資料來源” link leads to the Core source list. `document` places the full card above content. `sidebar` uses a permanent, independently scrollable desktop card. At widths up to 800px it becomes an in-flow disclosure: a fixed title and triangle indicate its expanded state, and the button/links share one visual frame. It is never a modal and does not trap focus. Every Section, up to eight levels deep, has a TOC anchor; IDs are encoded in links and looked up directly rather than interpolated into selectors.
 
-With JavaScript disabled, the disclosure button stays hidden and all links remain available. The fixed inline navigation script enables the button and sets `aria-current="location"` on the current Section link. Enter/Space opens the mobile TOC, Tab reaches links, Escape closes it and returns focus to the button. Activating a TOC link moves focus to its heading. Resizing from desktop to mobile moves a focused TOC link to the visible button before hiding the list. A skip link leads to the main content.
+With JavaScript disabled, the disclosure button stays hidden and the complete card remains visible. The fixed inline navigation script enables the button and sets `aria-current="location"` on the current Section or source link. Enter/Space opens the mobile TOC, Tab reaches links, Escape closes it and returns focus to the button. Activating a TOC link moves focus to its heading, including the source heading. Resizing from desktop to mobile moves a focused TOC link to the visible button before hiding the list. A skip link leads to the main content.
 
 No navigation selection is saved between openings. Initialization failure restores the visible static TOC. The CSP authorizes the exact navigation script hash; content is never embedded in that script. The script makes no requests and reads no storage. Optional [interactive reports](interactive.md) add a separately hashed adapter bundle and a safely encoded data payload. Switching preserves the TOC, section anchors and mobile disclosure state. Its Theme-aware control styles live in `styles/interactive.ts` and are included only when switching is available.
 
@@ -109,14 +109,16 @@ Hierarchy tree labels consume `--surface`, `--ink`, `--line`, `--radius` and `--
 
 The root underline uses `--accent`; text uses `--ink` and Theme fonts/leading. Each built-in Theme supplies its own six-color palette. Main branches repeat these colors in input order; descendants retain their main branch color. All built-in branch colors have at least 3:1 contrast against their Theme's paper and surface. Text remains in the readable ink color.
 
-| Theme       | Palette character    | Branches 1–6                                                     |
-| ----------- | -------------------- | ---------------------------------------------------------------- |
-| `minimal`   | Muted natural colors | `#3d7057`, `#426f79`, `#8a6a34`, `#70617d`, `#8c5b4c`, `#5c7088` |
-| `editorial` | Warm pigments        | `#8d542f`, `#9a732d`, `#6f7449`, `#8c5f60`, `#776180`, `#4c7370` |
-| `ocean`     | Cool sea colors      | `#246d98`, `#247f89`, `#4c729d`, `#53688f`, `#437e70`, `#6d6f97` |
-| `graphite`  | Neutral grays        | `#343434`, `#454545`, `#565656`, `#676767`, `#787878`, `#898989` |
-| `signal`    | Strong, clear colors | `#ae4433`, `#c26527`, `#967321`, `#527a4a`, `#3e7394`, `#845886` |
-| `midnight`  | Luminous soft colors | `#82cbe2`, `#8dd3b0`, `#e7bf78`, `#c5a3e4`, `#eea1a7`, `#9bb9ef` |
+Palettes use separated hues as well as background contrast. Unit checks require a minimum pairwise OKLab distance of 0.08; this is a design regression guard, not a guarantee of distinction for every kind of color vision. Graphite keeps neutral page colors but uses restrained colored branches. Branch labels and geometry remain the primary cues.
+
+| Theme       | Palette character        | Branches 1–6                                                     |
+| ----------- | ------------------------ | ---------------------------------------------------------------- |
+| `minimal`   | Natural, clear hues      | `#237747`, `#2463b5`, `#ad590f`, `#8545b3`, `#b3374f`, `#857000` |
+| `editorial` | Warm pigment accents     | `#a4491f`, `#947000`, `#47742f`, `#b03758`, `#7945a1`, `#137881` |
+| `ocean`     | Blue-led mixed hues      | `#176ea5`, `#00806b`, `#b45b15`, `#7a49b4`, `#52762b`, `#b43a69` |
+| `graphite`  | Restrained color accents | `#356c50`, `#3c65a1`, `#925b20`, `#76519a`, `#9e4252`, `#808400` |
+| `signal`    | Strong, clear colors     | `#c43c29`, `#b56c00`, `#748300`, `#1b835a`, `#246cd0`, `#9546bd` |
+| `midnight`  | Bright on dark surfaces  | `#43c6e6`, `#65d28c`, `#f5b544`, `#b897ff`, `#ff7a9b`, `#80abff` |
 
 External Themes inherit Minimal's palette, or Midnight's when their existing `color-scheme` token is `dark`. Override any subset of `--semloom-mindmap-branch-1` through `--semloom-mindmap-branch-6` in a Theme's **CSS**, scoped to its ID. Omitted colors retain the inherited value. These are component CSS custom properties, not additional manifest `tokens` keys; check contrast against your own backgrounds after overriding. For example:
 

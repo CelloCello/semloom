@@ -1,11 +1,11 @@
 import type { ThemeTokens, MindmapPalette } from './minimal.js';
 export const editorialMindmapPalette: MindmapPalette = [
-  '#8d542f',
-  '#9a732d',
-  '#6f7449',
-  '#8c5f60',
-  '#776180',
-  '#4c7370',
+  '#a4491f',
+  '#947000',
+  '#47742f',
+  '#b03758',
+  '#7945a1',
+  '#137881',
 ];
 
 // Local fonts only; unspecified tokens inherit the minimal baseline.

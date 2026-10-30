@@ -47,6 +47,56 @@ function luminance(hex) {
   return rgb[0] * 0.2126 + rgb[1] * 0.7152 + rgb[2] * 0.0722;
 }
 
+test('shared TOC exposes sources only when present and keeps one navigation region', () => {
+  const input = {
+    schemaVersion: '1.0',
+    title: '目錄範例',
+    sections: [
+      {
+        id: 'topic',
+        title: '正文',
+        blocks: [{ kind: 'prose', text: '完整內容' }],
+      },
+    ],
+  };
+  for (const sources of [
+    undefined,
+    [],
+    [{ id: 'reference', title: '參考資料' }],
+  ]) {
+    const html = compile(
+      { ...input, ...(sources ? { sources } : {}) },
+      { layout: 'sidebar' },
+    ).html;
+    assert.equal((html.match(/<nav /g) ?? []).length, 1);
+    assert.equal(
+      (html.match(/ data-toc-source>/g) ?? []).length,
+      sources?.length ? 1 : 0,
+    );
+    const title = sources?.length ? '目錄與資料來源' : '目錄';
+    assert.ok(html.includes(`hidden>${title}</button>`));
+    assert.ok(html.includes(`<h2>${title}</h2>`));
+    if (sources?.length)
+      assert.match(html, /href="#semloom-sources" data-toc-source/);
+  }
+});
+
+// OKLab distance catches near-identical hues even when both contrast with paper.
+function oklab(hex) {
+  const [r, g, b] = [1, 3, 5].map((start) => {
+    const v = parseInt(hex.slice(start, start + 2), 16) / 255;
+    return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+  });
+  const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+  const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+  const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+  return [
+    0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s,
+    1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s,
+    0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s,
+  ];
+}
+
 test('theme text, links, focus and selection stay legible on their surfaces', () => {
   const contrast = (a, b) => (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
   for (const name of themeNames) {
@@ -88,6 +138,16 @@ test('each built-in Theme emits six distinct visible mindmap colors; external Th
     );
     assert.deepEqual(colors, expectedMindmapPalettes[name]);
     assert.equal(new Set(colors).size, 6, name);
+    for (let i = 0; i < colors.length; i++)
+      for (let j = i + 1; j < colors.length; j++) {
+        const a = oklab(colors[i]),
+          b = oklab(colors[j]);
+        const distance = Math.hypot(...a.map((v, k) => v - b[k]));
+        assert.ok(
+          distance >= 0.08,
+          `${name}: ${colors[i]} / ${colors[j]} separation ${distance}`,
+        );
+      }
     for (const color of colors)
       for (const key of ['paper', 'surface']) {
         const a = luminance(color),

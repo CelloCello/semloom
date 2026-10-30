@@ -9,6 +9,5 @@
   }
   [data-layout-id='example.right-sidebar'] nav {
     grid-column: 2;
-    padding: 1rem 0 1.5rem 1rem;
   }
 }

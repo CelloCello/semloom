@@ -15,10 +15,6 @@ section section {
   padding-left: 1.5rem;
   border-left: 1px solid var(--line);
 }
-nav {
-  padding-bottom: 1.25rem;
-  border-bottom: 1px solid var(--line);
-}
 nav h2 {
   font-size: 1rem;
   margin: 0 0 0.5rem;

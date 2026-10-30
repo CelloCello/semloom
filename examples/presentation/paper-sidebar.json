@@ -1,0 +1,6 @@
+{
+  "id": "example.paper-sidebar",
+  "layoutApiVersion": "1.0",
+  "base": "sidebar",
+  "cssFile": "./styles/paper-sidebar.css"
+}

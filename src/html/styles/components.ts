@@ -259,20 +259,57 @@ tbody tr:hover {
 .skip-link:focus {
   transform: none;
 }
+[data-toc],
+.nav-toggle {
+  color: var(--ink);
+  background: var(--table-hover);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+[data-toc] {
+  padding: 1.25rem;
+}
+[data-toc] > ul {
+  list-style: none;
+  padding-left: 0;
+}
+[data-toc] a {
+  display: block;
+  padding: 0.35rem 0;
+  text-decoration: none;
+}
+[data-toc] a:hover {
+  text-decoration: underline;
+}
+.toc-sources {
+  margin: 1.25rem 0 0;
+}
 .nav-toggle {
   font: inherit;
-  color: var(--accent);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  padding: 0.65rem 1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 1rem 1.25rem;
   text-align: left;
   cursor: pointer;
+}
+.nav-toggle::before {
+  content: '';
+  flex: 0 0 auto;
+  border-top: 0.3em solid transparent;
+  border-bottom: 0.3em solid transparent;
+  border-left: 0.45em solid currentColor;
+}
+.nav-toggle[aria-expanded='true']::before {
+  transform: rotate(90deg);
 }
 .nav-toggle:hover {
   background: var(--table-head);
 }
 nav a[aria-current='location'] {
   font-weight: 700;
+  text-decoration: underline;
   text-decoration-thickness: 2px;
 }
 @media (max-width: 600px) {

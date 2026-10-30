@@ -92,7 +92,11 @@ test('interactive cards/table preserve server parity, plaintext, citations, keyb
           const sidebar = await page
             .locator('[data-toc]')
             .getAttribute('data-open');
-          for (const variant of ['comparison.cards', 'comparison.table']) {
+          for (const variant of [
+            'comparison.cards',
+            'comparison.table',
+            'comparison.responsive',
+          ]) {
             await select.selectOption(variant);
             await expect(select).toBeFocused();
             await expect(wrapper).toHaveAttribute('data-variant', variant);

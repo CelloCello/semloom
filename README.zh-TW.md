@@ -93,13 +93,15 @@ semloom themes list
 
 ![同一份比較報告套用六款 Semloom Theme](docs/assets/themes.webp)
 
-Layout 可獨立選擇：`document` 將目錄放在內容上方；`sidebar` 在桌機使用側邊目錄，手機則使用可展開目錄。所有 Theme 都能搭配兩種 Layout，列印時會轉為淺色色票。
+Layout 可獨立選擇：`document` 將目錄放在內容上方；`sidebar` 在桌機使用側邊目錄，手機則使用可展開目錄。各 Theme 的目錄卡片與資料來源入口採用各自的配色及圓角。所有 Theme 都能搭配兩種 Layout，列印時會轉為淺色色票。
 
 在 checkout 中執行 `pnpm demo:themes`，再開啟 `reports/themes/index.html`，即可比較全部十二種組合。樣式與擴充方式請見 [Themes and Layouts](docs/themes.md)。
 
 ## 搭配 coding agent
 
 若要自行擴充風格或頁面配置，可註冊本機 JSON manifests。[外部呈現指南](docs/presentation-authoring.md) 提供淺／深色 Theme 與右側目錄 Layout 範例，不必修改或重建 Semloom。
+
+[閱讀風格範例](docs/presentation-authoring.md#reading-preset) 以同一份語意資料，組合灰底深藍 Theme、紙張式側欄 Layout，以及桌機表格／手機卡片的自適應 Comparison Variant。
 
 內附的 [Semloom skill](skills/semloom/SKILL.md) 可引導 Agent 讀取 Schema、撰寫語意資料、驗證及修改後重建。請依 [skill 安裝說明](docs/skills.md) 註冊到所用的 Agent；安裝套件不會自動完成 skill 註冊。
 

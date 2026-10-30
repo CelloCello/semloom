@@ -1,0 +1,22 @@
+{
+  "id": "example.reading",
+  "themeApiVersion": "1.0",
+  "tokens": {
+    "paper": "#f4f6f8",
+    "surface": "#ffffff",
+    "ink": "#263343",
+    "muted": "#536277",
+    "accent": "#1d6389",
+    "line": "#d8e2e9",
+    "table-head": "#edf3f7",
+    "table-hover": "#f3f7fa",
+    "selection": "#cce2ef",
+    "radius": "8px",
+    "space": "1.25rem",
+    "body-leading": "1.75",
+    "title-weight": "700",
+    "font-body": "system-ui,-apple-system,BlinkMacSystemFont,\"Segoe UI\",\"PingFang TC\",\"Microsoft JhengHei\",sans-serif",
+    "font-heading": "system-ui,-apple-system,BlinkMacSystemFont,\"Segoe UI\",\"PingFang TC\",\"Microsoft JhengHei\",sans-serif"
+  },
+  "cssFile": "./styles/reading.css"
+}
