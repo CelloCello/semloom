@@ -1,5 +1,5 @@
 import type { Registry } from './registry.js';
-import { checkSchema, documentSchema, limits } from './schema.js';
+import { checkDocumentSchema, limits } from './schema.js';
 import { validateInlineContent } from './inline.js';
 import { validateListContent } from './list.js';
 import { validateHierarchy } from './hierarchy.js';
@@ -40,7 +40,7 @@ export function resolveDocument(
   input: unknown,
   registry: Registry,
 ): ResolvedDocument {
-  checkSchema<Document>(documentSchema(registry), input);
+  checkDocumentSchema<Document>(registry, input);
   const data = structuredClone(input);
   const used = new Set<string>();
   let sectionCount = 0;

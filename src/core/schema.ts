@@ -1,4 +1,4 @@
-import { Ajv, type ErrorObject } from 'ajv';
+import { Ajv, type ErrorObject, type ValidateFunction } from 'ajv';
 import type { Registry } from './registry.js';
 import {
   SemloomError,
@@ -28,7 +28,32 @@ const envelope = {
   id,
   sourceIds: { type: 'array', maxItems: 100, uniqueItems: true, items: id },
 };
+// Registry.definitions() freezes registration before its private Schema is cached.
+const documentSchemas = new WeakMap<Registry, JsonSchema>();
+const validators = new WeakMap<JsonSchema, ValidateFunction>();
+
 export function documentSchema(registry: Registry): JsonSchema {
+  // Exported Schemas remain editable without exposing cached compiler state.
+  return structuredClone(schemaFor(registry));
+}
+
+export function checkDocumentSchema<T>(
+  registry: Registry,
+  input: unknown,
+): asserts input is T {
+  checkSchema<T>(schemaFor(registry), input);
+}
+
+function schemaFor(registry: Registry): JsonSchema {
+  let schema = documentSchemas.get(registry);
+  if (!schema) {
+    schema = buildDocumentSchema(registry);
+    documentSchemas.set(registry, schema);
+  }
+  return schema;
+}
+
+function buildDocumentSchema(registry: Registry): JsonSchema {
   const definitions: Record<string, unknown> = {};
   const kinds = registry.definitions();
   definitions.block = {
@@ -114,13 +139,26 @@ export function checkSchema<T>(
   schema: JsonSchema,
   input: unknown,
 ): asserts input is T {
-  const validate = new Ajv({
-    strict: true,
-    strictNumbers: true,
-    allErrors: true,
-    ownProperties: true,
-  }).compile<T>(schema);
-  if (!validate(input)) {
+  // Callers retain private Schema objects; never key by the shared public $id.
+  let validate = validators.get(schema);
+  if (!validate) {
+    validate = new Ajv({
+      strict: true,
+      strictNumbers: true,
+      allErrors: true,
+      ownProperties: true,
+    }).compile(schema);
+    validators.set(schema, validate);
+  }
+  let valid = false;
+  try {
+    valid = validate(input);
+  } finally {
+    // Failed Ajv validators retain errors in referenced validators too. Evict
+    // the whole graph rather than reaching into Ajv internals to clear it.
+    if (!valid) validators.delete(schema);
+  }
+  if (!valid) {
     // Keep only the branch for this block's kind, rather than unrelated oneOf errors.
     const errors = validate.errors ?? [];
     const choices = ((

@@ -9,7 +9,7 @@ import {
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, resolve } from 'node:path';
-import { spawnSync } from 'node:child_process';
+import { runCli } from './cli-helpers.mjs';
 import { Ajv } from 'ajv';
 import { compile, parseConfig, loadPresentation } from '../dist/index.js';
 import { reportWorkflows } from './fixtures/report-workflows.mjs';
@@ -79,30 +79,32 @@ test('three report edits change only the requested content and preserve remainin
   assert.deepEqual(architecture.edited, expectedArchitecture);
 });
 
-test('shipped workflows validate against effective CLI Schema, retain selection across presentation, and match Library/CLI output', async () => {
+test('shipped workflows validate against effective CLI Schema, retain selection across presentation, and match Library/CLI output', async (t) => {
   const directory = resolve('reports/workflows/source');
   mkdirSync(directory, { recursive: true });
-  const commands = [];
-  function cli(args) {
-    const result = spawnSync(
-      process.execPath,
-      [resolve('dist/cli/main.js'), ...args],
-      { encoding: 'utf8' },
-    );
-    commands.push({ args, exitCode: result.status });
-    assert.equal(result.status, 0, result.stderr);
-    return result;
-  }
-  for (const scenario of reportWorkflows()) {
-    for (const variant of scenario.variants) {
+  const validators = new Map();
+  const tasks = reportWorkflows().flatMap((scenario) =>
+    scenario.variants.map((variant) => async () => {
+      const commands = [];
+      async function cli(args) {
+        const result = await runCli(args, { signal: t.signal });
+        commands.push({ args, exitCode: result.status });
+        assert.equal(result.status, 0, result.stderr);
+        return result;
+      }
       const catalog = await loadPresentation(
         parseConfig(variant.options),
         dirname(variant.configFile),
       );
       const schema = JSON.parse(
-        cli(['schema', '--config', variant.configFile]).stdout,
+        (await cli(['schema', '--config', variant.configFile])).stdout,
       );
-      const validate = new Ajv({ strict: true }).compile(schema);
+      const key = JSON.stringify(schema);
+      let validate = validators.get(key);
+      if (!validate) {
+        validate = new Ajv({ strict: true }).compile(schema);
+        validators.set(key, validate);
+      }
       for (const phase of ['initial', 'edited']) {
         const input = scenario[phase],
           original = structuredClone(input);
@@ -143,7 +145,7 @@ test('shipped workflows validate against effective CLI Schema, retain selection 
           '--theme',
           theme,
         ];
-        cli([
+        await cli([
           'validate',
           scenario.inputFiles[phase],
           '--config',
@@ -153,7 +155,7 @@ test('shipped workflows validate against effective CLI Schema, retain selection 
           directory,
           `${scenario.id}-${phase}-${variant.id}.html`,
         );
-        const result = cli(['build', ...args, '--explain', '-o', file]);
+        const result = await cli(['build', ...args, '--explain', '-o', file]);
         assert.equal(result.stdout, '');
         const notice = `Built ${file}\n`;
         assert.ok(result.stderr.endsWith(notice));
@@ -162,10 +164,19 @@ test('shipped workflows validate against effective CLI Schema, retain selection 
         assert.equal(readFileSync(file, 'utf8'), output.html);
         writeFileSync(file.replace(/\.html$/u, '.plan.json'), explain);
       }
-    }
-  }
+      return commands;
+    }),
+  );
+  // Drain every task even on failure so no CLI child outlives this test.
+  const results = await Promise.allSettled(tasks.map((task) => task()));
+  const failure = results.find((result) => result.status === 'rejected');
+  if (failure) throw failure.reason;
   writeFileSync(
     resolve(directory, 'commands.json'),
-    JSON.stringify(commands, null, 2) + '\n',
+    JSON.stringify(
+      results.flatMap((result) => result.value),
+      null,
+      2,
+    ) + '\n',
   );
 });

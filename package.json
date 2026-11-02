@@ -48,14 +48,16 @@
     "lint": "eslint src tests scripts playwright.config.ts",
     "format": "prettier --write src tests scripts docs skills examples benchmarks/scenarios .github/workflows *.json *.ts *.mjs *.yaml *.md",
     "format:check": "prettier --check src tests scripts docs skills examples benchmarks/scenarios .github/workflows *.json *.ts *.mjs *.yaml *.md",
-    "test": "pnpm build && node --test tests/*.test.mjs",
-    "test:e2e": "pnpm build && node scripts/playwright.mjs test",
+    "test": "pnpm build && pnpm test:built",
+    "test:built": "node --test tests/*.test.mjs",
+    "test:e2e": "pnpm build && pnpm test:e2e:built",
+    "test:e2e:built": "node scripts/playwright.mjs test",
     "browsers:install": "node scripts/playwright.mjs install chromium",
     "semloom": "node dist/cli/main.js",
     "demo": "pnpm build && pnpm semloom build examples/comparison.json -o reports/comparison.html --explain",
     "demo:themes": "pnpm build && node scripts/demo-themes.mjs",
     "benchmark": "pnpm build && node scripts/benchmark.mjs",
-    "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test && pnpm test:e2e"
+    "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm build && pnpm test:built && pnpm test:e2e:built"
   },
   "dependencies": {
     "ajv": "8.20.0",

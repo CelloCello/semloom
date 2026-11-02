@@ -151,7 +151,7 @@ const report = {
   scenarios,
   caveats: [
     'Compile time excludes Agent generation and is not end-to-end task time.',
-    'Subsequent calls reuse the process, not a compiled-validator cache.',
+    'Calls in one process reuse Registry/validators and may reuse bundler state; first samples can be warmed by earlier conditions.',
     'Fixed table and Auto select the same view for this input; no quality gain established.',
   ],
 };

@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Changed
+
+- Reuse the private built-in Registry and compiled validators within a process, with isolated per-Registry document Schemas and editable Schema exports.
+- Build once during `pnpm check` while retaining the complete Node and Chromium suites; standalone test commands still build first.
+
+### Fixed
+
+- Evict validators after rejected or throwing validation so cached Ajv error arrays and referenced validators can be collected; successful validations retain reuse.
+
 ## 0.1.0 — 2026-10-30
 
 Initial release.

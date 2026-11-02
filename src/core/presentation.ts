@@ -41,24 +41,22 @@ export const layoutDefinitionSchema = {
   },
 };
 
+const catalogSchema = {
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    themes: { type: 'array', maxItems: 50, items: themeDefinitionSchema },
+    layouts: { type: 'array', maxItems: 50, items: layoutDefinitionSchema },
+  },
+};
+
 export class PresentationCatalog {
   readonly #themes = new Map<string, ThemeDefinition>();
   readonly #layouts = new Map<string, LayoutDefinition>();
   readonly sourceFiles: readonly string[];
   constructor(input: unknown = {}, sourceFiles: readonly string[] = []) {
     checkSchema<{ themes?: ThemeDefinition[]; layouts?: LayoutDefinition[] }>(
-      {
-        type: 'object',
-        additionalProperties: false,
-        properties: {
-          themes: { type: 'array', maxItems: 50, items: themeDefinitionSchema },
-          layouts: {
-            type: 'array',
-            maxItems: 50,
-            items: layoutDefinitionSchema,
-          },
-        },
-      },
+      catalogSchema,
       input,
     );
     for (const [category, builtins, definitions, target] of [

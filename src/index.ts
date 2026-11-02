@@ -10,6 +10,9 @@ import {
   type PresentationCatalog,
 } from './core/presentation.js';
 
+// Keep the shared built-ins private; public createRegistry() stays independent.
+let defaultRegistry: Registry | undefined;
+
 export function compile(
   input: unknown,
   options: unknown = {},
@@ -33,7 +36,7 @@ export function compile(
       'PLUGIN_LOADING_REQUIRED',
       'Use loadRegistry(config.plugins, baseDirectory) and pass the loaded Registry to compile.',
     );
-  const effectiveRegistry = registry ?? createRegistry();
+  const effectiveRegistry = registry ?? (defaultRegistry ??= createRegistry());
   effectiveRegistry.freeze();
   const document = resolveDocument(input, effectiveRegistry);
   const plan = planDocument(document, config, effectiveRegistry, resolved.base);
