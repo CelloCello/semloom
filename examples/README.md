@@ -2,6 +2,30 @@
 
 Use these semantic documents, presentation configs and trusted local Plugin modules to build reports. From a source checkout, install dependencies and run `pnpm build` first; commands below run at the repository root. Generated HTML belongs in ignored `reports/`.
 
+## Charts and diagrams
+
+[charts.json](charts.json) demonstrates grouped vertical/horizontal bars, lines with missing values and a single-series donut. Its data is explicitly synthetic. [diagrams.json](diagrams.json) demonstrates Pele's supported flowchart, sequence, class, ER and state subset with author descriptions and source references. Read the [contracts and limits](../docs/semantic-schema.md#chart-content) before adapting them; do not pass raw engine options or Mermaid styling directives.
+
+```sh
+pnpm semloom validate examples/charts.json
+pnpm semloom build examples/charts.json -o reports/charts.html --explain
+pnpm semloom build examples/charts.json --config examples/charts-static.json -o reports/charts-static.html
+pnpm semloom validate examples/diagrams.json
+pnpm semloom build examples/diagrams.json -o reports/diagrams.html
+```
+
+The [static config](charts-static.json) explicitly selects `chart.static` for all four chart IDs, omitting ECharts reader code while retaining full SVGs/tables. Default `chart.svg` enhances hover/touch and bar/line legends independently of `interactive`; donut legends remain descriptive. Pele has no reader runtime. Wide figures scroll within their named regions. Print always shows full data, source and all series; bars use ordered panels with a common scale.
+
+The [initial mixed report](visual-workflow-initial.json) and [edited report](visual-workflow-edited.json) contain two charts and two diagrams. The edit changes only `comparison.series[0].values[0]` from 128 to 132 and the flowchart's output-node label; keys, order, other values, relationships and sources remain unchanged. Independent [paper](visual-workflow-paper.json) and [night](visual-workflow-night.json) configs select external Themes and the right-side TOC Layout.
+
+```sh
+pnpm semloom build examples/visual-workflow-initial.json --config examples/visual-workflow-paper.json -o reports/visual-initial.html
+pnpm semloom build examples/visual-workflow-edited.json --config examples/visual-workflow-paper.json -o reports/visual-edited.html
+pnpm semloom build examples/visual-workflow-edited.json --config examples/visual-workflow-night.json -o reports/visual-night.html
+```
+
+Keep descriptions and sources alongside figures. A portable Schema can accept a shape that semantic validation rejects, such as mismatched values lengths or invalid Mermaid syntax. A successfully validated figure may still fail `build` with `CHART_LAYOUT_LIMIT` or `DIAGRAM_LAYOUT_LIMIT` if full text cannot fit the readable A4 budget; split the authored figure instead of deleting values or reducing text to unreadable sizes.
+
 ## Choose a report
 
 For nested ordered/unordered lists, inline links and literal command blocks, use [technical-guide.json](technical-guide.json). It describes a built-checkout workflow with source references; commands are displayed as content and are not executed by the compiler. From the checkout root:

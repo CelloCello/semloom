@@ -111,6 +111,7 @@ export function enhanceVariants(adapters: Map<string, BrowserAdapter>) {
           return;
         }
         const previous = release;
+        host.dispatchEvent(new Event('semloom:releaseview'));
         release = incoming.release;
         selected = next;
         block.dataset.variant = next;

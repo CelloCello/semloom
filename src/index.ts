@@ -59,6 +59,8 @@ export { inlineLimits } from './core/inline.js';
 export { listLimits } from './core/list.js';
 export { codeLimits } from './core/code.js';
 export { hierarchyLimits } from './core/hierarchy.js';
+export { chartLimits } from './core/chart.js';
+export { diagramLimits } from './core/diagram.js';
 export { Registry } from './core/registry.js';
 export { SemloomError, themeNames, layoutNames } from './core/types.js';
 export type * from './core/types.js';

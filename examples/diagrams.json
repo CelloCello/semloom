@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "1.0",
+  "title": "圖表與技術圖解",
+  "sections": [
+    {
+      "title": "資料與流程",
+      "blocks": [
+        {
+          "kind": "diagram",
+          "title": "編譯流程",
+          "description": "輸入經驗證後，成功分支產生輸出，失敗分支回報診斷。",
+          "language": "mermaid",
+          "source": "flowchart LR\n A[輸入] --> B{驗證}\n B -->|成功| C[輸出]\n B -->|失敗| D[診斷]",
+          "id": "flowchart",
+          "sourceIds": ["pele"]
+        },
+        {
+          "kind": "diagram",
+          "title": "作者與編譯器的訊息",
+          "description": "作者提交資料給編譯器，編譯器回傳完整報告。",
+          "language": "mermaid",
+          "source": "sequenceDiagram\n participant A as 作者\n participant B as 編譯器\n A->>B: 提交資料\n B-->>A: 完整報告",
+          "id": "sequence",
+          "sourceIds": ["pele"]
+        },
+        {
+          "kind": "diagram",
+          "title": "報告物件關係",
+          "description": "示例模型：Report包含Section，並具有title欄位與compile方法。",
+          "language": "mermaid",
+          "source": "classDiagram\n class Report {\n +String title\n +compile()\n }\n Report --> Section : contains",
+          "id": "class",
+          "sourceIds": ["pele"]
+        },
+        {
+          "kind": "diagram",
+          "title": "報告資料關係",
+          "description": "示例資料關係：REPORT對應零至多個SECTION，SECTION保留title欄位。",
+          "language": "mermaid",
+          "source": "erDiagram\n REPORT ||--o{ SECTION : contains\n SECTION {\n string title\n }",
+          "id": "er",
+          "sourceIds": ["pele"]
+        },
+        {
+          "kind": "diagram",
+          "title": "草稿生命週期",
+          "description": "草稿包含Editing與Validating子狀態，完成後進入Ready並結束。",
+          "language": "mermaid",
+          "source": "stateDiagram-v2\n [*] --> Draft\n state Draft {\n Editing --> Validating\n }\n Draft --> Ready\n Ready --> [*]",
+          "id": "state",
+          "sourceIds": ["pele"]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "pele",
+      "title": "Pele API：受限 Mermaid 圖解的同步渲染",
+      "url": "https://pele.run/api"
+    }
+  ]
+}

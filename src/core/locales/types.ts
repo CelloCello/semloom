@@ -28,4 +28,9 @@ export type ReportMessages = Readonly<{
   cards: string;
   table: string;
   responsive: string;
+  chartData: string;
+  chartUnit: string;
+  chartRange: string;
+  diagramSource: string;
+  chartToggle: string;
 }>;

@@ -14,6 +14,8 @@ import { richTextKind } from './richtext.js';
 import { listKind } from './list.js';
 import { codeKind } from './code.js';
 import { hierarchyKind } from './hierarchy.js';
+import { chartKind } from './chart.js';
+import { diagramKind } from './diagram.js';
 import { reportVariant } from '../core/report-messages.js';
 
 const short = { type: 'string', maxLength: 1000 };
@@ -161,6 +163,8 @@ const builtin: Plugin = {
     listKind,
     codeKind,
     hierarchyKind,
+    chartKind,
+    diagramKind,
   ],
 };
 function compact(block: ComparisonBlock): boolean {

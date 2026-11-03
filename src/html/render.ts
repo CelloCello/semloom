@@ -17,12 +17,18 @@ import { stylesheetCss } from './styles/index.js';
 import { interactiveCss } from './styles/interactive.js';
 import { navigationHash, navigationScript } from './navigation.js';
 import { runtimeLicenseText } from './license.js';
-import { printThemeCss } from './themes/index.js';
+import {
+  printThemeCss,
+  visualThemeCss,
+  visualPrintCss,
+} from './themes/index.js';
 import { layoutPrintCss } from './layouts/document.js';
 import { planInteractive } from '../browser/plan.js';
 import { bundleInteractive, jsonForHtml } from '../browser/bundle.js';
 import { bundleMindmap } from '../browser/mindmap-bundle.js';
 import { reportMessages, reportVariant } from '../core/report-messages.js';
+import { peleNotice } from '../node/notices.js';
+import { bundleCharts } from '../browser/chart-bundle.js';
 
 export function renderDocument(
   document: ResolvedDocument,
@@ -50,6 +56,13 @@ export function renderDocument(
       ).root,
     }));
   const mindmap = mindmapBlocks.length ? bundleMindmap() : undefined;
+  const chartBlocks = document.blocks
+    .filter(
+      (block) =>
+        plan.blocks.find((b) => b.id === block.id)?.selected === 'chart.svg',
+    )
+    .map((block) => ({ ...block.data, id: block.id }));
+  const charts = chartBlocks.length ? bundleCharts() : undefined;
   const interactiveBlocks = new Map(
     runtimePlan.blocks.map((block) => [block.id, block]),
   );
@@ -74,10 +87,26 @@ export function renderDocument(
                   .render(block.data, {
                     ...plan.context,
                     headingLevel: depth + 1,
+                    blockId: block.id,
                   });
                 if (!isFragment(content))
                   throw new Error('Renderer must return an HtmlFragment.');
-              } catch {
+              } catch (error) {
+                if (
+                  error instanceof SemloomError &&
+                  [
+                    'CHART_LAYOUT_LIMIT',
+                    'DIAGRAM_LAYOUT_LIMIT',
+                    'RENDER_ID_REQUIRED',
+                  ].includes(error.diagnostics[0]?.code ?? '')
+                )
+                  throw new SemloomError(
+                    error.diagnostics.map((d) => ({
+                      ...d,
+                      path: block.path + d.path,
+                    })),
+                    2,
+                  );
                 throw new SemloomError(
                   [
                     {
@@ -170,6 +199,14 @@ export function renderDocument(
     ...plan.blocks.map((block) => block.selected),
     ...runtimePlan.adapters.keys(),
   ]);
+  const visualTheme = plan.blocks.some((b) =>
+    ['chart.svg', 'chart.static', 'diagram.svg'].includes(b.selected),
+  )
+    ? visualThemeCss(presentation.theme ?? (theme as ThemeName))
+    : '';
+  const diagramNotice = plan.blocks.some((b) => b.selected === 'diagram.svg')
+    ? peleNotice().replace(/-->/gu, '--&gt;')
+    : '';
   const page = html`<!doctype html>
     <html
       lang="${plan.context.locale}"
@@ -183,12 +220,13 @@ export function renderDocument(
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <meta
           http-equiv="Content-Security-Policy"
-          content="default-src 'none'; script-src 'sha256-${navigationHash}'${runtime ? ` 'sha256-${runtime.hash}'` : ''}${mindmap ? ` 'sha256-${mindmap.hash}'` : ''}; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'"
+          content="default-src 'none'; script-src 'sha256-${navigationHash}'${runtime ? ` 'sha256-${runtime.hash}'` : ''}${mindmap ? ` 'sha256-${mindmap.hash}'` : ''}${charts ? ` 'sha256-${charts.hash}'` : ''}; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'"
         />
         <title>${document.data.title}</title>
         ${fragment(`<!-- Semloom runtime license (report content is separate)\n${runtimeLicenseText}\n-->`)}
+        ${diagramNotice ? fragment(`<!-- ${diagramNotice} -->`) : ''}
         <style>
-          ${fragment(stylesheetCss(presentation.theme ?? (theme as ThemeName)) + (runtime ? interactiveCss : ''))}
+          ${fragment(stylesheetCss(presentation.theme ?? (theme as ThemeName)) + visualTheme + (runtime ? interactiveCss : ''))}
         </style>
         ${assets.map(
           (asset) =>
@@ -197,13 +235,17 @@ export function renderDocument(
             </style>`,
         )}
         ${
-          presentation.theme || presentation.layout
+          presentation.theme || presentation.layout || visualTheme
             ? html`
-                <style data-semloom-presentation>
-                  ${fragment((presentation.theme?.css ?? '') + '\n' + (presentation.layout?.css ?? ''))}
-                </style>
+                ${
+                  presentation.theme || presentation.layout
+                    ? html`<style data-semloom-presentation>
+                        ${fragment((presentation.theme?.css ?? '') + '\n' + (presentation.layout?.css ?? ''))}
+                      </style>`
+                    : ''
+                }
                 <style data-semloom-print>
-                  ${fragment(printThemeCss + layoutPrintCss)}
+                  ${fragment(printThemeCss + layoutPrintCss + (visualTheme ? visualPrintCss : ''))}
                 </style>
               `
             : ''
@@ -248,6 +290,7 @@ export function renderDocument(
         ${fragment(`<script data-semloom-navigation>${navigationScript}</script>`)}
         ${runtime ? fragment(`<script type="application/json" id="semloom-interactive-data">${jsonForHtml(runtimePlan.blocks)}</script><script data-semloom-interactive>${runtime.script}</script>`) : ''}
         ${mindmap ? fragment(`<script type="application/json" id="semloom-mindmap-data">${jsonForHtml({ blocks: mindmapBlocks, licenses: mindmap.licenses })}</script><script data-semloom-mindmap>${mindmap.script}</script>`) : ''}
+        ${charts ? fragment(`<script type="application/json" id="semloom-chart-data">${jsonForHtml({ blocks: chartBlocks, locale: plan.context.locale, licenses: charts.licenses })}</script><script data-semloom-charts>${charts.script}</script>`) : ''}
       </body>
     </html>`;
   return page.value + '\n';

@@ -21,3 +21,9 @@ Per-run timings and environment snapshots are generated measurements, not portab
 The runner also measures interactive builds in minimal/document and editorial/sidebar. These include browser bundling and encoded switching data, so compare them with their static counterparts as different capabilities. Browser lifecycle tests exercise repeated switching, failed construction and cleanup. They do not measure independent Agent generation costs or human interaction quality.
 
 [Additional report scenarios](scenarios/README.md) cover compact data, the six-kind PR daily report and wide multiline data. Each replays initial/edit tasks through fixed table, Auto and interactive Auto. These 18 additional conditions broaden content shapes; the original comparison's 14 conditions remain available separately. The `scenarios` result field and independent browser tests preserve facts/order/references rather than treating successful compilation as proof of fidelity.
+
+## Visual profiles
+
+The separate `visuals` result field adds ordinary, `chart.static`, `chart.svg`, diagram-only and two-chart/two-diagram mixed profiles from [fixed examples](../examples/README.md#charts-and-diagrams). It preserves the original 32 comparison/scenario conditions. Each profile records raw/gzip HTML, chart bundle bytes, 21 warm compiles and three cold CLI runs, with original samples and environment. No remote resources or model calls are involved.
+
+Run `SEMLOOM_BENCHMARK_BROWSER=1 pnpm benchmark` with the local Chromium cache for five sequential fresh 1280×900 opens per profile in rotating order. Reader-ready and CSS-animation-complete are separate navigation-relative timestamps. Run this separately from E2E suites to avoid contention. These are local observations, not cross-hardware latency guarantees.

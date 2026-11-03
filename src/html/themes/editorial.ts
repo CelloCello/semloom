@@ -1,4 +1,12 @@
 import type { ThemeTokens, MindmapPalette } from './minimal.js';
+export const editorialChartPalette = [
+  '#804224',
+  '#947000',
+  '#47742f',
+  '#b03758',
+  '#7945a1',
+  '#137881',
+] as const;
 export const editorialMindmapPalette: MindmapPalette = [
   '#a4491f',
   '#947000',

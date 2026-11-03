@@ -101,6 +101,16 @@ No navigation selection is saved between openings. Initialization failure restor
 
 At 375px the page fits the viewport; wide tables scroll in their own focusable region. Print removes the TOC, button and footer, restores one column, wraps table cells and retains all content/citations with source URLs. Print CSS cannot guarantee identical pagination across browsers or installed fonts.
 
+## Charts and diagrams
+
+Selected chart/diagram reports add their component CSS and chart color variables; ordinary reports do not acquire these assets. Each built-in Theme owns `--semloom-chart-series-1` through `--semloom-chart-series-6` separately from its mindmap palette. Series one uses the Theme accent. Lines add distinct markers and alternating line patterns; group and legend order remain authored order. Values do not acquire positive/negative judgment colors.
+
+External Themes inherit the Minimal chart palette, or Midnight's for `color-scheme: dark`, with their own accent as series one. Override any subset in scoped Theme CSS, for example `[data-theme='example.paper'] .semloom-chart { --semloom-chart-series-2: #2463b5; }`. These are component CSS variables, not additional manifest token keys. Check contrast and distinction against your chosen surfaces.
+
+Pele consumes mapped `--pele-bg`, `--pele-fg`, `--pele-muted`, `--pele-line`, `--pele-surface`, `--pele-surface-alt`, `--pele-border`, `--pele-accent` and `--pele-font` values within `.semloom-diagram`. The figure uses the same body font, caption hierarchy and citations as the report. Theme changes do not rerender geometric markup or change resolved IDs/data.
+
+Wide/narrow vectors retain natural font sizes and local scrolling. Print uses a light chart palette, neutral diagram surfaces, all series and full tables/source. Bar panels share a full-data domain and keep category order; paper-budget failures are explicit build diagnostics. See [chart/diagram examples](../examples/README.md#charts-and-diagrams).
+
 ## Hierarchy
 
 Hierarchy tree labels consume `--surface`, `--ink`, `--line`, `--radius` and `--body-leading`. The real Markmap renderer inherits Theme fonts, ink, paper and leading through its CSS variables, with colored underlines, curves and folding circles. `.semloom-mindmap-diagram` is a locally scrollable region at every screen width; narrowing the viewport does not switch it to a list. A full `.semloom-hierarchy-tree[data-mindmap-fallback]` remains available for no-JS, setup failure and print. Keep the fallback complete and check long labels with both Layout bases. Nodes do not add TOC entries: only Sections do. The [mindmap config](../examples/hierarchy-mindmap.json) combines this content with external paper/night Themes and the right-side TOC Layout.

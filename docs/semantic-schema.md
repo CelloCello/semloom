@@ -84,6 +84,66 @@ Use `{"overrides":{"concepts":"hierarchy.mindmap"}}` in presentation config for 
 
 Hierarchy nodes are report content, distinct from document Sections and TOC entries. They have no IDs, links, per-node citations, coordinates or Override targets. Select the Variant using the block's explicit ID. This contract represents a tree, without cross-links, dragging or graph cycles. See the [concept report](../examples/hierarchy.json) and its [mindmap config](../examples/hierarchy-mindmap.json), which also selects an external Theme and right-side TOC Layout.
 
+## Chart content
+
+`chart` requires literal `title` (200 characters), `chartType: "bar" | "line" | "donut"`, ordered `categories: { key, label }[]` and ordered `series: { key, label, values }[]`. Optional literal `description` allows 2,000 characters and `unit` 40. `orientation: "vertical" | "horizontal"` is exclusive to bar and defaults to vertical at render time. Keys allow 100 characters, labels 200; labels may repeat. Keys must be unique within their respective arrays. `ChartBlock` and `chartLimits` are public.
+
+Each values array must align exactly with the categories, without sorting, merging or filling. Bar/line accept finite numbers or `null`; null means missing and line segments break at missing values. All-null charts are rejected; zero and negative values are valid. Donut requires one series and at most six categories, with nonnegative finite values, no null, and a finite positive total. Zero slices retain their labels and original values. Limits: 1–100 categories, 1–6 series, 600 values per chart and 3,000 per document.
+
+The portable draft-07 Schema checks field structure and bounds. `resolveDocument()`, CLI `validate` and `build` also enforce key uniqueness, alignment, orientation, values and aggregate budgets. Schema success alone does not establish semantic validity. No raw ECharts options, colors, functions, arbitrary JavaScript or remote data are accepted.
+
+Default `chart.svg` produces complete wide/narrow SVGs and adds one offline ECharts reader runtime. Explicit `chart.static` keeps the same static content without its runtime, payload or notices. This enhancement is independent of the `interactive` Variant-switching flag. Bar/line legends toggle independently keyed series and retain at least one; duplicate labels never merge keys. Donut legends are descriptive and do not recalculate the denominator. Hover/touch tooltips use original values; the complete table remains accessible without hover or JavaScript.
+
+Bars include zero; lines use a padded nice domain derived from all valid values. Temporarily hiding a series does not change that full-data scale. Axis tick density, overlap suppression and numeric abbreviations affect display only. Category/series labels, tooltip values, table values and resolved data retain the authored content. Generated axis ticks describe the scale and may omit labels to fit the available space; they are not a listing of every authored value.
+
+Screen plots keep natural readable sizes within named, focusable scroll regions. Print uses all series, a light palette, full tables and sources. Bars are split into contiguous category panels with the same full-data domain, palette and series order. Print does not change reader selection.
+
+`CHART_LAYOUT_LIMIT` identifies a build-time paper limit and recommends splitting the chart; unexpected engine or SVG-processing failures use the standard `RENDER_FAILED` diagnostic. `validate` does not render or establish print-layout acceptance. Coordinate scaling, interval construction and tick formatting are renderer responsibilities, described in [numeric-axis implementation](architecture.md#numeric-axes); they are not author-configurable fields.
+
+```json
+{
+  "id": "work",
+  "kind": "chart",
+  "title": "Work volume",
+  "chartType": "bar",
+  "unit": "items",
+  "categories": [{ "key": "import", "label": "Import" }],
+  "series": [{ "key": "current", "label": "Current", "values": [128] }]
+}
+```
+
+## Diagram content
+
+`diagram` requires literal `title` (200 characters), author-written `description` (2,000), `language: "mermaid"` and exact `source` (10,000). Optional `preserveDirection` defaults to false at render time. Source preserves original whitespace and CRLF, and shares Code's rejection of NUL/unpaired surrogates. `DiagramBlock` and `diagramLimits` are public.
+
+Pele 1.13.0 parses source during semantic validation; the first release accepts flowchart, sequence, class, ER and state. This is a restricted Mermaid subset, not complete Mermaid.js compatibility. Limits per diagram are 100 entities and 200 relationships/messages (sequence notes count toward this budget); nested state scopes are counted. Document source is limited to 50,000 UTF-16 code units. Errors point to `/source` with bounded line/column information. Empty/invalid syntax, unsupported types and restricted constructs are rejected before planning or rendering.
+
+Source is never rewritten. Authors can specify topology, labels, direction and supported groups, but cannot supply styling/configuration overrides or external behavior:
+
+| Unsupported syntax                                         | Author-facing boundary                                                                                                      |
+| ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Frontmatter and initialization/config directives           | Empty frontmatter is also rejected. Every `%%{` occurrence is rejected, even inside a label or comment.                     |
+| `style`, `classDef`, `linkStyle` and CSS class application | Presentation belongs to the selected Theme. Ordinary words in legal labels, messages and members remain text.               |
+| Links/callbacks and sequence actor metadata                | No `click`, link or actor-properties commands. Legal identifiers are not rejected just because they share a command's name. |
+| Images, external icons, math and HTML labels               | Use literal text; external resources and embedded markup are unsupported.                                                   |
+| Explicit sequence fills                                    | Named transparent groups are supported; authored color/fill overrides are not.                                              |
+
+Sequence complexity includes notes and group-control events once each. Legal ER/class member text and flowchart node/edge labels may contain command-like words such as `style` or `click`; actual unsupported statements remain rejected. Parser/model checks and counting mechanics belong to the [Mermaid restriction implementation](architecture.md#mermaid-restriction-checks).
+
+No author render options or resolvers are accepted. Existing `code` stays literal and `hierarchy` retains its tree/Markmap contract. Layout limits belong to build-time rendering; `validate` does not promise print-layout acceptance.
+
+`diagram.svg` is fully static: no Pele parser/runtime is embedded in the report. Wide/narrow layouts preserve topology, groups, messages and exact source; supported direction adaptation is enabled unless `preserveDirection: true`. Oversize screen figures scroll locally. `DIAGRAM_LAYOUT_LIMIT` rejects layouts that cannot retain readable text within the A4 print budget; split the authored diagram. Diagrams retain a source disclosure on screen and complete source in print. No animation or Variant-switching adapter is added.
+
+```json
+{
+  "kind": "diagram",
+  "title": "Validation flow",
+  "description": "Valid input produces output; errors retain the prior report.",
+  "language": "mermaid",
+  "source": "flowchart LR\n A[Input] --> B{Validate}\n B -->|Pass| C[Output]\n B -->|Fail| D[Diagnostics]"
+}
+```
+
 ## References
 
 Document `sources` is optional. A source has unique `id`, plain `title`, optional absolute HTTP(S) `url` or an existing document fragment. Credentials, whitespace/control characters and other schemes are rejected. No URL is fetched during build or on report load.
@@ -96,6 +156,6 @@ The exported schema validates structure. Uniqueness across nodes, total node cou
 
 Config accepts registered `theme`/`layout` IDs, optional `themes`/`layouts` arrays of explicit local JSON manifests, an `overrides` object and a `plugins` array of explicit local `.js`/`.mjs`/`.cjs` paths. Defaults remain `minimal`/`document`; built-in names continue working. Registration paths resolve from the config directory. Schema export, validate, build and list use the same Registry and presentation catalog. Theme changes appearance; the Layout base participates in context. See [Themes and Layouts](themes.md) and [external manifests](presentation-authoring.md).
 
-Each override maps an explicit block ID to a compatible full Variant ID: `comparison.cards`, `comparison.table`, `prose.paragraph`, `richtext.paragraph`, `list.nested`, `code.block`, `insight.callout`, `metrics.summary`, `steps.list`, `steps.stepper`, `timeline.vertical`, `hierarchy.tree`, `hierarchy.mindmap`, or a loaded Plugin contribution. Unknown targets, sections, automatic IDs and unsupported selections are errors. No permissive fallback is provided. See [Plugin authoring](plugin-authoring.md) for registration, compatibility and assets.
+Each override maps an explicit block ID to a compatible full Variant ID: `comparison.cards`, `comparison.table`, `prose.paragraph`, `richtext.paragraph`, `list.nested`, `code.block`, `insight.callout`, `metrics.summary`, `steps.list`, `steps.stepper`, `timeline.vertical`, `hierarchy.tree`, `hierarchy.mindmap`, `chart.svg`, `chart.static`, `diagram.svg`, or a loaded Plugin contribution. Unknown targets, sections, automatic IDs and unsupported selections are errors. No permissive fallback is provided. See [Plugin authoring](plugin-authoring.md) for registration, compatibility and assets.
 
 Config also accepts `interactive: boolean` (default `false`). Build flags `--interactive` / `--no-interactive` override a valid config; supplying both is an error. This flag does not alter semantic validation, build-time selection or the initial static content. The browser selector contains only supported Variants with adapters, including low-score compatible ones; fewer than two candidates produces no selector or switching payload. Runtime data contains resolved block IDs and the same validated content, frozen against adapter mutation. Block sources remain outside the replaceable View. See [interactive reports](interactive.md).

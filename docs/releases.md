@@ -1,6 +1,6 @@
 # Package installation and verification
 
-Semloom can be used from a source checkout or a compiled `.tgz` archive. The package is `0.1.0`, licensed under MIT, and supports Node 22.14+ within 22.x and Node 24.x. `private: true` prevents publishing to the npm registry; it does not control GitHub repository visibility or local archive installation.
+Semloom can be used from a source checkout or a compiled `.tgz` archive. The package is `0.2.0`, licensed under MIT, and supports Node 22.14+ within 22.x and Node 24.x. `private: true` prevents publishing to the npm registry; it does not control GitHub repository visibility or local archive installation.
 
 ## From source
 
@@ -115,3 +115,11 @@ The `0.x` series is under active development; review the [changelog](../CHANGELO
 Release tags use `v<package version>`. Attach the verified `.tgz` and its `SHA256SUMS` to the matching GitHub Release. The changelog date records the release date; update it if publication is postponed.
 
 Generated HTML contains the MIT notice for embedded Semloom runtime code. When a built-in mindmap is selected, its JSON payload also preserves the full notices for Markmap and the contributing browser dependencies, including upstream-embedded [d3-flextree](licenses/d3-flextree.txt). These notices do not grant rights to input content or cited sources. See the [license](../LICENSE) and [evaluation methodology](evaluation.md).
+
+## Chart and diagram package assets
+
+The archive ships chart/diagram schemas, public data types, Node engine adapters, controlled SVG processing, browser chart entry and examples. Pinned ECharts/Pele dependencies install normally; compilation and reading then need no network. Synchronous `compile()` does not launch a browser. Main-entry consumers do not acquire upstream DOM ambient types.
+
+Consumer smoke builds chart and diagram examples through CLI and Library, checks byte-identical repeated output and shared semantic rejection. Selected `chart.svg` includes ECharts and contributing dependency LICENSE/NOTICE text in escaped JSON; `chart.static` omits those reader notices with its runtime. Pele SVGs retain its license in HTML without its parser. Existing Semloom/Markmap notices remain unchanged.
+
+The [mixed initial/edit workflow](../examples/README.md#charts-and-diagrams) is packaged. Repeated `--node` options test one archive under both supported Node lines. Installed browser checks use actual receipt artifacts rather than rebuilding from the checkout.

@@ -1,6 +1,6 @@
 ---
 name: semloom
-description: Create or update standalone offline HTML reports with Semloom from supplied facts and semantic JSON. Use when Semloom is requested or an existing Semloom report needs editing; not for general website development or other output formats.
+description: Create or edit standalone offline HTML reports with Semloom from supplied facts and semantic JSON. Use for Semloom report authoring, rebuilding and presentation changes; not compiler or Plugin development, general websites or other output formats.
 ---
 
 # Semloom reports
@@ -24,6 +24,20 @@ If using a registered skill from a different checkout/package, reconcile the ref
 With multiple Node versions or npm prefixes, check the actual CLI and skill target rather than assuming `npm root --global` describes the executable on PATH. A global CLI does not provide `import 'semloom'` to unrelated project files. For library use or Plugins with that import, install a project dependency or keep the Plugin modules in their original package location; see the [Agent guide](../../docs/agent-guide.md). Report authoring does not require changing global npm settings or shell startup files.
 
 ## Generate or update a report
+
+When the report needs a chart or diagram, choose from the user's intended comparison or relationships, using the effective Schema for fields:
+
+| Intended content                                                    | Semloom choice                                                                                                   |
+| ------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Compare category values                                             | `chart` bar; horizontal bars often suit long labels, grouped series compare the same ordered categories          |
+| Show a trend across an authored sequence                            | `chart` line; preserve category order and `null` gaps                                                            |
+| Show a few nonnegative parts of a whole                             | `chart` donut only when its single-series, no-null, positive-total limits fit the supplied facts                 |
+| Explain a flow, interaction, class model, ER model or state machine | `diagram` with supported Mermaid source and an author-written description grounded in the supplied relationships |
+| Group a tree or show literal source                                 | `hierarchy` for a tree; `code` for text that must not be rendered as a diagram                                   |
+
+For charts, retain ordered keyed categories/series and aligned original values; never replace missing values with zero. Follow the [chart/diagram contracts](../../docs/semantic-schema.md#chart-content) for supported syntax and budgets, and the [initial/edit workflow](../../examples/README.md#charts-and-diagrams) for complete JSON/config examples. These are controlled engine integrations: no arbitrary ECharts options, Mermaid styling/config directives, HTML labels, callbacks or external assets. If the supplied content needs an unsupported capability, explain the limit and confirm a meaningful alternative rather than discarding content.
+
+Schema export describes structure; `validate` also parses Mermaid and checks key/array/numeric constraints. Run both `validate` and `build`. Follow a build-time layout diagnostic by splitting the figure while retaining all values and relationships; confirm with the user if splitting changes the requested meaning. Unexpected engine failures require reporting the diagnostic rather than deleting data. `chart.svg` is enhanced independently of Variant switching; use an explicit block-ID `chart.static` Override to omit the reader engine. Diagrams are static. Inspect full SVGs, tables, exact source, citations, narrow local scrolling and print panels; do not patch generated HTML or change data to hide a layout defect.
 
 For user-provided Theme/Layout manifests, follow [external presentation authoring](../../docs/presentation-authoring.md). Use the same explicit config for schema, validation, build and listings; choose registered IDs without rewriting semantic JSON. External Layouts inherit a document/sidebar base and do not change content or citation ownership.
 

@@ -59,6 +59,12 @@ rounded:
   control: '4px'
 spacing:
   group: '1.5rem'
+components:
+  chart-legend-button:
+    backgroundColor: '{colors.paper}'
+    textColor: '{colors.ink}'
+    rounded: '{rounded.control}'
+    padding: '.35rem .6rem'
 ---
 
 ## Overview
@@ -69,7 +75,7 @@ Editorial shares that structure with warm paper (#f7f1e6), ink (#302a23), brown 
 
 Ocean, Graphite, Signal and Midnight extend that same report structure. Ocean uses cool white/navy/blue, 1.8 leading and 6px corners. Graphite uses neutral white/charcoal, 1.6 leading, 750 title weight, 1.25rem grouping and 2px corners. Signal uses white/near-black/brick-red, 1.7 leading, 750 title weight and 2px corners. Midnight uses dark blue-gray paper/surfaces, soft-white text and cyan links, 1.8 leading and 6px corners. All four inherit local system sans fonts. Theme choice does not alter the document, navigation or Variant selection; both Layouts work with every Theme.
 
-Source ownership follows those boundaries: `src/html/themes/` owns token definitions and the print palette; `src/html/styles/components.ts` owns shared typography and content/control styles; `src/html/layouts/` owns document/sidebar flow and Layout resets for print. `styles/index.ts` controls composition order, and Plugin-specific CSS remains with its manifest.
+Source ownership follows those boundaries: `src/html/themes/` owns token definitions and the print palette; `src/html/styles/components.ts` owns shared typography and content/control styles; `src/html/styles/visuals.ts` owns shared chart/diagram styles; `src/html/layouts/` owns document/sidebar flow and Layout resets for print. `styles/index.ts` controls composition order, and Plugin-specific CSS remains with its manifest.
 
 Optional switching uses an inline labeled native select, inheriting Theme fonts/colors with a visible focus ring. Its controls stay hidden until initialization succeeds; recoverable errors appear beside the selector while prior content remains readable. `styles/interactive.ts` is included only for reports with switchable blocks. Print hides the controls and runtime errors while retaining the current View and citations.
 
@@ -78,6 +84,8 @@ Optional switching uses an inline labeled native select, inheriting Theme fonts/
 Warm paper and near-black text; green links and focus indicators. One-pixel rules separate groups. Color never encodes factual conclusions.
 
 The default remains minimal. Midnight explicitly sets `--color-scheme: dark`; other Themes inherit light. Controls, hover states, table headers and selection use Theme variables. Print resets every Theme to light color scheme, white page/component surfaces, black text/links and neutral headers/rules. Plugin CSS should consume the same variables and avoid fixed light colors. See `src/html/themes/` for complete palettes and inherited values.
+
+Charts use six independent color roles (`--semloom-chart-series-1` through `--semloom-chart-series-6`), separate from mindmap branch variables. The first screen role follows the selected Theme accent; the remaining five come from that Theme's chart palette. External Themes inherit Minimal or Midnight according to color scheme and retain their own accent first. Print uses the Minimal chart palette on the common light print surface. Series labels, alternating line styles and distinct point symbols supplement color; donut labels remain available in the legend and complete table. Diagrams map text, edges, neutral surfaces and restrained accents to Theme variables rather than adopting the chart palette.
 
 ## Typography
 
@@ -95,6 +103,8 @@ Sidebar expands the page to 96rem with a 15rem sticky TOC and a flexible reading
 
 All Themes use the same TOC card, inheriting ink, table-hover background, line and radius tokens. With sources its fixed title is “目錄與資料來源” and a separate link leads to the source list; without sources it says “目錄”. Mobile sidebar joins the existing button and navigation visually, with a CSS triangle reflecting `aria-expanded` and no duplicate heading. Desktop sidebar remains open. Section/source navigation shares focus handling and the current-location mark. No-JS or setup failure retains the complete card, and print hides it.
 
+Charts and diagrams follow ordinary captions within the reading column. Screen widths at 760px and below select a separate narrow SVG layout; wide plots retain natural readable dimensions inside a named, focusable scrolling region. Plot regions do not introduce page-wide horizontal scrolling. Print uses dedicated static layouts: bars split contiguous categories into panels with the same full-data domain and every series, followed by a complete table; diagrams retain their complete source. Layout diagnostics reject content that cannot fit the readable paper budget instead of silently shrinking or clipping it.
+
 ## Elevation & Depth
 
 Flat surfaces, no shadows. Cards use a single border; no nested card decorations.
@@ -104,6 +114,12 @@ Flat surfaces, no shadows. Cards use a single border; no nested card decorations
 Complete [report workflows](examples/report-workflows/README.md) compose these components within the same document frame. Content edits retain unaffected values, field order and source references; Theme/Layout changes retain the content. Long Chinese hierarchy labels wrap, code scrolls locally on screen, and print retains full text with light surfaces.
 
 Lists use native ordered/unordered markers and bounded indentation; each item's text uses the Rich Text measure and inline styles. Code uses a quiet bordered Theme surface with an optional language caption, local monospace fonts and a focusable scrolling region. Screen preserves code whitespace without wrapping; print wraps long lines without altering DOM text. No highlighting, execution controls or copy runtime is added.
+
+Charts keep their own bar, line or donut geometry within the shared report frame, using Theme body fonts and ink, quiet grid lines, an ordinary title/description and an optional unit line. Static SVG, a wrapping HTML legend and a complete table disclosure remain usable without JavaScript. Missing line values produce gaps. Repeated labels stay literal and ordered; stable keys distinguish the underlying series and categories. Data-table numerals use tabular figures.
+
+Successful chart enhancement replaces only the screen plot and turns bar/line legend items into native buttons. Controls use the paper surface, ink, a one-pixel line border, the control radius and compact padding; hover uses the table-header surface, and keyboard focus uses a two-pixel accent outline. Hidden series have muted, struck-through labels and `aria-pressed="false"`; the last visible series cannot be hidden. The axis domain remains fixed to all data. Donut legends stay read-only. Tooltips use the Theme surface, ink and line with no shadow, preserve literal labels and show original values/units. The complete SVG is visible until initialization succeeds and returns on failure or disposal. Resize updates preserve reader selection. An initial 160ms fade starts from an already readable plot; reduced motion removes the fade and chart updates respect the preference. Print uses independent complete static content without changing screen legend choices.
+
+Diagrams use Pele's static flowchart, sequence, class, ER and state geometry with Theme fonts, neutral node surfaces and legible edges. The caption retains the author's description; a source disclosure preserves exact Mermaid text. Narrow and print layouts may change direction unless the author sets `preserveDirection`; text remains at readable natural size with local scrolling where needed. No browser diagram runtime, author styling override or external resource is part of this component. Print replaces the disclosure with complete wrapping source text and the dedicated light diagram layout.
 
 Hierarchy tree uses a complete native nested list with bounded indentation and bordered Theme surfaces. Mindmap uses the real Markmap renderer for text underlines, smooth branches and circular junctions. Theme fonts, ink, paper, leading and six branch colors apply; descendants retain their main branch color. Labels wrap at 224px. Native Markmap measures and lays out text, and its junctions fold/unfold via mouse or Enter/Space with accessible button labels, expanded state and focus rings. Animation, zoom and pan are disabled. The SVG uses natural dimensions in a focusable scrolling region, including 701px and 375px; it is never replaced with a list just because the screen narrows. The original full tree stays visible until successful setup, then is hidden from screen reading. No-JS, setup failure and print show that complete tree; print never loses folded descendants. Content nodes remain separate from document headings and navigation.
 

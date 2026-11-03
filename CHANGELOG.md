@@ -1,6 +1,12 @@
 # Changelog
 
-## Unreleased
+## 0.2.0 — 2026-11-03
+
+### Added
+
+- Controlled ECharts bar, line and donut charts with complete offline SVG/data tables, keyed reader legends, safe tooltips and pure-static overrides.
+- Static Pele flowchart, sequence, class, ER and state diagrams with shared syntax/subset validation, exact source and author descriptions.
+- Theme-owned chart palettes, natural narrow layouts, full-data A4 bar panels, readable layout diagnostics and installed-consumer coverage for both kinds.
 
 ### Changed
 

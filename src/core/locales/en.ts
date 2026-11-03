@@ -30,4 +30,9 @@ export const english: ReportMessages = Object.freeze({
   cards: 'Cards',
   table: 'Table',
   responsive: 'Responsive',
+  chartData: 'Chart data',
+  chartUnit: 'Unit: ',
+  chartRange: 'Categories',
+  diagramSource: 'Mermaid source',
+  chartToggle: 'Toggle series',
 });

@@ -1,4 +1,12 @@
 import type { ThemeTokens, MindmapPalette } from './minimal.js';
+export const graphiteChartPalette = [
+  '#424242',
+  '#3c65a1',
+  '#925b20',
+  '#76519a',
+  '#9e4252',
+  '#808400',
+] as const;
 export const graphiteMindmapPalette: MindmapPalette = [
   '#356c50',
   '#3c65a1',

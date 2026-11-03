@@ -1,0 +1,8 @@
+{
+  "overrides": {
+    "volume": "chart.static",
+    "comparison": "chart.static",
+    "trend": "chart.static",
+    "share": "chart.static"
+  }
+}
