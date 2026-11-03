@@ -1,6 +1,6 @@
 # Package installation and verification
 
-Semloom can be used from a source checkout or a compiled `.tgz` archive. The package is `0.1.0`, licensed under MIT, and supports Node 22.14+ within 22.x and Node 24.x. `private: true` prevents publishing to the npm registry; it does not control GitHub repository visibility or local archive installation.
+Semloom can be used from a source checkout or a compiled `.tgz` archive. The package is `0.2.0`, licensed under MIT, and supports Node 22.14+ within 22.x and Node 24.x. `private: true` prevents publishing to the npm registry; it does not control GitHub repository visibility or local archive installation.
 
 ## From source
 
