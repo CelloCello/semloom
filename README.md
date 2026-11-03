@@ -10,10 +10,10 @@ Keep the content in JSON, choose a presentation, and share the HTML. Reports wor
 
 ## What you get
 
-- **Structured content:** prose, rich text, nested lists, code, comparisons, insights, metrics, steps, timelines and hierarchy trees/mindmaps, with block-level source references.
+- **Structured content:** prose, rich text, nested lists, code, comparisons, insights, metrics, steps, timelines, hierarchy trees/mindmaps, ECharts charts and Pele diagrams, with block-level source references.
 - **Reusable presentation:** six built-in Themes, two Layout bases, local Theme/Layout extensions and compatible block Variants; change appearance while preserving the data.
 - **Clear validation:** export JSON Schema, catch invalid fields/references, and inspect presentation choices with `--explain`.
-- **Optional interaction:** switch compatible comparison views offline. Complete content stays readable without JavaScript.
+- **Reader interaction:** ECharts hover/touch values and keyed series legends; optional offline switching between compatible comparison views. Complete content stays readable without JavaScript.
 - **Agent and library workflows:** a bundled skill, an ESM API and trusted local Plugin extensions.
 
 ## Quick start
@@ -72,6 +72,18 @@ semloom build report.json -o reports/project-update.html --explain
 ```
 
 Existing text fields remain literal. Use [Rich Text](examples/richtext.json) for inline formatting, the [technical guide](examples/technical-guide.json) for nested lists and code, or the [hierarchy example](examples/hierarchy.json) with its [mindmap config](examples/hierarchy-mindmap.json) for offline Markmap. See the [data contract](docs/semantic-schema.md) for limits, links and fallback behavior. Sources belong to blocks; Semloom checks references without verifying facts or calculating metrics.
+
+## Charts and diagrams
+
+Use `chart` for vertical/horizontal bars, grouped bars, lines with explicit missing values, or a single-series donut. Use `diagram` for the supported Mermaid subset: flowchart, sequence, class, ER and state. Every figure starts with a complete static SVG; charts retain a data table, and diagrams retain exact source and an author description. Pele runs in Node during semantic validation and report builds; it is never embedded in the reader.
+
+```sh
+semloom build examples/charts.json -o reports/charts.html
+semloom build examples/charts.json --config examples/charts-static.json -o reports/charts-static.html
+semloom build examples/diagrams.json -o reports/diagrams.html
+```
+
+`chart.svg` adds one offline ECharts runtime per report, independently of `interactive`. Override with `chart.static` to omit it. No-JS, enhancement failure and print retain complete static content; long bar charts print as ordered panels with a shared scale. `validate` checks semantic data and Mermaid syntax; `build` may additionally reject an unreadable paper layout. See the [data contracts](docs/semantic-schema.md#chart-content) and [initial/edit workflow](examples/README.md#charts-and-diagrams). Raw ECharts options, arbitrary scripts, Mermaid styling directives and external diagram resources are unsupported.
 
 ## Choose a look
 

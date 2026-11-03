@@ -30,6 +30,12 @@ Each Variant has `id`, `supports(data, presentationContext)`, `score(data, prese
 
 Use the public `html` tagged template and `heading` helper. Interpolated strings are escaped; fragments are recognized privately rather than by a user-forgeable JSON marker. Do not return hand-built fragment objects. Markup must contain no remote resource dependencies, scripts or event handlers. Block citations are composed outside your rendered content by Core, so do not manually duplicate `sourceIds` rendering.
 
+## Rendering identities
+
+Core supplies optional `RenderContext.blockId` on every server render call, using the resolved block identity without inserting automatic IDs into `data`. Its optional typing preserves existing manually created contexts. New built-in SVG renderers require this identity and fail clearly if called directly without it. Theme stays outside rendering context; use CSS variables for appearance.
+
+Extensions targeting `chart` or `diagram` inherit the same [semantic validation](semantic-schema.md#chart-content). Preserve original values, missing values, key/label identity, relationships, exact source, descriptions and Core citations. Built-in `chart.svg` enhancement belongs to the selected built-in View; a third-party Variant does not implicitly gain ECharts. Switching away successfully disposes the initial enhancement while failed incoming construction retains it. No arbitrary SVG/raw-HTML trust helper is exported.
+
 ## CSS assets
 
 `assets` is an array of `{ id, type: "css", content, dependsOn? }`. Declare dependencies by asset ID; include their declarations in one of the loaded manifests. CSS is limited to 200,000 characters per asset and must use scoped classes and theme variables. URLs, imports, network image functions, CSS escapes/comments and style terminators are rejected; pre-process complex CSS into this static subset rather than relying on remote assets.

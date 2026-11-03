@@ -3,10 +3,14 @@ import { checkDocumentSchema, limits } from './schema.js';
 import { validateInlineContent } from './inline.js';
 import { validateListContent } from './list.js';
 import { validateHierarchy } from './hierarchy.js';
+import { validateChart, chartLimits } from './chart.js';
+import { validateDiagram, diagramLimits } from './diagram.js';
 import { validateUrlReference } from './url.js';
 import {
   fail,
   type Block,
+  type ChartBlock,
+  type DiagramBlock,
   type ComparisonBlock,
   type Document,
   type HierarchyBlock,
@@ -143,7 +147,28 @@ export function resolveDocument(
     if (source.url !== undefined)
       validateUrlReference(source.url, `/sources/${i}/url`, anchors);
   }
+  let chartValues = 0;
+  let diagramSource = 0;
   for (const block of blocks) {
+    if (block.data.kind === 'chart') {
+      chartValues += validateChart(block.data as ChartBlock, block.path);
+      if (chartValues > chartLimits.documentValues)
+        fail(
+          `${block.path}/series`,
+          'CHART_DOCUMENT_LIMIT',
+          'At most 3000 chart values per document.',
+        );
+    }
+    if (block.data.kind === 'diagram') {
+      diagramSource += (block.data as DiagramBlock).source.length;
+      if (diagramSource > diagramLimits.documentSource)
+        fail(
+          `${block.path}/source`,
+          'DIAGRAM_DOCUMENT_LIMIT',
+          'At most 50000 Mermaid source characters per document.',
+        );
+      validateDiagram(block.data as DiagramBlock, block.path);
+    }
     if (block.data.kind === 'richtext')
       validateInlineContent(
         (block.data as RichTextBlock).content,

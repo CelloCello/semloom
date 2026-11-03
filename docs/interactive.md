@@ -69,6 +69,14 @@ The synchronous factory returns `{ element: HTMLElement, dispose(): void }`. Its
 
 Register event listeners with `context.signal` and other resources with `context.onDispose` immediately after allocation. These hooks also clean partial construction if the factory throws before returning a View. `dispose()` releases any additional View-owned state; it must be idempotent and must not remove another View or shared document nodes.
 
+## Chart reader enhancement
+
+`chart.svg` adds a separate offline ECharts SVG bundle, payload and exact CSP hash once per report; `interactive: false` does not disable it. `chart.static` retains complete SSR and omits this engine, payload and notices. Pele diagrams remain fully static. Neither built-in kind adds a switching adapter or changes comparison candidate eligibility.
+
+The reader builds an incoming SVG while SSR stays visible, then commits only after successful setup. Tooltips construct safe DOM text from original labels/values; missing values remain explicit. Bar/line HTML legend buttons use safe key-derived internal names, support keyboard operation and retain at least one visible series. Repeated labels do not merge. Value domains remain based on all data. Donut legends are descriptive and keep their original denominator.
+
+Resize reads the block's width and actual local font; motion respects reduced-motion preferences. Failure keeps full SSR and tables. Engine instances, observers, listeners and pending frames are View-owned. A successful switch away from the initial enhanced chart releases its engine; a failed switch retains it. Removing a chart or leaving the page releases its resources without affecting other figures. Print uses build-time static SVG/panels and full tables, hides controls/tooltips, and does not alter screen selection or depend on `beforeprint`.
+
 ## Switching lifecycle
 
 1. Initialize controls against the existing server View; enable/show them only after setup succeeds. Do not replace the initial static DOM just to initialize.

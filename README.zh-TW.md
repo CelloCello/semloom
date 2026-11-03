@@ -10,10 +10,10 @@ Semloom 將語意 JSON 編譯成一份獨立的 HTML 報告，適合研究比較
 
 ## 可以做什麼
 
-- **結構化內容**：段落、Rich Text、巢狀清單、程式碼、比較、重點提示、數值摘要、步驟、時間軸與階層樹／mindmap，支援區塊層級的來源引用。
+- **結構化內容**：段落、Rich Text、巢狀清單、程式碼、比較、重點提示、數值摘要、步驟、時間軸、階層樹／mindmap、ECharts 圖表及 Pele 圖解，支援區塊層級的來源引用。
 - **可重用的呈現方式**：六款內建 Theme、兩種 Layout 基底、本機 Theme／Layout 擴充，以及相容的區塊 Variant；調整外觀時保留語意資料。
 - **明確的驗證**：匯出 JSON Schema、檢查欄位與引用，透過 `--explain` 查看實際呈現選擇。
-- **可選的互動功能**：離線切換相容的比較呈現；停用 JavaScript 時仍保留完整內容。
+- **讀者互動**：ECharts 滑鼠／觸控數值提示與數列圖例；也可選擇離線切換相容的比較呈現。停用 JavaScript 時仍保留完整內容。
 - **Agent 與程式整合**：內附 skill、ESM API，並可載入可信任的本機 Plugin。
 
 ## 快速開始
@@ -72,6 +72,18 @@ semloom build report.json -o reports/project-update.html --explain
 ```
 
 既有文字欄位仍照原文顯示。[Rich Text 範例](examples/richtext.json) 示範行內格式，[技術指南](examples/technical-guide.json) 結合巢狀清單與程式碼；[階層範例](examples/hierarchy.json) 搭配 [mindmap config](examples/hierarchy-mindmap.json) 可選離線 Markmap。限制、連結與備援行為請見[資料契約](docs/semantic-schema.md)。來源引用屬於區塊；Semloom 檢查引用關係，但不查證事實或計算指標。
+
+## 圖表與圖解
+
+`chart` 支援垂直／水平長條、群組長條、保留缺值斷點的折線，以及單數列環圈。`diagram` 支援受限 Mermaid 語法的 flowchart、sequence、class、ER 與 state。每張圖都有完整靜態 SVG；圖表附完整資料表，圖解保留原始語法與作者說明。Pele 在 Node 端的語意驗證與報告建置時執行，不會嵌入閱讀端。
+
+```sh
+semloom build examples/charts.json -o reports/charts.html
+semloom build examples/charts.json --config examples/charts-static.json -o reports/charts-static.html
+semloom build examples/diagrams.json -o reports/diagrams.html
+```
+
+預設 `chart.svg` 每份報告只加入一份離線 ECharts runtime，與 `interactive` 的 Variant 切換旗標分開。Override 為 `chart.static` 可省去該 runtime。無 JS、初始化失敗與列印都保留完整靜態內容；長條圖列印時依分類分段，各段共用尺度。`validate` 檢查語意資料與 Mermaid 語法，`build` 另可回報紙面布局超限。詳見[資料契約](docs/semantic-schema.md#chart-content)與[初稿／修改流程](examples/README.md#charts-and-diagrams)。不接受任意 ECharts options、JavaScript、Mermaid 樣式 directives 或外部圖解資源。
 
 ## 選擇外觀
 

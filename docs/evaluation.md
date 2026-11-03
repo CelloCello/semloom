@@ -25,3 +25,9 @@ The original fixed and Auto conditions choose the same table; this does not esta
 Artifact replay does not generate new model responses. A controlled efficiency study would need independent/counterbalanced tasks, prompts and effective Schema, model/version, input/output usage, retries, complete wall-clock timing and predefined fidelity/quality scoring. No result is required to beat another tool. This project does not claim general token savings, superior Planner quality or human preference from the fixed samples.
 
 Local browser automation uses Chromium; native OS select menus and other browser engines need separate checks. Local runtime/platform observations and future CI configuration must be distinguished from completed hosted CI runs. See [release verification](releases.md) and [showcase recipes](showcase.md).
+
+## Chart and diagram evidence
+
+`tests/charts-diagrams.test.mjs` separates Schema acceptance from semantic rejection, covers all five diagram models, resource budgets, source restrictions, keyed data, deterministic SVG IDs/references, finite extremes and CLI atomic failures. Browser checks cover natural text bounds, 375px/701px, Themes/Layouts, no-JS, tooltip values, keyed legends, touch/keyboard, reduced motion, static print, initial/edit external presentation and cleanup. A4 no-JS PDFs cover 100 long Chinese categories, six series, negative/zero/null values and both bar orientations.
+
+`pnpm benchmark` retains the original 32 cases and adds five visual profiles with raw/gzip HTML, bundle size and original warm/cold samples. Optional `SEMLOOM_BENCHMARK_BROWSER=1` measures reader-ready and animation-complete separately after Node work. Observation budgets are not microsecond CI assertions or promised latency. Captures establish their tested fonts, platform and viewports, not full Mermaid compatibility or real-device/screen-reader acceptance.

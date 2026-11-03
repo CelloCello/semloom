@@ -1,0 +1,116 @@
+{
+  "schemaVersion": "1.0",
+  "title": "服務處理量與報告流程（合成示例）",
+  "sources": [
+    {
+      "id": "synthetic",
+      "title": "本報告使用合成數據，僅示範圖表契約，並非實際績效。"
+    },
+    {
+      "id": "pele",
+      "title": "Pele API：受限 Mermaid 圖解的同步渲染",
+      "url": "https://pele.run/api"
+    }
+  ],
+  "sections": [
+    {
+      "id": "reading",
+      "title": "處理量與流程",
+      "blocks": [
+        {
+          "kind": "prose",
+          "text": "這份報告以合成數據示範資料圖表；圖解說明報告產生流程，不代表實際績效。"
+        },
+        {
+          "kind": "chart",
+          "title": "服務處理量比較（合成示例）",
+          "description": "示例資料，非實際績效。",
+          "chartType": "bar",
+          "unit": "件",
+          "categories": [
+            {
+              "key": "import",
+              "label": "文件匯入與格式整理"
+            },
+            {
+              "key": "validate",
+              "label": "資料驗證與錯誤回報"
+            },
+            {
+              "key": "compile",
+              "label": "報告編譯與輸出"
+            }
+          ],
+          "series": [
+            {
+              "key": "current",
+              "label": "本期",
+              "values": [128, 0, null]
+            },
+            {
+              "key": "previous",
+              "label": "前期",
+              "values": [104, -12, 112]
+            }
+          ],
+          "id": "comparison",
+          "orientation": "horizontal",
+          "sourceIds": ["synthetic"]
+        },
+        {
+          "kind": "chart",
+          "title": "每週處理量趨勢（合成示例）",
+          "description": "示例資料，非實際績效。",
+          "chartType": "line",
+          "unit": "件",
+          "categories": [
+            {
+              "key": "import",
+              "label": "第一週"
+            },
+            {
+              "key": "validate",
+              "label": "第二週"
+            },
+            {
+              "key": "compile",
+              "label": "第三週"
+            }
+          ],
+          "series": [
+            {
+              "key": "current",
+              "label": "本期",
+              "values": [128, null, 144]
+            },
+            {
+              "key": "previous",
+              "label": "前期",
+              "values": [104, 112, 130]
+            }
+          ],
+          "id": "trend",
+          "sourceIds": ["synthetic"]
+        },
+        {
+          "kind": "diagram",
+          "title": "編譯流程",
+          "description": "輸入經驗證後，成功分支產生輸出，失敗分支回報診斷。",
+          "language": "mermaid",
+          "source": "flowchart LR\n A[輸入] --> B{驗證}\n B -->|成功| C[輸出]\n B -->|失敗| D[診斷]",
+          "id": "flowchart",
+          "sourceIds": ["pele"]
+        },
+        {
+          "kind": "diagram",
+          "title": "作者與編譯器的訊息",
+          "description": "作者提交資料給編譯器，編譯器回傳完整報告。",
+          "language": "mermaid",
+          "source": "sequenceDiagram\n participant A as 作者\n participant B as 編譯器\n A->>B: 提交資料\n B-->>A: 完整報告",
+          "id": "sequence",
+          "sourceIds": ["pele"]
+        }
+      ]
+    }
+  ]
+}

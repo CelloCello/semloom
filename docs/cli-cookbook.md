@@ -51,3 +51,15 @@ pnpm semloom build examples/comparison-plugin/report.json --config examples/comp
 ```
 
 Use the same config for Schema, validate and build. Plugin paths resolve relative to the config file. Read the [Agent guide](agent-guide.md) for the generation/edit loop, the [Schema contract](semantic-schema.md) for plain text and block references, and [Plugin authoring](plugin-authoring.md) before loading code. Only load modules you trust: they execute with Node.js access at build time.
+
+## Build charts and Mermaid diagrams
+
+```sh
+pnpm semloom validate examples/charts.json
+pnpm semloom build examples/charts.json -o reports/charts.html --explain
+pnpm semloom build examples/charts.json --config examples/charts-static.json -o reports/charts-static.html
+pnpm semloom validate examples/diagrams.json
+pnpm semloom build examples/diagrams.json -o reports/diagrams.html
+```
+
+`validate` and Library `resolveDocument()` share chart alignment/key/numeric checks and Mermaid source/parse/model validation. Exported `schema` remains portable and structural. `build` also checks readable paper limits, returning `CHART_LAYOUT_LIMIT` or `DIAGRAM_LAYOUT_LIMIT` at a field pointer with exit 2 and the old output untouched. See the [initial/edit workflow](../examples/README.md#charts-and-diagrams). `--no-interactive` disables Variant switching; select `chart.static` via Override to omit ECharts enhancement.

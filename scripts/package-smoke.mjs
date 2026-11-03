@@ -144,6 +144,20 @@ for (const binary of runtimes) {
       'examples/hierarchy-reference.json',
       'examples/hierarchy-reference-mindmap.json',
       'dist/core/hierarchy.js',
+      'dist/core/chart.js',
+      'dist/core/diagram.js',
+      'dist/node/chart.js',
+      'dist/node/pele.js',
+      'dist/node/svg.js',
+      'examples/charts.json',
+      'examples/charts-static.json',
+      'examples/diagrams.json',
+      'examples/visual-workflow-initial.json',
+      'examples/visual-workflow-edited.json',
+      'examples/visual-workflow-paper.json',
+      'examples/visual-workflow-night.json',
+      'dist/browser/charts.js',
+      'dist/browser/chart-bundle.js',
       'dist/browser/mindmap.js',
       'docs/licenses/d3-flextree.txt',
       'dist/plugins/hierarchy.js',
@@ -436,6 +450,136 @@ for (const binary of runtimes) {
       `import assert from 'node:assert/strict';\nimport {compile} from ${JSON.stringify(manifest.name)};\nimport {safeUrl} from ${JSON.stringify(`${manifest.name}/browser`)};\nimport {readFileSync} from 'node:fs';\nsafeUrl('https://example.com');\nconst output=compile(JSON.parse(readFileSync('examples/comparison.json','utf8')),{interactive:true});\nassert.ok(output.html.includes('data-semloom-interactive'));\n`,
     );
     run(binary, ['library-smoke.mjs'], consumer);
+    for (const input of ['charts', 'diagrams']) {
+      run(binary, [cli, 'validate', `examples/${input}.json`], consumer);
+      run(
+        binary,
+        [cli, 'build', `examples/${input}.json`, '-o', `reports/${input}.html`],
+        consumer,
+      );
+    }
+    run(
+      binary,
+      [
+        cli,
+        'build',
+        'examples/charts.json',
+        '--config',
+        'examples/charts-static.json',
+        '-o',
+        'reports/charts-static.html',
+      ],
+      consumer,
+    );
+    assert.ok(
+      !(
+        await readFile(join(consumer, 'reports/charts-static.html'), 'utf8')
+      ).includes('data-semloom-charts'),
+    );
+    await writeFile(
+      join(consumer, 'fixed-domain.json'),
+      JSON.stringify({
+        schemaVersion: '1.0',
+        title: 'Fixed domain regression',
+        sections: [
+          {
+            title: 'Precision',
+            blocks: [
+              {
+                id: 'fixed-domain',
+                kind: 'chart',
+                title: 'Fixed domain',
+                chartType: 'line',
+                categories: ['A', 'B', 'C'].map((label) => ({
+                  key: label,
+                  label,
+                })),
+                series: [
+                  {
+                    key: 's',
+                    label: 'S',
+                    values: [
+                      1897.6200639968738, 1897.6200639968897,
+                      1897.6200639969059,
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      }),
+    );
+    await writeFile(
+      join(consumer, 'fixed-domain-static.json'),
+      JSON.stringify({ overrides: { 'fixed-domain': 'chart.static' } }),
+    );
+    run(binary, [cli, 'validate', 'fixed-domain.json'], consumer);
+    run(
+      binary,
+      [cli, 'build', 'fixed-domain.json', '-o', 'reports/fixed-domain.html'],
+      consumer,
+    );
+    run(
+      binary,
+      [
+        cli,
+        'build',
+        'fixed-domain.json',
+        '--config',
+        'fixed-domain-static.json',
+        '-o',
+        'reports/fixed-domain-static.html',
+      ],
+      consumer,
+    );
+    await writeFile(
+      join(consumer, 'visuals-smoke.mjs'),
+      [
+        "import assert from 'node:assert/strict';",
+        "import {readFileSync} from 'node:fs';",
+        `import {compile,createRegistry,resolveDocument,documentSchema,chartLimits,diagramLimits} from ${JSON.stringify(manifest.name)};`,
+        "for(const name of ['charts','diagrams']){const input=JSON.parse(readFileSync('examples/'+name+'.json','utf8')); const output=compile(input); assert.equal(output.html,readFileSync('reports/'+name+'.html','utf8')); assert.ok(output.html.includes('<svg')); assert.equal(compile(input).html,output.html);}",
+        "const fixed=JSON.parse(readFileSync('fixed-domain.json','utf8'));for(const name of ['fixed-domain','fixed-domain-static']){const options=name.endsWith('-static')?JSON.parse(readFileSync('fixed-domain-static.json','utf8')):{};assert.equal(compile(fixed,options).html,readFileSync('reports/'+name+'.html','utf8'));}",
+        "const input=JSON.parse(readFileSync('examples/charts.json','utf8'));input.sections[0].blocks[0].series[0].values=[1];assert.throws(()=>resolveDocument(input,createRegistry()),/CHART_VALUES_LENGTH/);",
+        "const diagram=JSON.parse(readFileSync('examples/diagrams.json','utf8'));diagram.sections[0].blocks[0].source='flowchart LR\\n invalid syntax';assert.throws(()=>resolveDocument(diagram,createRegistry()),/DIAGRAM_SYNTAX/);",
+        "diagram.sections[0].blocks=diagram.sections[0].blocks.slice(0,1);diagram.sections[0].blocks[0].source='flowchart LR\\n rect --> link --> properties';assert.ok(compile(diagram).html.includes('<svg'));",
+        "for(const source of ['erDiagram\\n A {\\n style name\\n }','classDiagram\\n class A {\\n link property\\n }','flowchart LR\\n A{hello; click here} --> B','flowchart LR\\n A -->|hello; click here| B','flowchart LR\\n A -- hello; click here --> B']){diagram.sections[0].blocks[0].source=source;assert.ok(compile(diagram).html.includes('<svg'));}",
+        "const tiny=JSON.parse(readFileSync('examples/charts.json','utf8'));for(const values of [[Number.MIN_VALUE,null,2*Number.MIN_VALUE],[2**-1022-Number.MIN_VALUE,null,2**-1022+Number.MIN_VALUE],[1.23456789,1.234568,1.2345681],[7.000000000000003e-309,7.000000000000013e-309,7.00000000000002e-309]]){tiny.sections[0].blocks=[{kind:'chart',title:'Precision',chartType:'line',categories:['A','B','C'].map(label=>({key:label,label})),series:[{key:'s',label:'S',values}]}];const figures=[...compile(tiny).html.matchAll(/<svg\\b[\\s\\S]*?<\\/svg>/gu)];assert.equal(figures.length,3);for(const [svg] of figures){const ticks=[...svg.matchAll(/<text\\b[^>]*>([^<]+)<\\/text>/gu)].map(m=>m[1]).filter(t=>!['A','B','C'].includes(t));assert.ok(ticks.length>=2);assert.equal(new Set(ticks).size,ticks.length);}}",
+        "const sequence=(messages,notes)=>'sequenceDiagram\\nparticipant A\\nparticipant B\\n'+Array(messages).fill('A->>B: message').concat(Array(notes).fill('Note over A: note')).join('\\n');diagram.sections[0].blocks[0].source=sequence(199,1);resolveDocument(diagram,createRegistry());diagram.sections[0].blocks[0].source=sequence(200,1);assert.throws(()=>resolveDocument(diagram,createRegistry()),/DIAGRAM_LIMIT/);",
+        "assert.equal(chartLimits.documentValues,3000);assert.equal(diagramLimits.entities,100);assert.ok(JSON.stringify(documentSchema(createRegistry())).includes('diagram'));",
+      ].join('\n'),
+    );
+    run(binary, ['visuals-smoke.mjs'], consumer);
+    for (const [phase, theme] of [
+      ['initial', 'paper'],
+      ['edited', 'night'],
+    ]) {
+      run(
+        binary,
+        [
+          cli,
+          'validate',
+          `examples/visual-workflow-${phase}.json`,
+          '--config',
+          `examples/visual-workflow-${theme}.json`,
+        ],
+        consumer,
+      );
+      run(
+        binary,
+        [
+          cli,
+          'build',
+          `examples/visual-workflow-${phase}.json`,
+          '--config',
+          `examples/visual-workflow-${theme}.json`,
+          '-o',
+          `reports/visual-workflow-${phase}.html`,
+        ],
+        consumer,
+      );
+    }
     const presentationConfig = 'examples/presentation/presentation.json';
     for (const category of ['themes', 'layouts']) {
       const listed = JSON.parse(
@@ -710,7 +854,7 @@ for (const binary of runtimes) {
     await writeFile(
       join(consumer, 'types-node.mts'),
       [
-        `import {compile,createPresentation,parseConfig,loadPresentation,resolveDocument,planDocument,createRegistry,type Config,type NormalizedConfig,type Document,type ThemeDefinition,type LayoutDefinition,type ThemeTokens} from ${JSON.stringify(manifest.name)};`,
+        `import {compile,createPresentation,parseConfig,loadPresentation,resolveDocument,planDocument,createRegistry,type ChartBlock,type DiagramBlock,type RenderContext,type Config,type NormalizedConfig,type Document,type ThemeDefinition,type LayoutDefinition,type ThemeTokens} from ${JSON.stringify(manifest.name)};`,
         "const data:Document={schemaVersion:'1.0',title:'T',sections:[{title:'S'}]};",
         "const tokens:Partial<ThemeTokens>={accent:'#123456'};",
         "const theme:ThemeDefinition={id:'consumer.typed',themeApiVersion:'1.0',tokens};",
@@ -722,6 +866,10 @@ for (const binary of runtimes) {
         'const themePaths:string[]=normalized.themes;',
         'const layoutPaths:string[]=parseConfig().layouts;',
         'const registry=createRegistry();',
+        "const chart:ChartBlock={kind:'chart',title:'T',chartType:'line',categories:[{key:'x',label:'X'}],series:[{key:'s',label:'S',values:[null]}]};",
+        "const diagram:DiagramBlock={kind:'diagram',title:'D',description:'Description',language:'mermaid',source:'flowchart LR\\n A-->B'};",
+        "const legacyContext:RenderContext={locale:'en',layout:'document',headingLevel:3};",
+        'void [chart,diagram,legacyContext];',
         'void [output,compile(data,legacy),planDocument(resolveDocument(data,registry),legacy,registry),loadPresentation(legacy),themePaths,layoutPaths];',
       ].join('\n'),
     );
@@ -773,6 +921,13 @@ for (const binary of runtimes) {
       'interactive',
       'plugin-interactive',
       'presentation',
+      'charts',
+      'charts-static',
+      'fixed-domain',
+      'fixed-domain-static',
+      'diagrams',
+      'visual-workflow-initial',
+      'visual-workflow-edited',
       'hierarchy-tree',
       'hierarchy-mindmap',
       ...installedThemes.map((theme) => `mindmap-palette-${theme}`),

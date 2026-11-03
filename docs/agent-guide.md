@@ -15,6 +15,12 @@ Plugin imports resolve from the declaring module's location. A CLI from another 
 
 The workflow below uses the checkout prefix; substitute the selected entry for installed-package use. When saving Schema JSON, use `node dist/cli/main.js schema > semantic.schema.json` in a checkout, `npx --no-install semloom schema > semantic.schema.json` for a project-local package, or `semloom schema > semantic.schema.json` for a global CLI. `pnpm semloom` may add banners to stdout. Include the same `--config` when applicable.
 
+## Chart and diagram authoring
+
+Use explicit `chart` data for bars, lines or a donut. Preserve category/series keys, ordered labels and aligned values; `null` is missing, never zero. Use `diagram` with Mermaid source and an author-written description for the five [supported diagram types](semantic-schema.md#diagram-content). The [chart and diagram workflow](../examples/README.md#charts-and-diagrams) includes complete examples, a bounded value/source edit and independent external paper/night configs. Do not invent values or diagram explanations from visual styling. Keep `code` literal and use `hierarchy` for trees rather than executing arbitrary code fences.
+
+Always run `validate`, which checks Mermaid syntax and semantic constraints beyond the portable Schema. `build` additionally checks readable paper layouts; split an oversize figure when a layout diagnostic asks for it. Default `chart.svg` has offline tooltips and series controls regardless of `interactive`; choose `chart.static` via an explicit block-ID Override for smaller static files. Inspect the actual graphic, data table/source, narrow layout and print output after edits. Preserve all unaffected values, relationships, IDs and source references.
+
 ## Report workflow
 
 1. Run `schema` with the selected CLI and read the effective schema. Read [comparison](../examples/comparison.json) for real research data, [blocks](../examples/blocks.json) for the six original kinds with illustrative data, and [richtext](../examples/richtext.json) for inline formatting. Use `--config` consistently when local Plugins are configured; `plugins list --config ...` shows the loaded kinds and Variant extensions.

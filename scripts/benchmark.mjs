@@ -5,6 +5,10 @@ import { createHash } from 'node:crypto';
 import assert from 'node:assert/strict';
 import { compile, documentSchema, createRegistry } from '../dist/index.js';
 import { loadScenarios } from './scenarios.mjs';
+import { gzipSync } from 'node:zlib';
+import { cpus, release } from 'node:os';
+import { resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 await mkdir('reports/benchmark', { recursive: true });
 const source = JSON.parse(
@@ -131,11 +135,142 @@ for (const scenario of loadScenarios()) {
     }
   }
 }
+// A separate fixed visual corpus preserves the original 32 conditions verbatim.
+const mixedVisual = JSON.parse(
+  await readFile('examples/visual-workflow-initial.json', 'utf8'),
+);
+const subset = (kinds, count = Infinity) => ({
+  ...mixedVisual,
+  sections: [
+    {
+      ...mixedVisual.sections[0],
+      blocks: mixedVisual.sections[0].blocks
+        .filter((b) => kinds.includes(b.kind))
+        .slice(0, count),
+    },
+  ],
+});
+const visualProfiles = [
+  { id: 'ordinary', document: subset(['prose']), options: {} },
+  {
+    id: 'chart.static',
+    document: subset(['chart'], 1),
+    options: { overrides: { comparison: 'chart.static' } },
+  },
+  { id: 'chart.svg', document: subset(['chart'], 1), options: {} },
+  { id: 'diagram-only', document: subset(['diagram'], 1), options: {} },
+  { id: 'mixed', document: mixedVisual, options: {} },
+];
+const visuals = [];
+await mkdir('reports/benchmark/visuals', { recursive: true });
+for (const profile of visualProfiles) {
+  const result = compile(profile.document, profile.options);
+  assert.deepEqual(result.document.data, profile.document);
+  await writeFile(`reports/benchmark/visuals/${profile.id}.html`, result.html);
+  await writeFile(
+    `reports/benchmark/visuals/${profile.id}.json`,
+    JSON.stringify(profile.document),
+  );
+  await writeFile(
+    `reports/benchmark/visuals/${profile.id}.config.json`,
+    JSON.stringify(profile.options),
+  );
+  const script =
+    /<script data-semloom-charts>([\s\S]*?)<\/script>/u.exec(
+      result.html,
+    )?.[1] ?? '';
+  visuals.push({
+    id: profile.id,
+    htmlBytes: Buffer.byteLength(result.html),
+    gzipBytes: gzipSync(result.html).length,
+    chartBundleBytes: Buffer.byteLength(script),
+    chartBundleGzipBytes: gzipSync(script).length,
+    sha256: createHash('sha256').update(result.html).digest('hex'),
+    warmCompileMs: [],
+    coldCliWallClockMs: [],
+    browserReadyMs: [],
+    browserAnimationCompleteMs: [],
+  });
+}
+for (let i = 0; i < 21; i++)
+  for (const [index, profile] of visualProfiles.entries()) {
+    const start = performance.now();
+    compile(profile.document, profile.options);
+    visuals[index].warmCompileMs.push(performance.now() - start);
+  }
+for (let i = 0; i < 3; i++)
+  for (const [index, profile] of visualProfiles.entries()) {
+    const start = performance.now();
+    const result = spawnSync(
+      process.execPath,
+      [
+        'dist/cli/main.js',
+        'build',
+        `reports/benchmark/visuals/${profile.id}.json`,
+        '--config',
+        `reports/benchmark/visuals/${profile.id}.config.json`,
+        '-o',
+        `reports/benchmark/visuals/${profile.id}-cli.html`,
+      ],
+      { encoding: 'utf8' },
+    );
+    assert.equal(result.status, 0, result.stderr);
+    visuals[index].coldCliWallClockMs.push(performance.now() - start);
+  }
+if (process.env.SEMLOOM_BENCHMARK_BROWSER === '1') {
+  process.env.PLAYWRIGHT_BROWSERS_PATH ??= resolve('.cache/ms-playwright');
+  const { chromium } = await import('@playwright/test');
+  const browser = await chromium.launch();
+  try {
+    for (let i = 0; i < 5; i++)
+      for (let j = 0; j < visuals.length; j++) {
+        const index = (i + j) % visuals.length;
+        const profile = visuals[index];
+        const page = await browser.newPage({
+          viewport: { width: 1280, height: 900 },
+        });
+        const errors = [];
+        page.on('pageerror', (error) => errors.push(error.message));
+        page.on('request', (request) => {
+          if (/^https?:/u.test(request.url())) errors.push(request.url());
+        });
+        await page.goto(
+          pathToFileURL(resolve(`reports/benchmark/visuals/${profile.id}.html`))
+            .href,
+        );
+        if (profile.chartBundleBytes)
+          await page.waitForFunction(
+            (count) =>
+              document.querySelectorAll('[data-chart-ready]').length === count,
+            profile.id === 'mixed' ? 2 : 1,
+          );
+        const timing = await page.evaluate(async () => {
+          await document.fonts.ready;
+          await new Promise((done) =>
+            requestAnimationFrame(() => requestAnimationFrame(done)),
+          );
+          const ready = performance.now();
+          await Promise.all(
+            document.getAnimations().map((animation) => animation.finished),
+          );
+          return { ready, complete: performance.now() };
+        });
+        assert.deepEqual(errors, []);
+        profile.browserReadyMs.push(timing.ready);
+        profile.browserAnimationCompleteMs.push(timing.complete);
+        await page.close();
+      }
+  } finally {
+    await browser.close();
+  }
+}
 const report = {
   environment: {
     node: process.version,
     platform: process.platform,
     arch: process.arch,
+    cpu: cpus()[0]?.model,
+    osRelease: release(),
     dependencies: JSON.parse(await readFile('package.json', 'utf8'))
       .dependencies,
   },
@@ -149,10 +284,12 @@ const report = {
   coldCliWallClockMs: coldRuns,
   conditions: rows,
   scenarios,
+  visuals,
   caveats: [
     'Compile time excludes Agent generation and is not end-to-end task time.',
     'Calls in one process reuse Registry/validators and may reuse bundler state; first samples can be warmed by earlier conditions.',
     'Fixed table and Auto select the same view for this input; no quality gain established.',
+    'Visual samples use 21 warm compiles and 3 cold CLI invocations per profile. SEMLOOM_BENCHMARK_BROWSER=1 adds 5 sequential 1280x900 browser opens per profile after Node measurements, rotating profile order; reader-ready and CSS-animation-complete are separate navigation-relative timestamps.',
   ],
 };
 await writeFile(
@@ -164,6 +301,12 @@ console.log(
     {
       coldCliWallClockMs: coldRuns.map(Math.round),
       additionalScenarioConditions: scenarios.length,
+      visualProfiles: visuals.map((v) => ({
+        id: v.id,
+        htmlBytes: v.htmlBytes,
+        gzipBytes: v.gzipBytes,
+        warmMedianMs: [...v.warmCompileMs].sort((a, b) => a - b)[10],
+      })),
       conditions: rows.map((r) => ({
         condition: r.condition,
         htmlBytes: r.htmlBytes,

@@ -71,6 +71,24 @@ export interface CodeBlock extends Block {
   text: string;
   language?: string;
 }
+export interface ChartBlock extends Block {
+  kind: 'chart';
+  title: string;
+  description?: string;
+  unit?: string;
+  chartType: 'bar' | 'line' | 'donut';
+  orientation?: 'vertical' | 'horizontal';
+  categories: { key: string; label: string }[];
+  series: { key: string; label: string; values: (number | null)[] }[];
+}
+export interface DiagramBlock extends Block {
+  kind: 'diagram';
+  title: string;
+  description: string;
+  language: 'mermaid';
+  source: string;
+  preserveDirection?: boolean;
+}
 export interface HierarchyNode {
   label: string;
   children?: HierarchyNode[];
@@ -147,6 +165,7 @@ export interface PresentationContext {
 }
 export interface RenderContext extends PresentationContext {
   headingLevel: number;
+  blockId?: string;
 }
 export interface BrowserEntry {
   entry: string;

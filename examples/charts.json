@@ -1,0 +1,153 @@
+{
+  "schemaVersion": "1.0",
+  "title": "圖表與技術圖解",
+  "sections": [
+    {
+      "title": "資料與流程",
+      "blocks": [
+        {
+          "kind": "chart",
+          "title": "服務處理量（合成示例）",
+          "description": "示例資料，非實際績效。",
+          "chartType": "bar",
+          "unit": "件",
+          "categories": [
+            {
+              "key": "import",
+              "label": "文件匯入與格式整理"
+            },
+            {
+              "key": "validate",
+              "label": "資料驗證與錯誤回報"
+            },
+            {
+              "key": "compile",
+              "label": "報告編譯與輸出"
+            }
+          ],
+          "series": [
+            {
+              "key": "current",
+              "label": "本期",
+              "values": [128, 0, null]
+            },
+            {
+              "key": "previous",
+              "label": "前期",
+              "values": [104, -12, 112]
+            }
+          ],
+          "id": "volume",
+          "sourceIds": ["synthetic"]
+        },
+        {
+          "kind": "chart",
+          "title": "服務處理量比較（合成示例）",
+          "description": "示例資料，非實際績效。",
+          "chartType": "bar",
+          "unit": "件",
+          "categories": [
+            {
+              "key": "import",
+              "label": "文件匯入與格式整理"
+            },
+            {
+              "key": "validate",
+              "label": "資料驗證與錯誤回報"
+            },
+            {
+              "key": "compile",
+              "label": "報告編譯與輸出"
+            }
+          ],
+          "series": [
+            {
+              "key": "current",
+              "label": "本期",
+              "values": [128, 0, null]
+            },
+            {
+              "key": "previous",
+              "label": "前期",
+              "values": [104, -12, 112]
+            }
+          ],
+          "id": "comparison",
+          "orientation": "horizontal",
+          "sourceIds": ["synthetic"]
+        },
+        {
+          "kind": "chart",
+          "title": "每週處理量趨勢（合成示例）",
+          "description": "示例資料，非實際績效。",
+          "chartType": "line",
+          "unit": "件",
+          "categories": [
+            {
+              "key": "import",
+              "label": "第一週"
+            },
+            {
+              "key": "validate",
+              "label": "第二週"
+            },
+            {
+              "key": "compile",
+              "label": "第三週"
+            }
+          ],
+          "series": [
+            {
+              "key": "current",
+              "label": "本期",
+              "values": [128, null, 144]
+            },
+            {
+              "key": "previous",
+              "label": "前期",
+              "values": [104, 112, 130]
+            }
+          ],
+          "id": "trend",
+          "sourceIds": ["synthetic"]
+        },
+        {
+          "kind": "chart",
+          "title": "處理類別占比（合成示例）",
+          "description": "示例資料，非實際績效。",
+          "chartType": "donut",
+          "unit": "件",
+          "categories": [
+            {
+              "key": "import",
+              "label": "文件匯入與格式整理"
+            },
+            {
+              "key": "validate",
+              "label": "資料驗證與錯誤回報"
+            },
+            {
+              "key": "compile",
+              "label": "報告編譯與輸出"
+            }
+          ],
+          "series": [
+            {
+              "key": "volume",
+              "label": "件數",
+              "values": [128, 0, 112]
+            }
+          ],
+          "id": "share",
+          "sourceIds": ["synthetic"]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "synthetic",
+      "title": "本報告使用合成數據，僅示範圖表契約，並非實際績效。"
+    }
+  ]
+}

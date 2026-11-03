@@ -8,6 +8,22 @@ export type MindmapPalette = readonly [
   string,
   string,
 ];
+export type ChartPalette = readonly [
+  string,
+  string,
+  string,
+  string,
+  string,
+  string,
+];
+export const minimalChartPalette: ChartPalette = [
+  '#285744',
+  '#2463b5',
+  '#ad590f',
+  '#8545b3',
+  '#b3374f',
+  '#857000',
+];
 export const minimalMindmapPalette: MindmapPalette = [
   '#237747',
   '#2463b5',

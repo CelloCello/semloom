@@ -29,4 +29,9 @@ export const traditionalChinese: ReportMessages = Object.freeze({
   cards: '卡片',
   table: '表格',
   responsive: '自適應',
+  chartData: '圖表資料',
+  chartUnit: '單位：',
+  chartRange: '分類',
+  diagramSource: 'Mermaid 原始語法',
+  chartToggle: '顯示或隱藏數列',
 });
